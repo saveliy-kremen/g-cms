@@ -1,0 +1,32 @@
+<div class="register-page">
+  <div class="content">
+    <form class="register-form" #myForm="ngForm" (ngSubmit)="onRegister()">
+      <div class="text-center">
+        <h2 class="app-name">Material Admin</h2>
+      </div>
+      <div class="register-fields">
+        <mat-form-field>
+          <input matInput placeholder="Full name">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Email">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Phone">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="password" placeholder="Password">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="password" placeholder="Confirm password">
+        </mat-form-field>
+      </div>
+      <div>
+        <div class="register-fields">
+          <button type="submit" mat-raised-button color="primary" class="w-100">Register</button>
+          <button type="button" mat-button color="primary" class="w-100" routerLink="/login">Log In</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

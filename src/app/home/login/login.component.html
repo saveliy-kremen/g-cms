@@ -1,0 +1,28 @@
+<div class="login-page">
+  <div class="content">
+    <form class="login-form" #myForm="ngForm" (ngSubmit)="onLogin()">
+      <div class="text-center">
+        <h2 class="app-name">Material Admin</h2>
+      </div>
+      <div class="login-fields">
+        <mat-form-field>
+          <input matInput placeholder="Email">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="password" placeholder="Password">
+        </mat-form-field>
+      </div>
+      <div class="login-line">
+        <mat-checkbox color="primary">Remember Me</mat-checkbox>
+        <a routerLink="/forgot">Forgot Password</a>
+      </div>
+      <div>
+        <div class="login-fields">
+          <button type="submit" mat-raised-button color="primary" class="w-100">Login</button>
+          <button type="button" mat-button color="primary" class="w-100" routerLink="/register">Sign Up</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>

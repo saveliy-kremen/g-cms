@@ -5,6 +5,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AuthService } from './shared/services/auth.service';
+import { SessionService } from './shared/services/session.service';
 
 @NgModule({
   declarations: [
@@ -16,6 +18,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
     TranslateModule.forRoot()
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  providers: [AuthService, SessionService]
 })
 export class AppModule { }

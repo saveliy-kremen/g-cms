@@ -1,15 +1,26 @@
 <div class="login-page">
   <div class="content">
-    <form class="login-form" #myForm="ngForm" (ngSubmit)="onLogin()">
+    <form class="login-form" #myForm="ngForm" [formGroup]="loginForm" (ngSubmit)="submitLoginForm()">
       <div class="text-center">
         <h2 class="app-name">Material Admin</h2>
       </div>
+      <div class="alert alert-{{loginMessage.type}}" *ngIf="loginMessage">
+        {{loginMessage.text}}
+      </div>
       <div class="login-fields">
         <mat-form-field>
-          <input matInput placeholder="Email">
+          <input matInput formControlName="login" placeholder="Email">
+          <mat-error>
+            <validator-message [field]="loginForm.get('login')" [submitted]="loginFormSubmitted" title="login">
+            </validator-message>
+          </mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput type="password" placeholder="Password">
+          <input matInput type="password" formControlName="password" placeholder="Password">
+          <mat-error>
+            <validator-message [field]="loginForm.get('password')" [submitted]="loginFormSubmitted" title="password">
+            </validator-message>
+          </mat-error>
         </mat-form-field>
       </div>
       <div class="login-line">
@@ -22,7 +33,6 @@
           <button type="button" mat-button color="primary" class="w-100" routerLink="/register">Sign Up</button>
         </div>
       </div>
-
     </form>
   </div>
 </div>

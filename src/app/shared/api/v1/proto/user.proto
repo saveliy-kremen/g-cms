@@ -30,21 +30,13 @@ message AuthRequest {
   string password = 2;
 }
 
-message AuthResponse {
+message UserResponse {
   User user = 1;
   string token = 2;
 }
 
-message IsProfileCompleteResponse{
-  bool complete = 1;
-}
-
-message UserResponse {
-  User user = 1;
-}
-
 service UserService {
-  rpc Auth(AuthRequest) returns (AuthResponse);
+  rpc Auth(AuthRequest) returns (UserResponse);
   rpc Me(google.protobuf.Empty) returns (UserResponse);
-  rpc Register(RegisterRequest) returns (AuthResponse);
+  rpc Register(RegisterRequest) returns (UserResponse);
 }

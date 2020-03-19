@@ -13,7 +13,6 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 
 import {
   AuthRequest,
-  AuthResponse,
   RegisterRequest,
   UserResponse} from './user_pb';
 
@@ -37,18 +36,18 @@ export class UserServiceClient {
   }
 
   methodInfoAuth = new grpcWeb.AbstractClientBase.MethodInfo(
-    AuthResponse,
+    UserResponse,
     (request: AuthRequest) => {
       return request.serializeBinary();
     },
-    AuthResponse.deserializeBinary
+    UserResponse.deserializeBinary
   );
 
   auth(
     request: AuthRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: AuthResponse) => void) {
+               response: UserResponse) => void) {
     return this.client_.rpcCall(
       this.hostname_ +
         '/v1.UserService/Auth',
@@ -81,18 +80,18 @@ export class UserServiceClient {
   }
 
   methodInfoRegister = new grpcWeb.AbstractClientBase.MethodInfo(
-    AuthResponse,
+    UserResponse,
     (request: RegisterRequest) => {
       return request.serializeBinary();
     },
-    AuthResponse.deserializeBinary
+    UserResponse.deserializeBinary
   );
 
   register(
     request: RegisterRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: AuthResponse) => void) {
+               response: UserResponse) => void) {
     return this.client_.rpcCall(
       this.hostname_ +
         '/v1.UserService/Register',

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -38,7 +38,7 @@ func Interceptors() grpc.UnaryServerInterceptor {
 // context that is passed to the handler
 func AuthenticationInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (out interface{}, err error) {
 	methodParts := strings.Split(info.FullMethod, "/")
-	exceptions := []string{"Auth", "PhoneRegister"}
+	exceptions := []string{"Auth", "Register"}
 	_, found := utils.Find(exceptions, methodParts[len(methodParts)-1])
 	if found {
 		return handler(ctx, req)
@@ -50,7 +50,7 @@ func AuthenticationInterceptor(ctx context.Context, req interface{}, info *grpc.
 	}
 
 	tokenString, ok := md["authorization"]
-	if !ok || len(tokenString) < 1 {
+	if !ok || len(tokenString) < 1 || len(tokenString[0]) < 8 {
 		return nil, errGrpcUnauthenticated
 	}
 
@@ -85,7 +85,7 @@ func GetUserIDFromMetadata(ctx context.Context) (*uint, error) {
 	}
 
 	tokenString, ok := md["authorization"]
-	if !ok || len(tokenString) < 1 {
+	if !ok || len(tokenString) < 1 || len(tokenString[0]) < 8 {
 		return nil, errGrpcUnauthenticated
 	}
 

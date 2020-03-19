@@ -108,7 +108,7 @@ export namespace AuthRequest {
   }
 }
 
-export class AuthResponse extends jspb.Message {
+export class UserResponse extends jspb.Message {
   getUser(): User | undefined;
   setUser(value?: User): void;
   hasUser(): boolean;
@@ -116,45 +116,6 @@ export class AuthResponse extends jspb.Message {
 
   getToken(): string;
   setToken(value: string): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AuthResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: AuthResponse): AuthResponse.AsObject;
-  static serializeBinaryToWriter(message: AuthResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AuthResponse;
-  static deserializeBinaryFromReader(message: AuthResponse, reader: jspb.BinaryReader): AuthResponse;
-}
-
-export namespace AuthResponse {
-  export type AsObject = {
-    user?: User.AsObject,
-    token: string,
-  }
-}
-
-export class IsProfileCompleteResponse extends jspb.Message {
-  getComplete(): boolean;
-  setComplete(value: boolean): void;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): IsProfileCompleteResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: IsProfileCompleteResponse): IsProfileCompleteResponse.AsObject;
-  static serializeBinaryToWriter(message: IsProfileCompleteResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): IsProfileCompleteResponse;
-  static deserializeBinaryFromReader(message: IsProfileCompleteResponse, reader: jspb.BinaryReader): IsProfileCompleteResponse;
-}
-
-export namespace IsProfileCompleteResponse {
-  export type AsObject = {
-    complete: boolean,
-  }
-}
-
-export class UserResponse extends jspb.Message {
-  getUser(): User | undefined;
-  setUser(value?: User): void;
-  hasUser(): boolean;
-  clearUser(): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): UserResponse.AsObject;
@@ -167,6 +128,7 @@ export class UserResponse extends jspb.Message {
 export namespace UserResponse {
   export type AsObject = {
     user?: User.AsObject,
+    token: string,
   }
 }
 

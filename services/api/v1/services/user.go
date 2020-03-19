@@ -1,6 +1,7 @@
 package services
 
 import (
+	"log"
 	"time"
 
 	_ "image/png"
@@ -31,13 +32,17 @@ type UserServiceImpl struct {
 }
 
 // Get User profile or create if not found.
-func (u *UserServiceImpl) Auth(ctx context.Context, req *v1.AuthRequest) (*v1.AuthResponse, error) {
+func (u *UserServiceImpl) Auth(ctx context.Context, req *v1.AuthRequest) (*v1.UserResponse, error) {
 	user := models.User{}
-	if db.DB.First(&user).RecordNotFound() {
-		db.DB.Create(&user)
+	if db.DB.Where("email = ?", req.Login).First(&user).RecordNotFound() {
+		return nil, status.Errorf(codes.PermissionDenied, "User not exist")
+	}
+	if !auth.ComparePasswords(user.Password, []byte(req.Password)) {
+		log.Println("err")
+		return nil, status.Errorf(codes.PermissionDenied, "Wrong password")
 	}
 	token := auth.CreateToken(user.ID)
-	resp := &v1.AuthResponse{User: models.UserToResponse(user),
+	resp := &v1.UserResponse{User: models.UserToResponse(user),
 		Token: token,
 	}
 	return resp, nil
@@ -46,15 +51,20 @@ func (u *UserServiceImpl) Auth(ctx context.Context, req *v1.AuthRequest) (*v1.Au
 // Get User profile or create if not found.
 func (u *UserServiceImpl) Me(ctx context.Context, req *empty.Empty) (*v1.UserResponse, error) {
 	user := auth.GetUser(ctx)
-	resp := &v1.UserResponse{User: models.UserToResponse(user)}
-
+	token := auth.CreateToken(user.ID)
+	resp := &v1.UserResponse{User: models.UserToResponse(user),
+		Token: token,
+	}
 	return resp, nil
 }
 
 // Get User profile or create if not found.
-func (u *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest) (*v1.AuthResponse, error) {
+func (u *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest) (*v1.UserResponse, error) {
 	user := models.User{}
 
+	if !db.DB.Where("email = ?", req.Email).First(&user).RecordNotFound() {
+		return nil, status.Errorf(codes.AlreadyExists, "User already exist")
+	}
 	user.Fullname = req.Fullname
 	user.Phone = req.Phone
 	user.Email = req.Email
@@ -63,11 +73,10 @@ func (u *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest)
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 	token := auth.CreateToken(user.ID)
-	resp := &v1.AuthResponse{
+	resp := &v1.UserResponse{
 		User:  models.UserToResponse(user),
 		Token: token,
 	}
-
 	return resp, nil
 }
 

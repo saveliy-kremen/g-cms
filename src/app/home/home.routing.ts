@@ -9,7 +9,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 export const HomeRoutes: Routes = [
   {
     path: '', component: HomeLayoutComponent, children: [
-      { path: '', component: IndexComponent },
+      { path: '', component: LoginComponent },
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'forgot', component: ForgotPasswordComponent },

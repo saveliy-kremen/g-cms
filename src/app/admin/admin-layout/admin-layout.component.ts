@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserResponse, User } from 'src/app/shared/api/v1/user_pb';
+import { User } from 'src/app/shared/api/v1/user_pb';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
@@ -12,7 +12,7 @@ export class AdminLayoutComponent implements OnInit {
   showMenu = false;
   sideNavOpened = true;
   sideNavMode: 'side' | 'over' = 'side';
-  user: User
+  user: User.AsObject
 
   constructor(
     private authService: AuthService,

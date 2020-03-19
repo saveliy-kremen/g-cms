@@ -9,6 +9,14 @@
 // Be sure that you only ever include this mixin once!
 @include mat-core();
 
+:root {
+    --primary-color: #dc3545;
+    --dark-color: #333333;
+    --light-color: #f4f4f4;
+    --danger-color: #dc3545;
+    --success-color: #28a745;
+  }
+
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
@@ -30,3 +38,60 @@ $admin-theme: mat-light-theme($admin-primary, $admin-accent, $admin-warn);
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.alert {
+    padding: 0.7rem;
+    margin: 1rem 0;
+    opacity: 0.9;
+    background: var(--light-color);
+    color: #333;
+  }
+  
+  .btn-primary,
+  .bg-primary,
+  .badge-primary,
+  .alert-primary {
+    background: var(--primary-color);
+    color: #fff;
+  }
+  
+  .btn-light,
+  .bg-light,
+  .badge-light,
+  .alert-light {
+    background: var(--light-color);
+    color: #333;
+  }
+  
+  .btn-dark,
+  .bg-dark,
+  .badge-dark,
+  .alert-dark {
+    background: var(--dark-color);
+    color: #fff;
+  }
+  
+  .btn-danger,
+  .bg-danger,
+  .badge-danger,
+  .alert-danger {
+    background: var(--danger-color);
+    color: #fff;
+  }
+  
+  .btn-success,
+  .bg-success,
+  .badge-success,
+  .alert-success {
+    background: var(--success-color);
+    color: #fff;
+  }
+  
+  .btn-white,
+  .bg-white,
+  .badge-white,
+  .alert-white {
+    background: #fff;
+    color: #333;
+    border: #ccc solid 1px;
+  }

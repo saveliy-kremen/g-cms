@@ -1,24 +1,50 @@
 <div class="register-page">
   <div class="content">
-    <form class="register-form" #myForm="ngForm" (ngSubmit)="onRegister()">
+    <form class="register-form" #myForm="ngForm" [formGroup]="registerForm" (ngSubmit)="submitRegisterForm()">
       <div class="text-center">
         <h2 class="app-name">Material Admin</h2>
       </div>
+      <div class="alert alert-{{registerMessage.type}}" *ngIf="registerMessage">
+        {{registerMessage.text}}
+      </div>
       <div class="register-fields">
         <mat-form-field>
-          <input matInput placeholder="Full name">
+          <input matInput formControlName="fullname" placeholder="Full name">
+          <mat-error>
+            <validator-message [field]="registerForm.get('fullname')" [submitted]="registerFormSubmitted"
+              title="fullname">
+            </validator-message>
+          </mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Email">
+          <input matInput formControlName="email" placeholder="Email">
+          <mat-error>
+            <validator-message [field]="registerForm.get('email')" [submitted]="registerFormSubmitted" title="email">
+            </validator-message>
+          </mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Phone">
+          <input matInput formControlName="phone" placeholder="Phone">
+          <mat-error>
+            <validator-message [field]="registerForm.get('phone')" [submitted]="registerFormSubmitted" title="phone">
+            </validator-message>
+          </mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput type="password" placeholder="Password">
+          <input matInput formControlName="password" type="password" placeholder="Password">
+          <mat-error>
+            <validator-message [field]="registerForm.get('password')" [submitted]="registerFormSubmitted"
+              title="password">
+            </validator-message>
+          </mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput type="password" placeholder="Confirm password">
+          <input matInput formControlName="confirmPassword" type="password" placeholder="Confirm password">
+          <mat-error>
+            <validator-message [field]="registerForm.get('confirmPassword')" [submitted]="registerFormSubmitted"
+              title="confirm password">
+            </validator-message>
+          </mat-error>
         </mat-form-field>
       </div>
       <div>

@@ -6,8 +6,7 @@ import { AdminRoutes } from './admin.routing';
 import { AdminLayoutComponent } from './admin-layout/admin-layout.component';
 import { IndexComponent } from './index/index.component';
 import { MaterialModule } from '../shared/material/material.module';
-
-
+import { UserGrpcService } from '../shared/services/user.service';
 
 @NgModule({
   declarations: [AdminLayoutComponent, IndexComponent],
@@ -18,6 +17,6 @@ import { MaterialModule } from '../shared/material/material.module';
   ],
   exports: [
     MaterialModule,
-  ]
+  ],
 })
 export class AdminModule { }

@@ -1,0 +1,15 @@
+{
+	"Name": "gcms",
+	"Port": 2090,
+	"EnvoyPort": 2091,
+	"UploadPort": 2092,
+	"Host": "http://alllead.best/",
+	"Domain": "@alllead.best",
+	"Prefix": "g",
+	"User": "newud_gcms",
+	"Dbname": "newud_gcms",
+	"Password": "MKTG853Vup",
+	"UploadPath": "../upload",
+	"JWTKey": "2Ye5_w1z3zpD4dSGdRp3s98ZipCNQqmsHRB9vioOx54",
+	"JWTExpire": 96
+}

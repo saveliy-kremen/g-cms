@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { User } from 'src/app/shared/api/v1/user_pb';
+import { Router } from '@angular/router';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -9,18 +12,27 @@ export class AdminLayoutComponent implements OnInit {
   showMenu = false;
   sideNavOpened = true;
   sideNavMode: 'side' | 'over' = 'side';
+  user: User.AsObject
 
-  constructor() { }
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
+    this.authService.userChange.subscribe((value) => {
+      this.user = value
+    }, (err) => {
+      console.log(err)
+    })
   }
 
   toggleSidebar() {
     this.sideNavOpened = !this.sideNavOpened;
   }
 
-  onLoggedout() {
-    //localStorage.removeItem('isLoggedin');
-    //this.router.navigate(['/login']);
+  onLogout() {
+    this.authService.logout()
+    this.router.navigate(['/login'])
   }
 }

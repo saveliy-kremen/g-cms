@@ -18,7 +18,7 @@
     <mat-menu #profile="matMenu" [overlapTrigger]="false">
       <button mat-menu-item>
         <mat-icon>person</mat-icon>
-        <span>Profile</span>
+        <span>{{user?.fullname}}</span>
       </button>
       <button mat-menu-item>
         <mat-icon>inbox</mat-icon>
@@ -29,7 +29,7 @@
         <span>Settings</span>
       </button>
     </mat-menu>
-    <button mat-icon-button (click)="onLoggedout()">
+    <button mat-icon-button (click)="onLogout()">
       <mat-icon>exit_to_app</mat-icon>
     </button>
   </mat-toolbar>

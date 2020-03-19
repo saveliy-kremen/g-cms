@@ -1,0 +1,2 @@
+docker build -t g-cms_envoy:v1 .
+docker run  -p 2091:2091 --net=host  g-cms_envoy:v1

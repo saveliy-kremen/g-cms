@@ -15,16 +15,16 @@ const (
 type User struct {
 	gorm.Model
 
-	Fullname  string  `json:"fullname"`
-	Phone     string  `json:"phone"`
-	Email     string  `json:"email"`
-	Password  string  `json:"password"`
-	Photo     string  `json:"photo"`
-	Role      uint    `json:"role"`
-	Trademark string  `json:"trademark"`
-	Tariff    uint    `json:"tariff"`
-	Amount    float32 `json:"amount" sql:"type:decimal(10,2)"`
-	About     string  `json:"about"`
+	Fullname  string
+	Phone     string
+	Email     string
+	Password  string
+	Photo     string
+	Role      uint
+	Trademark string
+	Tariff    uint
+	Amount    float32 `sql:"type:decimal(10,2)"`
+	About     string
 }
 
 func UserToResponse(user User) *v1.User {

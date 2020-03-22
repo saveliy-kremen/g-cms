@@ -26,6 +26,6 @@ func init() {
 		log.Fatal("Could not connecto to database ", err)
 	}
 	DB.DB().SetMaxIdleConns(0)
-	DB.AutoMigrate(&models.User{})
+	DB.AutoMigrate(&models.User{}, &models.Category{})
 	//DB.LogMode(true)
 }

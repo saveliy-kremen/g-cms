@@ -11,7 +11,6 @@ import { ValidationModule } from '../shared/validation/validation.module';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
-import { UserGrpcService } from '../shared/services/user.service';
 
 @NgModule({
   declarations: [HomeLayoutComponent, IndexComponent, RegisterComponent, LoginComponent, ForgotPasswordComponent],

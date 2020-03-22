@@ -22,5 +22,6 @@ import { CategoriesComponent } from './categories/categories.component';
     MaterialModule,
     TranslateModule,
   ],
+  providers: [UserGrpcService]
 })
 export class AdminModule { }

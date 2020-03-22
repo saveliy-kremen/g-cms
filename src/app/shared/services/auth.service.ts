@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject, Observable, Observer } from 'rxjs';
+import { Observable, Observer, BehaviorSubject } from 'rxjs';
 
 import { SessionService } from 'src/app/shared/services/session.service';
 import { User } from 'src/app/shared/api/v1/user_pb';
@@ -10,7 +10,7 @@ export class AuthService {
   private isAuthenticated = false;
   private user: User.AsObject;
 
-  userChange: Subject<User.AsObject> = new Subject<User.AsObject>();
+  userChange: BehaviorSubject<User.AsObject> = new BehaviorSubject<User.AsObject>(null);
 
   constructor(
     private session: SessionService,

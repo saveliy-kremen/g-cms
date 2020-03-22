@@ -56,6 +56,10 @@
   bottom: 0;
   left: 0;
   right: 0;
+  .nav-link {
+    color: white;
+    text-decoration: none;
+  }
   .sidenav-container {
     flex: 1;
     background: $main-background-color;
@@ -69,6 +73,7 @@
       flex-direction: column;
       .main-container {
         flex: 1;
+        padding-left: 20px;
       }
       .page-footer {
         padding: 10px;

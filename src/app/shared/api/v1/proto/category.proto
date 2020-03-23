@@ -26,10 +26,24 @@ message Category{
   string seoKeywords = 12;
 }
 
+message AddCategoryRequest {
+  string id = 1;
+  string parent = 2;
+  string text = 3;
+}
+
+message DeleteCategoryRequest {
+  string id = 1;
+}
+
 message CategoriesResponse {
   repeated Category categories = 1;
 }
 
 service CategoryService {
   rpc Categories(google.protobuf.Empty) returns (CategoriesResponse);
+  rpc AddCategory(AddCategoryRequest) returns (CategoriesResponse);
+  rpc AddCategoryBefore(AddCategoryRequest) returns (CategoriesResponse);
+  rpc AddCategoryAfter(AddCategoryRequest) returns (CategoriesResponse);
+  rpc DeleteCategory(DeleteCategoryRequest) returns (CategoriesResponse);
 }

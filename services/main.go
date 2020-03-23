@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
+	"google.golang.org/grpc"
 	"net"
 	"net/http"
 	"os"
 	"strconv"
-
-	"google.golang.org/grpc"
 
 	v1 "./api/v1"
 	"./api/v1/services"

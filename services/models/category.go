@@ -46,3 +46,16 @@ func CategoryToResponse(category Category) *v1.Category {
 		SeoKeywords:    category.SeoKeywords,
 	}
 }
+
+func CategoriesToResponse(categories []Category) []*v1.Category {
+	respCategories := []*v1.Category{}
+	for _, category := range categories {
+		if category.Parent == "#" {
+			category.Opened = true
+		} else {
+			category.Opened = false
+		}
+		respCategories = append(respCategories, CategoryToResponse(category))
+	}
+	return respCategories
+}

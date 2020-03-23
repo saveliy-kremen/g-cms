@@ -5,8 +5,8 @@ import { CategoryGrpcService } from 'src/app/shared/services/category.service';
 //Browser
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 
 declare var $: any;
 
@@ -30,6 +30,7 @@ export class CategoriesComponent implements OnInit {
   constructor(
     private categoryService: CategoryGrpcService,
     private translateService: TranslateService,
+    private modalService: ModalService,
     @Inject(PLATFORM_ID) platformId
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -40,11 +41,7 @@ export class CategoriesComponent implements OnInit {
       try {
         let res = await this.categoryService.categories().toPromise()
         this.categoriesData = res.categoriesList
-        for (let i = 0; i < this.categoriesData.length; i++) {
-          if (this.categoriesData[i].parent === "#") {
-            this.categoriesData[i].text = await this.translateService.get(this.categoriesData[i].text).toPromise();
-          }
-        }
+        await this.categoriesTranslate();
         $('#categoryTree').jstree({
           'core': {
             'data': this.categoriesData,
@@ -74,10 +71,19 @@ export class CategoriesComponent implements OnInit {
     }
   }
 
+  async categoriesTranslate() {
+    for (let i = 0; i < this.categoriesData.length; i++) {
+      if (this.categoriesData[i].parent === "#") {
+        this.categoriesData[i].text = await this.translateService.get(this.categoriesData[i].text).toPromise();
+      }
+    }
+  }
+
   async addCategory(data) {
     try {
-      //const res: any = await this.graphql.addCategory(data.id, data.parent, data.text, null);
-      //this.categoriesData = res.data.addCategory;
+      let res = await this.categoryService.addCategory(data).toPromise()
+      this.categoriesData = res.categoriesList
+      await this.categoriesTranslate();
       $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
       $('#categoryTree').jstree(true).refresh();
     } catch (err) {
@@ -88,8 +94,9 @@ export class CategoriesComponent implements OnInit {
 
   async addCategoryBefore(data) {
     try {
-      //const res: any = await this.graphql.addCategoryBefore(data.id, data.parent, data.text, null);
-      //this.categoriesData = res.data.addCategoryBefore;
+      let res = await this.categoryService.addCategoryBefore(data).toPromise()
+      this.categoriesData = res.categoriesList
+      await this.categoriesTranslate();
       $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
       $('#categoryTree').jstree(true).refresh();
     } catch (err) {
@@ -100,8 +107,9 @@ export class CategoriesComponent implements OnInit {
 
   async addCategoryAfter(data) {
     try {
-      //const res: any = await this.graphql.addCategoryAfter(data.id, data.parent, data.text, null);
-      //this.categoriesData = res.data.addCategoryAfter;
+      let res = await this.categoryService.addCategoryAfter(data).toPromise()
+      this.categoriesData = res.categoriesList
+      await this.categoriesTranslate();
       $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
       $('#categoryTree').jstree(true).refresh();
     } catch (err) {
@@ -113,18 +121,26 @@ export class CategoriesComponent implements OnInit {
   deleteCategoryConfirm(id) {
     this.categoryID = id;
     const category = this.categoriesData.filter(item => item.id === id)[0];
-    this.modalCategoryDeleteTitle = "Delete Category";
-    this.modalCategoryDeleteText = `Delete category "${category.text}" ?`;
-    $('#modalCategoryDelete').modal('show');
+    const modalData = {
+      title: "Delete Category",
+      text: `Delete category "${category.text}" ?`,
+      callBackFunction: this.deleteCategory.bind(this)
+    };
+    this.modalService.showModal(modalData);
   }
 
-  async deleteCategory() {
+  async deleteCategory(confirm) {
     try {
-      //const res: any = await this.graphql.deleteCategory(this.categoryID);
-      //this.categoriesData = res.data.categoryDelete;
-      $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
-      $('#categoryTree').jstree(true).refresh();
-      $('#modalCategoryDelete').modal('hide');
+      if (confirm) {
+        console.log("delete")
+        /*
+        let res = await this.categoryService.deleteCategory(this.categoryID).toPromise()
+        this.categoriesData = res.categoriesList
+        await this.categoriesTranslate();
+        */
+        $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
+        $('#categoryTree').jstree(true).refresh();
+      }
     } catch (err) {
       console.log(err)
       $('#categoryTree').jstree(true).refresh();

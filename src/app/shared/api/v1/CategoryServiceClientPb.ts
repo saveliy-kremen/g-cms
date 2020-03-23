@@ -11,7 +11,10 @@ import * as grpcWeb from 'grpc-web';
 
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 
-import {CategoriesResponse} from './category_pb';
+import {
+  AddCategoryRequest,
+  CategoriesResponse,
+  DeleteCategoryRequest} from './category_pb';
 
 export class CategoryServiceClient {
   client_: grpcWeb.AbstractClientBase;
@@ -51,6 +54,94 @@ export class CategoryServiceClient {
       request,
       metadata || {},
       this.methodInfoCategories,
+      callback);
+  }
+
+  methodInfoAddCategory = new grpcWeb.AbstractClientBase.MethodInfo(
+    CategoriesResponse,
+    (request: AddCategoryRequest) => {
+      return request.serializeBinary();
+    },
+    CategoriesResponse.deserializeBinary
+  );
+
+  addCategory(
+    request: AddCategoryRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: CategoriesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.CategoryService/AddCategory',
+      request,
+      metadata || {},
+      this.methodInfoAddCategory,
+      callback);
+  }
+
+  methodInfoAddCategoryBefore = new grpcWeb.AbstractClientBase.MethodInfo(
+    CategoriesResponse,
+    (request: AddCategoryRequest) => {
+      return request.serializeBinary();
+    },
+    CategoriesResponse.deserializeBinary
+  );
+
+  addCategoryBefore(
+    request: AddCategoryRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: CategoriesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.CategoryService/AddCategoryBefore',
+      request,
+      metadata || {},
+      this.methodInfoAddCategoryBefore,
+      callback);
+  }
+
+  methodInfoAddCategoryAfter = new grpcWeb.AbstractClientBase.MethodInfo(
+    CategoriesResponse,
+    (request: AddCategoryRequest) => {
+      return request.serializeBinary();
+    },
+    CategoriesResponse.deserializeBinary
+  );
+
+  addCategoryAfter(
+    request: AddCategoryRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: CategoriesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.CategoryService/AddCategoryAfter',
+      request,
+      metadata || {},
+      this.methodInfoAddCategoryAfter,
+      callback);
+  }
+
+  methodInfoDeleteCategory = new grpcWeb.AbstractClientBase.MethodInfo(
+    CategoriesResponse,
+    (request: DeleteCategoryRequest) => {
+      return request.serializeBinary();
+    },
+    CategoriesResponse.deserializeBinary
+  );
+
+  deleteCategory(
+    request: DeleteCategoryRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: CategoriesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.CategoryService/DeleteCategory',
+      request,
+      metadata || {},
+      this.methodInfoDeleteCategory,
       callback);
   }
 

@@ -1,5 +1,9 @@
 package utils
 
+import (
+	"regexp"
+)
+
 func Find(slice []string, val string) (int, bool) {
 	for i, item := range slice {
 		if item == val {
@@ -7,4 +11,90 @@ func Find(slice []string, val string) (int, bool) {
 		}
 	}
 	return -1, false
+}
+
+func Translit(s string) string {
+	var translations = map[string]string{
+		"А":   "A",
+		"а":   "a",
+		"Б":   "B",
+		"б":   "b",
+		"В":   "V",
+		"в":   "v",
+		"Г":   "G",
+		"г":   "g",
+		"Д":   "D",
+		"д":   "d",
+		"Е":   "E",
+		"е":   "e",
+		"Є":   "Ye",
+		"є":   "ie",
+		"Ё":   "Yo",
+		"ё":   "yo",
+		"Ж":   "Zh",
+		"ж":   "zh",
+		"З":   "Z",
+		"з":   "z",
+		"И":   "I",
+		"и":   "i",
+		"Й":   "J",
+		"й":   "j",
+		"І":   "I",
+		"і":   "i",
+		"Ї":   "Yi",
+		"ї":   "yi",
+		"К":   "K",
+		"к":   "k",
+		"Л":   "L",
+		"л":   "l",
+		"М":   "M",
+		"м":   "m",
+		"Н":   "N",
+		"н":   "n",
+		"О":   "O",
+		"о":   "o",
+		"П":   "P",
+		"п":   "p",
+		"Р":   "R",
+		"р":   "r",
+		"С":   "S",
+		"с":   "s",
+		"Т":   "T",
+		"т":   "t",
+		"У":   "U",
+		"у":   "u",
+		"Ф":   "F",
+		"ф":   "f",
+		"Х":   "H",
+		"х":   "h",
+		"Ц":   "C",
+		"ц":   "c",
+		"Ч":   "Ch",
+		"ч":   "ch",
+		"Ш":   "Sh",
+		"ш":   "sh",
+		"Щ":   "Shh",
+		"щ":   "shh",
+		"ь":   "",
+		"ъ":   "",
+		"Ы":   "Y",
+		"ы":   "y",
+		"Э":   "Je",
+		"э":   "je",
+		"Ю":   "Yu",
+		"ю":   "yu",
+		"Я":   "Ya",
+		"я":   "ya",
+		" ":   "_",
+		"\\.": "",
+		"/":   "_",
+		"&":   "and",
+	}
+
+	translate_string := s
+	for k, v := range translations {
+		r, _ := regexp.Compile(k)
+		translate_string = r.ReplaceAllString(translate_string, v)
+	}
+	return translate_string
 }

@@ -9,6 +9,7 @@ import { IndexComponent } from './index/index.component';
 import { MaterialModule } from '../shared/material/material.module';
 import { UserGrpcService } from '../shared/services/user.service';
 import { CategoriesComponent } from './categories/categories.component';
+import { ModalModule } from '../shared/modal/modal.module';
 
 @NgModule({
   declarations: [AdminLayoutComponent, IndexComponent, CategoriesComponent],
@@ -16,12 +17,8 @@ import { CategoriesComponent } from './categories/categories.component';
     CommonModule,
     MaterialModule,
     TranslateModule,
+    ModalModule,
     RouterModule.forChild(AdminRoutes),
   ],
-  exports: [
-    MaterialModule,
-    TranslateModule,
-  ],
-  providers: [UserGrpcService]
 })
 export class AdminModule { }

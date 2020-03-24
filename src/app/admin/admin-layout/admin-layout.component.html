@@ -33,6 +33,7 @@
       <mat-icon>exit_to_app</mat-icon>
     </button>
   </mat-toolbar>
+  <mat-progress-bar mode="query" *ngIf="loading"></mat-progress-bar>
 
   <mat-sidenav-container class="sidenav-container">
     <mat-sidenav #snav class="sidenav mat-elevation-z10" [(mode)]="sideNavMode" [(opened)]="sideNavOpened">

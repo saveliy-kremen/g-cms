@@ -95,3 +95,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: #333;
     border: #ccc solid 1px;
   }
+
+.vakata-context, .vakata-context ul, #jstree-marker {
+  z-index: 3;
+}

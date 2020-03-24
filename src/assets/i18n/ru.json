@@ -1,4 +1,12 @@
 {
   "Categories": "Категории",
-  "Import": "Импорт"
+  "Import": "Импорт",
+  "Delete Сategory": "Удаление категории",
+  "Delete сategory": "Удалить категорию",
+  "Insert": "Вставить",
+  "Insert before": "Вставить перед",
+  "Insert after": "Вставить после",
+  "New category": "Новая категория",
+  "Edit": "Редактировать",
+  "Delete": "Удалить"
 }

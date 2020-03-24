@@ -1,12 +1,13 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 
-import { Category } from 'src/app/shared/api/v1/category_pb';
 import { CategoryGrpcService } from 'src/app/shared/services/category.service';
+import { TranslateService } from '@ngx-translate/core';
+import { ModalService } from 'src/app/shared/modal/modal.service';
+import { LoaderService } from 'src/app/shared/services/loader.service';
+import { Observable } from 'rxjs';
 //Browser
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { TranslateService } from '@ngx-translate/core';
-import { ModalService } from 'src/app/shared/modal/modal.service';
 
 declare var $: any;
 
@@ -16,46 +17,63 @@ declare var $: any;
   styleUrls: ['./categories.component.scss']
 })
 export class CategoriesComponent implements OnInit {
-  isBrowser: boolean;
-  @ViewChild('treeComponent') treeComponent;
+  isBrowser: boolean
+  @ViewChild('treeComponent') treeComponent
 
-  categoriesData: any;
-  categoryID: string;
+  categoriesData: any
+  categoryID: string
+  loader$: Observable<any>
+  translates: {}
 
   //modal
-  modalCategoryDeleteTitle: string;
-  modalCategoryDeleteText: string;
-  modalCategoryDeleteButtons: any = [{ title: "Delete", handler: this.deleteCategory.bind(this) }];
+  modalCategoryDeleteTitle: string
+  modalCategoryDeleteText: string
+  modalCategoryDeleteButtons: any = [{ title: "Delete", handler: this.deleteCategory.bind(this) }]
 
   constructor(
     private categoryService: CategoryGrpcService,
     private translateService: TranslateService,
     private modalService: ModalService,
+    private loaderService: LoaderService,
     @Inject(PLATFORM_ID) platformId
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
   async ngOnInit() {
+    this.loaderService.showLoader()
     if (this.isBrowser) {
       try {
         let res = await this.categoryService.categories().toPromise()
         this.categoriesData = res.categoriesList
         await this.categoriesTranslate();
+        this.translates = {
+          "New category": await this.translateService.get("New category").toPromise(),
+          "Insert": await this.translateService.get("Insert").toPromise(),
+          "Insert before": await this.translateService.get("Insert before").toPromise(),
+          "Insert after": await this.translateService.get("Insert after").toPromise(),
+          "Edit": await this.translateService.get("Edit").toPromise(),
+          "Delete": await this.translateService.get("Delete").toPromise(),
+          "Delete Category": await this.translateService.get("Delete Сategory").toPromise(),
+          "Delete category": await this.translateService.get("Delete category").toPromise()
+        }
         $('#categoryTree').jstree({
           'core': {
             'data': this.categoriesData,
             check_callback: async function (op, node, parent, position, more) {
               if (op === "move_node" && more && more.core) {
+                this.loaderService.showLoader()
                 try {
-                  //const res: any = await this.graphql.categoryMoveNode(node.id, parent.id != "#" ? parent.id : null, position);
-                  //this.categoriesData = res.data.categoryMoveNode;
+                  let res = await this.categoryService.moveCategory({ id: node.id, parent: parent.id, position: position }).toPromise()
+                  this.categoriesData = res.categoriesList
+                  await this.categoriesTranslate();
                   $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
                   $('#categoryTree').jstree(true).refresh();
                 } catch (err) {
                   console.log(err)
                   $('#categoryTree').jstree(true).refresh();
                 }
+                this.loaderService.hideLoader()
                 return true;
               }
             }.bind(this)
@@ -69,6 +87,7 @@ export class CategoriesComponent implements OnInit {
         console.log(err)
       }
     }
+    this.loaderService.hideLoader()
   }
 
   async categoriesTranslate() {
@@ -80,6 +99,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   async addCategory(data) {
+    this.loaderService.showLoader()
     try {
       let res = await this.categoryService.addCategory(data).toPromise()
       this.categoriesData = res.categoriesList
@@ -90,9 +110,11 @@ export class CategoriesComponent implements OnInit {
       console.log(err)
       $('#categoryTree').jstree(true).refresh();
     }
+    this.loaderService.hideLoader()
   }
 
   async addCategoryBefore(data) {
+    this.loaderService.showLoader()
     try {
       let res = await this.categoryService.addCategoryBefore(data).toPromise()
       this.categoriesData = res.categoriesList
@@ -103,9 +125,11 @@ export class CategoriesComponent implements OnInit {
       console.log(err)
       $('#categoryTree').jstree(true).refresh();
     }
+    this.loaderService.hideLoader()
   }
 
   async addCategoryAfter(data) {
+    this.loaderService.showLoader()
     try {
       let res = await this.categoryService.addCategoryAfter(data).toPromise()
       this.categoriesData = res.categoriesList
@@ -116,28 +140,27 @@ export class CategoriesComponent implements OnInit {
       console.log(err)
       $('#categoryTree').jstree(true).refresh();
     }
+    this.loaderService.hideLoader()
   }
 
-  deleteCategoryConfirm(id) {
+  async deleteCategoryConfirm(id) {
     this.categoryID = id;
     const category = this.categoriesData.filter(item => item.id === id)[0];
     const modalData = {
-      title: "Delete Category",
-      text: `Delete category "${category.text}" ?`,
+      title: this.translates["Delete Category"],
+      text: `${this.translates["Delete Category"]} "${category.text}" ?`,
       callBackFunction: this.deleteCategory.bind(this)
     };
     this.modalService.showModal(modalData);
   }
 
   async deleteCategory(confirm) {
+    this.loaderService.showLoader()
     try {
       if (confirm) {
-        console.log("delete")
-        /*
         let res = await this.categoryService.deleteCategory(this.categoryID).toPromise()
         this.categoriesData = res.categoriesList
         await this.categoriesTranslate();
-        */
         $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
         $('#categoryTree').jstree(true).refresh();
       }
@@ -145,47 +168,48 @@ export class CategoriesComponent implements OnInit {
       console.log(err)
       $('#categoryTree').jstree(true).refresh();
     }
+    this.loaderService.hideLoader()
   }
 
   customMenu(node) {
     var items = {
       insertItem: {
-        label: "Вставить",
-        icon: "glyphicon glyphicon-menu-down",
+        label: this.translates["Insert"],
+        icon: "glyphicon glyphicon-chevron-right",
         action: function (data) {
           var inst = $.jstree.reference(data.reference),
             obj = inst.get_node(data.reference);
           inst.create_node(obj, {}, "last", function (new_node) {
-            inst.edit(new_node, 'Новая категория', this.addCategory.bind(this));
+            inst.edit(new_node, this.translates["New category"], this.addCategory.bind(this));
           }.bind(this));
         }.bind(this)
       },
       beforeItem: {
-        label: "Вставить перед",
-        icon: "glyphicon glyphicon-menu-left",
+        label: this.translates["Insert before"],
+        icon: "glyphicon glyphicon-chevron-up",
         _disabled: node.parent == '#',
         action: function (data) {
           var inst = $.jstree.reference(data.reference),
             obj = inst.get_node(data.reference);
           inst.create_node(obj, {}, "first", function (new_node) {
-            inst.edit(new_node, 'Новая категория', this.addCategoryBefore.bind(this));
+            inst.edit(new_node, this.translates["New category"], this.addCategoryBefore.bind(this));
           }.bind(this));
         }.bind(this)
       },
       afterItem: {
-        label: "Вставить после",
-        icon: "glyphicon glyphicon-menu-right",
+        label: this.translates["Insert after"],
+        icon: "glyphicon glyphicon-chevron-down",
         _disabled: node.parent == '#',
         action: function (data) {
           var inst = $.jstree.reference(data.reference),
             obj = inst.get_node(data.reference);
           inst.create_node(obj, {}, "last", function (new_node) {
-            inst.edit(new_node, 'Новая категория', this.addCategoryAfter.bind(this));
+            inst.edit(new_node, this.translates["New category"], this.addCategoryAfter.bind(this));
           }.bind(this));
         }.bind(this)
       },
       renameItem: {
-        label: "Редактировать",
+        label: this.translates["Edit"],
         icon: "glyphicon glyphicon-edit",
         separator_before: true,
         _disabled: node.parent == '#',
@@ -194,7 +218,7 @@ export class CategoriesComponent implements OnInit {
         }.bind(this)
       },
       deleteItem: {
-        label: "Удалить",
+        label: this.translates["Delete"],
         icon: "glyphicon glyphicon-trash",
         _disabled: node.parent == '#',
         action: () => this.deleteCategoryConfirm(node.id)

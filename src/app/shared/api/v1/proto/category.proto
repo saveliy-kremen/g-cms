@@ -36,6 +36,12 @@ message DeleteCategoryRequest {
   string id = 1;
 }
 
+message MoveCategoryRequest {
+  string id = 1;
+  string parent = 2;
+  uint32 position = 3;
+}
+
 message CategoriesResponse {
   repeated Category categories = 1;
 }
@@ -46,4 +52,5 @@ service CategoryService {
   rpc AddCategoryBefore(AddCategoryRequest) returns (CategoriesResponse);
   rpc AddCategoryAfter(AddCategoryRequest) returns (CategoriesResponse);
   rpc DeleteCategory(DeleteCategoryRequest) returns (CategoriesResponse);
+  rpc MoveCategory(MoveCategoryRequest) returns (CategoriesResponse);
 }

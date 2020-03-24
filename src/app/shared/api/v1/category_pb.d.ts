@@ -136,6 +136,32 @@ export namespace DeleteCategoryRequest {
   }
 }
 
+export class MoveCategoryRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getParent(): string;
+  setParent(value: string): void;
+
+  getPosition(): number;
+  setPosition(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): MoveCategoryRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: MoveCategoryRequest): MoveCategoryRequest.AsObject;
+  static serializeBinaryToWriter(message: MoveCategoryRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): MoveCategoryRequest;
+  static deserializeBinaryFromReader(message: MoveCategoryRequest, reader: jspb.BinaryReader): MoveCategoryRequest;
+}
+
+export namespace MoveCategoryRequest {
+  export type AsObject = {
+    id: string,
+    parent: string,
+    position: number,
+  }
+}
+
 export class CategoriesResponse extends jspb.Message {
   getCategoriesList(): Array<Category>;
   setCategoriesList(value: Array<Category>): void;

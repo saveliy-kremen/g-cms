@@ -165,6 +165,42 @@ func (u *CategoryServiceImpl) AddCategoryAfter(ctx context.Context, req *v1.AddC
 	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
 }
 
+func (u *CategoryServiceImpl) MoveCategory(ctx context.Context, req *v1.MoveCategoryRequest) (*v1.CategoriesResponse, error) {
+	user := auth.GetUser(ctx)
+
+	parent := models.Category{}
+	if db.DB.Where("user_id = ?", user.ID).First(&parent, parent).RecordNotFound() {
+		return nil, status.Errorf(codes.Aborted, "Error move category")
+	}
+	category := models.Category{}
+	if db.DB.Where("user_id = ?", user.ID).First(&category, req.Id).RecordNotFound() {
+		return nil, status.Errorf(codes.Aborted, "Error move category")
+	}
+	children := []models.Category{}
+	db.DB.Where("user_id = ? AND parent = ? AND id <> ?", user.ID, req.Parent, req.Id).Order("sort").Find(&children)
+	for i, child := range children {
+		if i < int(req.Position) {
+			child.Sort = i
+		} else {
+			child.Sort = i + 1
+		}
+		db.DB.Save(&child)
+	}
+	category.Sort = int(req.Position)
+	if req.Parent != "#" {
+		category.Parent = req.Parent
+	} else {
+		category.Parent = strconv.Itoa(int(parent.ID))
+	}
+	if db.DB.Save(&category).Error != nil {
+
+		return nil, status.Errorf(codes.Aborted, "Error move category")
+	}
+	categories := []models.Category{}
+	db.DB.Where("user_id = ?", user.ID).Order("sort").Find(&categories)
+	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+}
+
 func deleteCategory(user_id uint, category models.Category) {
 	parent_id := category.ID
 	children := []models.Category{}
@@ -304,46 +340,6 @@ func (u *CategoryServiceImpl) EditCategory(ctx context.Context, args struct {
 		db.DB.Save(&category)
 	}
 	return types.GetCategory(category), nil
-}
-
-func (u *CategoryServiceImpl) CategoryMoveNode(ctx context.Context, args struct {
-	ID       string
-	ParentID *string
-	Position int32
-}) (*[]*types.Category, error) {
-
-	id := args.ID
-	parent_id := "1"
-	if args.ParentID != nil {
-		parent_id = *args.ParentID
-	}
-	position := args.Position
-
-	parent := models.Category{}
-	if !db.DB.Where("category_id = ?", parent_id).First(&parent).RecordNotFound() {
-		category := models.Category{}
-		if !db.DB.Where("category_id = ?", id).First(&category).RecordNotFound() {
-			children := []models.Category{}
-			db.DB.Where("parent = ? AND id <> ?", parent_id, category.ID).Order("sort").Find(&children)
-			for i, child := range children {
-				if i < int(position) {
-					child.Sort = i
-				} else {
-					child.Sort = i + 1
-				}
-				db.DB.Save(&child)
-			}
-			category.Sort = int(position)
-			if db.DB.Save(&category).Error != nil {
-				return nil, errors.New("Error_move_node")
-			}
-		} else {
-			return nil, errors.New("Node_not_found")
-		}
-	} else {
-		return nil, errors.New("Parent_node_not_found")
-	}
-	return r.Categories(ctx, struct{ ParentID *string }{ParentID: &parent_id})
 }
 */
 

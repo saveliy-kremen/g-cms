@@ -2,7 +2,6 @@ import { Injectable, NgZone } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { ModalComponent } from './modal.component';
-import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'

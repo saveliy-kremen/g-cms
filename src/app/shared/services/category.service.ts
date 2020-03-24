@@ -6,7 +6,7 @@ import * as grpcWeb from 'grpc-web';
 import { grpcUnary } from './helpers/grpc-unary';
 
 import { Empty } from '../../shared/api/v1/google/protobuf/empty_pb';
-import { AddCategoryRequest, DeleteCategoryRequest, CategoriesResponse } from '../../shared/api/v1/category_pb';
+import { AddCategoryRequest, MoveCategoryRequest, DeleteCategoryRequest, CategoriesResponse } from '../../shared/api/v1/category_pb';
 import { CategoryServiceClient } from '../../shared/api/v1/CategoryServiceClientPb';
 import { environment } from 'src/environments/environment';
 import { SessionService } from './session.service';
@@ -105,6 +105,25 @@ export class CategoryGrpcService {
             var request = new DeleteCategoryRequest();
             request.setId(id);
             this.client.deleteCategory(request, meta, (err: grpcWeb.Error, response: CategoriesResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<CategoriesResponse.AsObject>(promise);
+    }
+
+    public moveCategory(data): Observable<CategoriesResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+        const promise = new Promise((resolve, reject) => {
+            var request = new MoveCategoryRequest();
+            request.setId(data.id);
+            request.setParent(data.parent);
+            request.setPosition(data.position);
+            this.client.moveCategory(request, meta, (err: grpcWeb.Error, response: CategoriesResponse) => {
                 if (err) {
                     return reject(err);
                 }

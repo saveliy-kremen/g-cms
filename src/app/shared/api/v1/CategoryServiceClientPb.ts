@@ -14,7 +14,8 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 import {
   AddCategoryRequest,
   CategoriesResponse,
-  DeleteCategoryRequest} from './category_pb';
+  DeleteCategoryRequest,
+  MoveCategoryRequest} from './category_pb';
 
 export class CategoryServiceClient {
   client_: grpcWeb.AbstractClientBase;
@@ -142,6 +143,28 @@ export class CategoryServiceClient {
       request,
       metadata || {},
       this.methodInfoDeleteCategory,
+      callback);
+  }
+
+  methodInfoMoveCategory = new grpcWeb.AbstractClientBase.MethodInfo(
+    CategoriesResponse,
+    (request: MoveCategoryRequest) => {
+      return request.serializeBinary();
+    },
+    CategoriesResponse.deserializeBinary
+  );
+
+  moveCategory(
+    request: MoveCategoryRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: CategoriesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.CategoryService/MoveCategory',
+      request,
+      metadata || {},
+      this.methodInfoMoveCategory,
       callback);
   }
 

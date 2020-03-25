@@ -8,19 +8,20 @@ import (
 
 // Configuration Contains basic settings for connection to db
 type Configuration struct {
-	Name       string
-	Host       string
-	Domain     string
-	Port       int
-	EnvoyPort  int
-	UploadPort int
-	Prefix     string
-	User       string
-	Password   string
-	Dbname     string
-	UploadPath string
-	JWTKey     string
-	JWTExpire  int
+	Name              string
+	Host              string
+	Domain            string
+	Port              int
+	EnvoyPort         int
+	UploadPort        int
+	Prefix            string
+	User              string
+	Password          string
+	Dbname            string
+	UploadPath        string
+	CategoryThumbSize string
+	JWTKey            string
+	JWTExpire         int
 }
 
 //AppConfig Almacena la configuración del archivo config.json.

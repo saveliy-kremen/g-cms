@@ -2,11 +2,10 @@ package services
 
 import (
 	"context"
-	"github.com/davecgh/go-spew/spew"
+	//"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"os"
 	"strconv"
 	"strings"
 
@@ -15,6 +14,7 @@ import (
 	"../../../db"
 	"../../../models"
 	"../../../packages/auth"
+	"../../../packages/upload"
 	"../../../packages/utils"
 )
 
@@ -63,7 +63,6 @@ func (u *CategoryServiceImpl) Category(ctx context.Context, req *v1.CategoryRequ
 }
 
 func (u *CategoryServiceImpl) EditCategory(ctx context.Context, req *v1.EditCategoryRequest) (*v1.CategoryResponse, error) {
-	spew.Dump(req)
 	user_id := auth.GetUserUID(ctx)
 	category := models.Category{}
 	if db.DB.Where("user_id = ? AND alias = ?", user_id, req.OldAlias).First(&category).RecordNotFound() {
@@ -78,12 +77,12 @@ func (u *CategoryServiceImpl) EditCategory(ctx context.Context, req *v1.EditCate
 	}
 
 	if req.Image != "" {
-		directory := config.AppConfig.UploadPath + "/categories/" + strconv.Itoa(int(category.ID))
-		os.RemoveAll(directory)
-		os.MkdirAll(directory, 0775)
-		//args.Image.WriteFile(directory + "/" + args.Image.FileName)
-		//category.Image = strconv.Itoa(int(category.ID)) + "/" + req.Image
-		db.DB.Save(&category)
+		directory := config.AppConfig.UploadPath + "/categories/" + strconv.Itoa(int(category.ID)) + "/"
+		file, err := upload.UploadImage(req.Image, directory, "category")
+		if err == nil {
+			category.Image = file
+			db.DB.Save(&category)
+		}
 	}
 	return &v1.CategoryResponse{Category: models.CategoryToResponse(category)}, nil
 }

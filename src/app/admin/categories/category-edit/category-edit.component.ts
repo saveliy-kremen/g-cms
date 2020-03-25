@@ -18,7 +18,7 @@ export class CategoryEditComponent implements OnInit {
   categoryForm: FormGroup;
   categoryFormSubmitted: boolean = false;
   categoryMessage: Message = new Message("success", "");
-  uploadUrl: string = environment.siteUrl + "/upload/categories/";
+  uploadUrl: string = environment.siteUrl + "/uploads/categories/";
   image: String;
 
   constructor(
@@ -39,7 +39,7 @@ export class CategoryEditComponent implements OnInit {
       let res = await this.categoryService.category(this.activeRoute.snapshot.params["alias"]).toPromise()
       this.category = res.category;
       this.categoryForm.patchValue({ ...this.category, title: this.category.text });
-      this.image = this.category.image !== "" ? this.uploadUrl + this.category.image : "";
+      this.image = this.category.image !== "" ? this.uploadUrl + this.category.id + "/" + this.category.image : "";
       this.categoryMessage = new Message("success", "");
     } catch (err) {
       console.log(err)

@@ -1,16 +1,23 @@
 package upload
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"image"
+	"image/jpeg"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
 
 	"../../config"
 	"../../packages/auth"
+	"../../packages/thumbs"
 )
 
 func UploadFileHandler() http.HandlerFunc {
@@ -68,4 +75,28 @@ func UploadFileHandler() http.HandlerFunc {
 		}
 		json.NewEncoder(w).Encode(resp)
 	})
+}
+
+func UploadImage(data string, directory string, file string) (string, *error) {
+	os.RemoveAll(directory)
+	os.MkdirAll(directory, 0775)
+	secs := time.Now().Unix()
+	img, _ := os.Create(directory + file)
+	defer img.Close()
+
+	i := strings.Index(data, ",")
+	if i < 0 {
+		err := errors.New("Unkwown format of image")
+		return "", &err
+	}
+	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data[i+1:]))
+	src, _, err := image.Decode(reader)
+	if err != nil {
+		err := errors.New("Error decode image")
+		return "", &err
+	}
+	jpeg.Encode(img, src, nil)
+	thumb := thumbs.CreateThumb(directory+file, config.AppConfig.CategoryThumbSize, directory, file+"-thumb")
+	os.Remove(directory + file)
+	return thumb + "?" + strconv.Itoa(int(secs)), nil
 }

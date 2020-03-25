@@ -9,7 +9,8 @@
 	"User": "newud_gcms",
 	"Dbname": "newud_gcms",
 	"Password": "MKTG853Vup",
-	"UploadPath": "../upload",
+	"UploadPath": "../../public_html/uploads",
+	"CategoryThumbSize": "200x200",
 	"JWTKey": "2Ye5_w1z3zpD4dSGdRp3s98ZipCNQqmsHRB9vioOx54",
 	"JWTExpire": 96
 }

@@ -1,0 +1,70 @@
+<mat-card>
+  <div class="card-header card-header-success">
+    <h4 class="card-title">Категории</h4>
+    <p class="card-category">Редактировать категорию</p>
+  </div>
+  <br>
+
+  <div class="card-body">
+    <form novalidate #form="ngForm" [formGroup]="categoryForm" (ngSubmit)="submitCategoryForm()">
+      <div class="alert alert-{{categoryMessage.type}}" *ngIf="categoryMessage.text">
+        {{categoryMessage.text}}
+      </div>
+
+      <mat-tab-group>
+        <mat-tab label="{{'Основные характеристики'}}">
+          <br>
+          <mat-form-field>
+            <input matInput formControlName="title" placeholder="Название">
+            <mat-error>
+              <validator-message [field]="categoryForm.get('title')" [submitted]="categoryFormSubmitted" title="title">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <br>
+          <mat-form-field>
+            <input matInput formControlName="alias" placeholder="Alias">
+            <mat-error>
+              <validator-message [field]="categoryForm.get('alias')" [submitted]="categoryFormSubmitted" title="alias">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+
+          <div style="position: relative;">
+            <ngx-dropzone #dropzone class="custom-dropzone" [multiple]="false" [accept]="'image/png,image/jpeg'"
+              [maxFileSize]="2000000" (change)="onSelect($event)" (change)="onSelect($event)">
+            </ngx-dropzone>
+            <div class="dropzone-inner" style="position: absolute; top: 0">
+              <button mat-stroked-button type="button" class="btn btn-secondary"
+                (click)="dropzone.showFileSelector()">{{"Add" | translate}}</button>
+              <div class="dropzone" *ngIf="image">
+                <div class="preview">
+                  <img src={{image}} height="140">
+                </div>
+              </div>
+            </div>
+            <br>
+          </div>
+        </mat-tab>
+        <mat-tab label="{{'Описание'}}">
+          <br>
+          <mat-form-field class="full-width">
+            <mat-label>Описание</mat-label>
+            <textarea matInput formControlName="description" rows="3" placeholder="Описание"></textarea>
+            <mat-error>
+              <validator-message [field]="categoryForm.get('description')" [submitted]="categoryFormSubmitted"
+                title="description">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+        </mat-tab>
+      </mat-tab-group>
+      <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;">
+        {{"Save" | translate}}
+      </button>
+      <button mat-raised-button type="reset" class="btn btn-secondary" routerLink="/admin/categories">
+        {{"Cancel" | translate}}
+      </button>
+    </form>
+  </div>
+</mat-card>

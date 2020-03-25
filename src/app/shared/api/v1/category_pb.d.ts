@@ -162,6 +162,78 @@ export namespace MoveCategoryRequest {
   }
 }
 
+export class CategoryRequest extends jspb.Message {
+  getAlias(): string;
+  setAlias(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CategoryRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: CategoryRequest): CategoryRequest.AsObject;
+  static serializeBinaryToWriter(message: CategoryRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CategoryRequest;
+  static deserializeBinaryFromReader(message: CategoryRequest, reader: jspb.BinaryReader): CategoryRequest;
+}
+
+export namespace CategoryRequest {
+  export type AsObject = {
+    alias: string,
+  }
+}
+
+export class EditCategoryRequest extends jspb.Message {
+  getTitle(): string;
+  setTitle(value: string): void;
+
+  getOldalias(): string;
+  setOldalias(value: string): void;
+
+  getAlias(): string;
+  setAlias(value: string): void;
+
+  getDescription(): string;
+  setDescription(value: string): void;
+
+  getImage(): string;
+  setImage(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): EditCategoryRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: EditCategoryRequest): EditCategoryRequest.AsObject;
+  static serializeBinaryToWriter(message: EditCategoryRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): EditCategoryRequest;
+  static deserializeBinaryFromReader(message: EditCategoryRequest, reader: jspb.BinaryReader): EditCategoryRequest;
+}
+
+export namespace EditCategoryRequest {
+  export type AsObject = {
+    title: string,
+    oldalias: string,
+    alias: string,
+    description: string,
+    image: string,
+  }
+}
+
+export class CategoryResponse extends jspb.Message {
+  getCategory(): Category | undefined;
+  setCategory(value?: Category): void;
+  hasCategory(): boolean;
+  clearCategory(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CategoryResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: CategoryResponse): CategoryResponse.AsObject;
+  static serializeBinaryToWriter(message: CategoryResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CategoryResponse;
+  static deserializeBinaryFromReader(message: CategoryResponse, reader: jspb.BinaryReader): CategoryResponse;
+}
+
+export namespace CategoryResponse {
+  export type AsObject = {
+    category?: Category.AsObject,
+  }
+}
+
 export class CategoriesResponse extends jspb.Message {
   getCategoriesList(): Array<Category>;
   setCategoriesList(value: Array<Category>): void;

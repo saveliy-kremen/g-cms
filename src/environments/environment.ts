@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  siteUrl: "http://alllead.best",
   grpcUrl: "http://alllead.best:2091",
   jwtCoockieName: "ngJWT",
 };

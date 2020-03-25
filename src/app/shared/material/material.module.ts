@@ -9,6 +9,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   declarations: [],
@@ -22,7 +24,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatMenuModule,
     MatListModule,
     MatCheckboxModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTabsModule,
+    MatCardModule
   ],
   exports: [
     MatToolbarModule,
@@ -33,7 +37,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatMenuModule,
     MatListModule,
     MatCheckboxModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTabsModule,
+    MatCardModule
   ]
 })
 export class MaterialModule { }

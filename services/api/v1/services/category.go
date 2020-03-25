@@ -2,16 +2,16 @@ package services
 
 import (
 	"context"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	//"os"
-	//"github.com/davecgh/go-spew/spew"
+	"os"
 	"strconv"
 	"strings"
 
 	v1 "../../../api/v1"
-	//"../../../config"
+	"../../../config"
 	"../../../db"
 	"../../../models"
 	"../../../packages/auth"
@@ -52,38 +52,74 @@ func addCategoryChildrenList(category models.Category, list CategoryListItem) []
 }
 */
 
+func (u *CategoryServiceImpl) Category(ctx context.Context, req *v1.CategoryRequest) (*v1.CategoryResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	category := models.Category{}
+	if db.DB.Where("user_id = ? AND alias = ?", user_id, req.Alias).First(&category).RecordNotFound() {
+		return nil, status.Errorf(codes.InvalidArgument, "Category not found")
+	}
+	return &v1.CategoryResponse{Category: models.CategoryToResponse(category)}, nil
+}
+
+func (u *CategoryServiceImpl) EditCategory(ctx context.Context, req *v1.EditCategoryRequest) (*v1.CategoryResponse, error) {
+	spew.Dump(req)
+	user_id := auth.GetUserUID(ctx)
+	category := models.Category{}
+	if db.DB.Where("user_id = ? AND alias = ?", user_id, req.OldAlias).First(&category).RecordNotFound() {
+		return nil, status.Errorf(codes.InvalidArgument, "Category not found")
+	}
+
+	category.Title = req.Title
+	category.Alias = req.Alias
+	category.Description = req.Description
+	if db.DB.Save(&category).Error != nil {
+		return nil, status.Errorf(codes.Aborted, "Error save category")
+	}
+
+	if req.Image != "" {
+		directory := config.AppConfig.UploadPath + "/categories/" + strconv.Itoa(int(category.ID))
+		os.RemoveAll(directory)
+		os.MkdirAll(directory, 0775)
+		//args.Image.WriteFile(directory + "/" + args.Image.FileName)
+		//category.Image = strconv.Itoa(int(category.ID)) + "/" + req.Image
+		db.DB.Save(&category)
+	}
+	return &v1.CategoryResponse{Category: models.CategoryToResponse(category)}, nil
+}
+
 func (u *CategoryServiceImpl) Categories(ctx context.Context, req *empty.Empty) (*v1.CategoriesResponse, error) {
-	user := auth.GetUser(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	parentCategory := models.Category{}
-	if db.DB.Where("user_id =? && parent = ?", user.ID, "#").First(&parentCategory).RecordNotFound() {
-		parentCategory.UserID = user.ID
+	if db.DB.Where("user_id =? && parent = ?", user_id, "#").First(&parentCategory).RecordNotFound() {
+		parentCategory.UserID = user_id
 		parentCategory.Parent = "#"
 		parentCategory.Title = "Categories"
-		parentCategory.Alias = strconv.Itoa(int(user.ID)) + "_categories"
+		parentCategory.Alias = strconv.Itoa(int(user_id)) + "_categories"
 		parentCategory.Description = "Main category"
 		db.DB.Create(&parentCategory)
 	}
 
 	categories := []models.Category{}
-	db.DB.Where("user_id = ?", user.ID).Order("sort").Find(&categories)
+	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
 	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
 }
 
 func (u *CategoryServiceImpl) AddCategory(ctx context.Context, req *v1.AddCategoryRequest) (*v1.CategoriesResponse, error) {
-	user := auth.GetUser(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	parent := models.Category{}
-	if db.DB.Where("user_id = ? AND id = ?", user.ID, req.Parent).First(&parent).RecordNotFound() {
+	if db.DB.Where("user_id = ? AND id = ?", user_id, req.Parent).First(&parent).RecordNotFound() {
 		return nil, status.Errorf(codes.InvalidArgument, "Parent category not found")
 	}
 	category := models.Category{}
-	category.UserID = user.ID
+	category.UserID = user_id
 	category.Title = req.Text
 	category.Parent = req.Parent
 
 	last_category := models.Category{}
-	if db.DB.Where("user_id = ? AND parent = ?", user.ID, req.Parent).Order("sort DESC").First(&last_category).RecordNotFound() {
+	if db.DB.Where("user_id = ? AND parent = ?", user_id, req.Parent).Order("sort DESC").First(&last_category).RecordNotFound() {
 		category.Sort = 0
 	} else {
 		category.Sort = last_category.Sort + 1
@@ -97,26 +133,26 @@ func (u *CategoryServiceImpl) AddCategory(ctx context.Context, req *v1.AddCatego
 	}
 
 	categories := []models.Category{}
-	db.DB.Where("user_id = ?", user.ID).Order("sort").Find(&categories)
+	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
 	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
 }
 
 func (u *CategoryServiceImpl) AddCategoryBefore(ctx context.Context, req *v1.AddCategoryRequest) (*v1.CategoriesResponse, error) {
-	user := auth.GetUser(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	before := models.Category{}
-	if db.DB.Where("user_id = ?", user.ID).First(&before, req.Parent).RecordNotFound() {
+	if db.DB.Where("user_id = ?", user_id).First(&before, req.Parent).RecordNotFound() {
 		return nil, status.Errorf(codes.Aborted, "Before node not found")
 	}
 	afters := []models.Category{}
-	db.DB.Where("user_id = ? AND parent = ? AND sort >= ?", user.ID, before.Parent, before.Sort).Find(&afters)
+	db.DB.Where("user_id = ? AND parent = ? AND sort >= ?", user_id, before.Parent, before.Sort).Find(&afters)
 	for _, after := range afters {
 		after.Sort = after.Sort + 1
 		db.DB.Save(&after)
 	}
 
 	category := models.Category{}
-	category.UserID = user.ID
+	category.UserID = user_id
 	category.Title = req.Text
 	category.Parent = before.Parent
 	category.Sort = before.Sort
@@ -129,26 +165,26 @@ func (u *CategoryServiceImpl) AddCategoryBefore(ctx context.Context, req *v1.Add
 	}
 
 	categories := []models.Category{}
-	db.DB.Where("user_id = ?", user.ID).Order("sort").Find(&categories)
+	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
 	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
 }
 
 func (u *CategoryServiceImpl) AddCategoryAfter(ctx context.Context, req *v1.AddCategoryRequest) (*v1.CategoriesResponse, error) {
-	user := auth.GetUser(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	after := models.Category{}
-	if db.DB.Where("user_id = ?", user.ID).First(&after, req.Parent).RecordNotFound() {
+	if db.DB.Where("user_id = ?", user_id).First(&after, req.Parent).RecordNotFound() {
 		return nil, status.Errorf(codes.Aborted, "After node not found")
 	}
 	afters := []models.Category{}
-	db.DB.Where("user_id = ? AND parent = ? AND sort > ?", user.ID, after.Parent, after.Sort).Find(&afters)
+	db.DB.Where("user_id = ? AND parent = ? AND sort > ?", user_id, after.Parent, after.Sort).Find(&afters)
 	for _, after := range afters {
 		after.Sort = after.Sort + 1
 		db.DB.Save(&after)
 	}
 
 	category := models.Category{}
-	category.UserID = user.ID
+	category.UserID = user_id
 	category.Title = req.Text
 	category.Parent = after.Parent
 	category.Sort = after.Sort + 1
@@ -161,23 +197,23 @@ func (u *CategoryServiceImpl) AddCategoryAfter(ctx context.Context, req *v1.AddC
 	}
 
 	categories := []models.Category{}
-	db.DB.Where("user_id = ?", user.ID).Order("sort").Find(&categories)
+	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
 	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
 }
 
 func (u *CategoryServiceImpl) MoveCategory(ctx context.Context, req *v1.MoveCategoryRequest) (*v1.CategoriesResponse, error) {
-	user := auth.GetUser(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	parent := models.Category{}
-	if db.DB.Where("user_id = ?", user.ID).First(&parent, parent).RecordNotFound() {
+	if db.DB.Where("user_id = ?", user_id).First(&parent, parent).RecordNotFound() {
 		return nil, status.Errorf(codes.Aborted, "Error move category")
 	}
 	category := models.Category{}
-	if db.DB.Where("user_id = ?", user.ID).First(&category, req.Id).RecordNotFound() {
+	if db.DB.Where("user_id = ?", user_id).First(&category, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.Aborted, "Error move category")
 	}
 	children := []models.Category{}
-	db.DB.Where("user_id = ? AND parent = ? AND id <> ?", user.ID, req.Parent, req.Id).Order("sort").Find(&children)
+	db.DB.Where("user_id = ? AND parent = ? AND id <> ?", user_id, req.Parent, req.Id).Order("sort").Find(&children)
 	for i, child := range children {
 		if i < int(req.Position) {
 			child.Sort = i
@@ -197,7 +233,7 @@ func (u *CategoryServiceImpl) MoveCategory(ctx context.Context, req *v1.MoveCate
 		return nil, status.Errorf(codes.Aborted, "Error move category")
 	}
 	categories := []models.Category{}
-	db.DB.Where("user_id = ?", user.ID).Order("sort").Find(&categories)
+	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
 	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
 }
 
@@ -217,16 +253,16 @@ func deleteCategory(user_id uint, category models.Category) {
 }
 
 func (u *CategoryServiceImpl) DeleteCategory(ctx context.Context, req *v1.DeleteCategoryRequest) (*v1.CategoriesResponse, error) {
-	user := auth.GetUser(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	category := models.Category{}
-	if db.DB.Where("user_id = ?", user.ID).First(&category, req.Id).RecordNotFound() {
+	if db.DB.Where("user_id = ?", user_id).First(&category, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.Aborted, "Category not found")
 	}
-	deleteCategory(user.ID, category)
+	deleteCategory(user_id, category)
 
 	categories := []models.Category{}
-	db.DB.Where("user_id = ?", user.ID).Order("sort").Find(&categories)
+	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
 	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
 }
 
@@ -288,58 +324,6 @@ func (u *CategoryServiceImpl) PropertyCategories(ctx context.Context, args struc
 		}
 	}
 	return types.GetCategories(categories), nil
-}
-
-func (u *CategoryServiceImpl) Category(ctx context.Context, args struct {
-	Alias string
-}) (*types.Category, error) {
-
-	alias := args.Alias
-
-	category := models.Category{}
-	if db.DB.Where("alias = ?", alias).First(&category).RecordNotFound() {
-		return nil, errors.New("Category_not_found")
-	}
-	return types.GetCategory(category), nil
-}
-
-func (u *CategoryServiceImpl) EditCategory(ctx context.Context, args struct {
-	Title       string
-	Alias       string
-	NewAlias    string
-	Description *string
-	Image       *graphqlupload.GraphQLUpload
-}) (*types.Category, error) {
-
-	title := args.Title
-	alias := args.Alias
-	newAlias := args.NewAlias
-	description := ""
-	if args.Description != nil {
-		description = *args.Description
-	}
-
-	category := models.Category{}
-	if db.DB.Where("alias = ?", alias).First(&category).RecordNotFound() {
-		return nil, errors.New("Category_not found")
-	}
-
-	category.Title = title
-	category.Alias = newAlias
-	category.Description = description
-	if db.DB.Save(&category).Error != nil {
-		return nil, errors.New("Save_category_error")
-	}
-
-	if args.Image != nil {
-		directory := config.AppConfig.UploadPath + "/categories/" + strconv.Itoa(int(category.ID))
-		os.RemoveAll(directory)
-		os.MkdirAll(directory, 0775)
-		args.Image.WriteFile(directory + "/" + args.Image.FileName)
-		category.Image = strconv.Itoa(int(category.ID)) + "/" + args.Image.FileName
-		db.DB.Save(&category)
-	}
-	return types.GetCategory(category), nil
 }
 */
 

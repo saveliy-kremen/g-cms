@@ -42,15 +42,33 @@ message MoveCategoryRequest {
   uint32 position = 3;
 }
 
+message CategoryRequest {
+  string alias = 1;
+}
+
+message EditCategoryRequest {
+  string title = 1;
+  string oldAlias = 2;
+  string alias = 3;
+  string description = 4;
+  string image = 5;
+}
+
+message CategoryResponse {
+  Category category = 1;
+}
+
 message CategoriesResponse {
   repeated Category categories = 1;
 }
 
 service CategoryService {
+  rpc Category(CategoryRequest) returns (CategoryResponse);
   rpc Categories(google.protobuf.Empty) returns (CategoriesResponse);
   rpc AddCategory(AddCategoryRequest) returns (CategoriesResponse);
   rpc AddCategoryBefore(AddCategoryRequest) returns (CategoriesResponse);
   rpc AddCategoryAfter(AddCategoryRequest) returns (CategoriesResponse);
   rpc DeleteCategory(DeleteCategoryRequest) returns (CategoriesResponse);
   rpc MoveCategory(MoveCategoryRequest) returns (CategoriesResponse);
+  rpc EditCategory(EditCategoryRequest) returns (CategoryResponse);
 }

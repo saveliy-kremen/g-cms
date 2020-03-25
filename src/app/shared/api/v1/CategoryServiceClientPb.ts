@@ -14,7 +14,10 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 import {
   AddCategoryRequest,
   CategoriesResponse,
+  CategoryRequest,
+  CategoryResponse,
   DeleteCategoryRequest,
+  EditCategoryRequest,
   MoveCategoryRequest} from './category_pb';
 
 export class CategoryServiceClient {
@@ -34,6 +37,28 @@ export class CategoryServiceClient {
     this.hostname_ = hostname;
     this.credentials_ = credentials;
     this.options_ = options;
+  }
+
+  methodInfoCategory = new grpcWeb.AbstractClientBase.MethodInfo(
+    CategoryResponse,
+    (request: CategoryRequest) => {
+      return request.serializeBinary();
+    },
+    CategoryResponse.deserializeBinary
+  );
+
+  category(
+    request: CategoryRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: CategoryResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.CategoryService/Category',
+      request,
+      metadata || {},
+      this.methodInfoCategory,
+      callback);
   }
 
   methodInfoCategories = new grpcWeb.AbstractClientBase.MethodInfo(
@@ -165,6 +190,28 @@ export class CategoryServiceClient {
       request,
       metadata || {},
       this.methodInfoMoveCategory,
+      callback);
+  }
+
+  methodInfoEditCategory = new grpcWeb.AbstractClientBase.MethodInfo(
+    CategoryResponse,
+    (request: EditCategoryRequest) => {
+      return request.serializeBinary();
+    },
+    CategoryResponse.deserializeBinary
+  );
+
+  editCategory(
+    request: EditCategoryRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: CategoryResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.CategoryService/EditCategory',
+      request,
+      metadata || {},
+      this.methodInfoEditCategory,
       callback);
   }
 

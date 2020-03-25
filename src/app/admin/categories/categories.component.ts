@@ -1,10 +1,11 @@
-import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, NgZone } from '@angular/core';
 
 import { CategoryGrpcService } from 'src/app/shared/services/category.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { LoaderService } from 'src/app/shared/services/loader.service';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 //Browser
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -22,7 +23,6 @@ export class CategoriesComponent implements OnInit {
 
   categoriesData: any
   categoryID: string
-  loader$: Observable<any>
   translates: {}
 
   //modal
@@ -35,6 +35,8 @@ export class CategoriesComponent implements OnInit {
     private translateService: TranslateService,
     private modalService: ModalService,
     private loaderService: LoaderService,
+    private router: Router,
+    private ngZone: NgZone,
     @Inject(PLATFORM_ID) platformId
   ) {
     this.isBrowser = isPlatformBrowser(platformId);

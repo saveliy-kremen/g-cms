@@ -13,6 +13,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [],
@@ -23,6 +24,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatSidenavModule,
     MatIconModule,
     MatInputModule,
+    MatSelectModule,
     MatMenuModule,
     MatListModule,
     MatCheckboxModule,
@@ -38,6 +40,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatSidenavModule,
     MatIconModule,
     MatInputModule,
+    MatSelectModule,
     MatMenuModule,
     MatListModule,
     MatCheckboxModule,

@@ -1,10 +1,14 @@
 <mat-card>
   <mat-card-title>{{"Properties" | translate}}</mat-card-title>
+  <mat-card-subtitle>Управление свойствами</mat-card-subtitle>
+
+  <button mat-mini-fab color="accent" style="margin: 20px;" routerLink="/admin/properties/create">
+    <mat-icon>add</mat-icon>
+  </button>
 
   <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
     <app-table [columnDefs]="displayedColumns" [displayedColumns]="displayedColumns" [dataSource]="dataSource"
       [length]="length" (changePageHandler)="changePage($event)">
     </app-table>
   </mat-card-content>
-
 </mat-card>

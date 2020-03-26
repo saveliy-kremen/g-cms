@@ -57,7 +57,7 @@ func (u *CategoryServiceImpl) Category(ctx context.Context, req *v1.CategoryRequ
 
 	category := models.Category{}
 	if db.DB.Where("user_id = ? AND alias = ?", user_id, req.Alias).First(&category).RecordNotFound() {
-		return nil, status.Errorf(codes.InvalidArgument, "Category not found")
+		return nil, status.Errorf(codes.NotFound, "Category not found")
 	}
 	return &v1.CategoryResponse{Category: models.CategoryToResponse(category)}, nil
 }
@@ -66,7 +66,7 @@ func (u *CategoryServiceImpl) EditCategory(ctx context.Context, req *v1.EditCate
 	user_id := auth.GetUserUID(ctx)
 	category := models.Category{}
 	if db.DB.Where("user_id = ? AND alias = ?", user_id, req.OldAlias).First(&category).RecordNotFound() {
-		return nil, status.Errorf(codes.InvalidArgument, "Category not found")
+		return nil, status.Errorf(codes.NotFound, "Category not found")
 	}
 
 	category.Title = req.Title
@@ -110,7 +110,7 @@ func (u *CategoryServiceImpl) AddCategory(ctx context.Context, req *v1.AddCatego
 
 	parent := models.Category{}
 	if db.DB.Where("user_id = ? AND id = ?", user_id, req.Parent).First(&parent).RecordNotFound() {
-		return nil, status.Errorf(codes.InvalidArgument, "Parent category not found")
+		return nil, status.Errorf(codes.NotFound, "Parent category not found")
 	}
 	category := models.Category{}
 	category.UserID = user_id
@@ -141,7 +141,7 @@ func (u *CategoryServiceImpl) AddCategoryBefore(ctx context.Context, req *v1.Add
 
 	before := models.Category{}
 	if db.DB.Where("user_id = ?", user_id).First(&before, req.Parent).RecordNotFound() {
-		return nil, status.Errorf(codes.Aborted, "Before node not found")
+		return nil, status.Errorf(codes.NotFound, "Before node not found")
 	}
 	afters := []models.Category{}
 	db.DB.Where("user_id = ? AND parent = ? AND sort >= ?", user_id, before.Parent, before.Sort).Find(&afters)
@@ -173,7 +173,7 @@ func (u *CategoryServiceImpl) AddCategoryAfter(ctx context.Context, req *v1.AddC
 
 	after := models.Category{}
 	if db.DB.Where("user_id = ?", user_id).First(&after, req.Parent).RecordNotFound() {
-		return nil, status.Errorf(codes.Aborted, "After node not found")
+		return nil, status.Errorf(codes.NotFound, "After node not found")
 	}
 	afters := []models.Category{}
 	db.DB.Where("user_id = ? AND parent = ? AND sort > ?", user_id, after.Parent, after.Sort).Find(&afters)
@@ -256,7 +256,7 @@ func (u *CategoryServiceImpl) DeleteCategory(ctx context.Context, req *v1.Delete
 
 	category := models.Category{}
 	if db.DB.Where("user_id = ?", user_id).First(&category, req.Id).RecordNotFound() {
-		return nil, status.Errorf(codes.Aborted, "Category not found")
+		return nil, status.Errorf(codes.NotFound, "Category not found")
 	}
 	deleteCategory(user_id, category)
 

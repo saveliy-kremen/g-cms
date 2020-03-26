@@ -4,7 +4,6 @@ import { CategoryGrpcService } from 'src/app/shared/services/category.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { LoaderService } from 'src/app/shared/services/loader.service';
-import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 //Browser
 import { PLATFORM_ID } from '@angular/core';

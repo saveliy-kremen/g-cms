@@ -28,6 +28,7 @@ func main() {
 	// register our service implementation
 	v1.RegisterUserServiceServer(svr, &services.UserServiceImpl{})
 	v1.RegisterCategoryServiceServer(svr, &services.CategoryServiceImpl{})
+	v1.RegisterPropertyServiceServer(svr, &services.PropertyServiceImpl{})
 
 	// trap SIGINT / SIGTERM to exit cleanly
 	//c := make(chan os.Signal, 1)

@@ -16,10 +16,11 @@ import { CategoryEditComponent } from './categories/category-edit/category-edit.
 import { ValidationModule } from '../shared/validation/validation.module';
 import { PropertiesComponent } from './properties/properties.component';
 import { TableModule } from '../shared/table/table.module';
+import { PropertyEditComponent } from './properties/property-edit/property-edit.component';
 
 @NgModule({
   declarations: [
-    AdminLayoutComponent, IndexComponent, CategoriesComponent, CategoryEditComponent, PropertiesComponent
+    AdminLayoutComponent, IndexComponent, CategoriesComponent, CategoryEditComponent, PropertiesComponent, PropertyEditComponent
   ],
   imports: [
     CommonModule,

@@ -5,6 +5,7 @@ import { IndexComponent } from './index/index.component';
 import { CategoriesComponent } from './categories/categories.component';
 import { CategoryEditComponent } from './categories/category-edit/category-edit.component';
 import { PropertiesComponent } from './properties/properties.component';
+import { PropertyEditComponent } from './properties/property-edit/property-edit.component';
 
 export const AdminRoutes: Routes = [
   {
@@ -13,6 +14,8 @@ export const AdminRoutes: Routes = [
       { path: 'categories', component: CategoriesComponent },
       { path: 'categories/edit/:alias', component: CategoryEditComponent },
       { path: 'properties', component: PropertiesComponent },
+      { path: 'properties/create', component: PropertyEditComponent },
+      { path: 'properties/edit/:id', component: PropertyEditComponent },
       { path: 'db', component: IndexComponent },
       { path: '**', redirectTo: '' }
     ]

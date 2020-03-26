@@ -13,5 +13,10 @@
   "Edit": "Редактировать",
   "Delete": "Удалить",
   "Cancel": "Отмена",
-  "Properties": "Свойства"
+  "Properties": "Свойства",
+  "PAGINATOR.ITEMS_PER_PAGE": "На странице",
+  "PAGINATOR.FIRST_PAGE": "Первая страница",
+  "PAGINATOR.NEXT_PAGE": "Следующая страница",
+  "PAGINATOR.PREVIOUS_PAGE": "Предыдущая страница",
+  "PAGINATOR.LAST_PAGE": "Последняя страница"
 }

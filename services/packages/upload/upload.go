@@ -77,7 +77,7 @@ func UploadFileHandler() http.HandlerFunc {
 	})
 }
 
-func UploadImage(data string, directory string, file string) (string, *error) {
+func UploadImage(data string, directory string, file string) (string, error) {
 	os.RemoveAll(directory)
 	os.MkdirAll(directory, 0775)
 	secs := time.Now().Unix()
@@ -86,14 +86,13 @@ func UploadImage(data string, directory string, file string) (string, *error) {
 
 	i := strings.Index(data, ",")
 	if i < 0 {
-		err := errors.New("Unkwown format of image")
-		return "", &err
+		return "", errors.New("Unkwown format of image")
 	}
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data[i+1:]))
 	src, _, err := image.Decode(reader)
 	if err != nil {
 		err := errors.New("Error decode image")
-		return "", &err
+		return "", err
 	}
 	jpeg.Encode(img, src, nil)
 	thumb := thumbs.CreateThumb(directory+file, config.AppConfig.CategoryThumbSize, directory, file+"-thumb")

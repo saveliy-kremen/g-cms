@@ -7,6 +7,8 @@ export const environment = {
   siteUrl: "http://alllead.best",
   grpcUrl: "http://alllead.best:2091",
   jwtCoockieName: "ngJWT",
+  propertyTypes: ["Строка", "Число"],
+  propertyDisplayTypes: ["Список", "Флажки", "Слайдер"],
 };
 
 /*

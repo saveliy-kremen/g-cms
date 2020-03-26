@@ -9,7 +9,7 @@ import { MatPaginator } from '@angular/material/paginator';
     <!-- Columns definition -->
     <ng-container *ngFor="let column of columnDefs; let i = index" matColumnDef="{{column}}" [sticky]="i == 0">
         <th mat-header-cell *matHeaderCellDef>{{column}}</th>
-        <td mat-cell *matCellDef="let element"> {{element[column]}} </td>
+        <td mat-cell *matCellDef="let element" [innerHTML]="element[column] | safeHtml"></td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -32,7 +32,14 @@ import { MatPaginator } from '@angular/material/paginator';
     }
     .mat-column-position {
         width: 30px;
-    }`
+    }
+    :host /deep/ .glyphicon-edit {
+      color: #9c27b0;
+    }
+    :host /deep/ .glyphicon-trash {
+      color: red;
+    }
+    `
   ]
 })
 export class TableComponent {

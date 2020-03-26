@@ -1,0 +1,70 @@
+<mat-card>
+  <mat-card-title>{{"Properties" | translate}}</mat-card-title>
+  <mat-card-subtitle>{{editing ? ("Edit" | translate) : ("Add" | translate)}} cвойство</mat-card-subtitle>
+
+  <mat-card-content>
+    <form novalidate #form="ngForm" [formGroup]="propertyForm" (ngSubmit)="submitPropertyForm()">
+      <div class="alert alert-{{propertyMessage.type}}" *ngIf="propertyMessage.text">
+        {{propertyMessage.text}}
+      </div>
+
+      <mat-tab-group>
+        <mat-tab label="{{'Основные характеристики'}}">
+          <br>
+          <mat-form-field class="full-width">
+            <input matInput formControlName="title" placeholder="Название">
+            <mat-error>
+              <validator-message [field]="propertyForm.get('title')" [submitted]="propertyFormSubmitted" title="title">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <br>
+          <mat-form-field class="full-width">
+            <input matInput formControlName="code" placeholder="Код">
+            <mat-error>
+              <validator-message [field]="propertyForm.get('code')" [submitted]="propertyFormSubmitted" title="code">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <br>
+          <mat-form-field>
+            <mat-label>Тип значения</mat-label>
+            <mat-select formControlName="type">
+              <mat-option *ngFor="let propertyType of propertyTypes; let i = index" [value]="i">
+                {{propertyType}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <br>
+          <mat-form-field>
+            <mat-label>Показывать в фильтре</mat-label>
+            <mat-select formControlName="display">
+              <mat-option *ngFor="let propertyDisplayType of propertyDisplayTypes; let i = index" [value]="i">
+                {{propertyDisplayType}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <br>
+          <mat-checkbox labelPosition="before" formControlName="plural">Множественное</mat-checkbox>
+          <br>
+          <mat-form-field>
+            <input matInput formControlName="sort" placeholder="Сортировка">
+            <mat-error>
+              <validator-message [field]="propertyForm.get('sort')" [submitted]="propertyFormSubmitted" title="sort">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+        </mat-tab>
+        <mat-tab label="{{'Категория'}}">
+          <br>
+          <div id="categoryTree">
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+      <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;">
+        {{editing ? ("Save" | translate) : ("Add" | translate)}}
+      </button>
+      <button mat-raised-button type="reset" class="btn btn-secondary" routerLink="/admin/properties">
+        {{"Cancel" | translate}}
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>

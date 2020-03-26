@@ -1,11 +1,8 @@
 <mat-card>
-  <div class="card-header card-header-success">
-    <h4 class="card-title">Категории</h4>
-    <p class="card-category">Редактировать категорию</p>
-  </div>
-  <br>
+  <mat-card-title>{{"Category" | translate}}</mat-card-title>
+  <mat-card-subtitle>Редактировать категорию</mat-card-subtitle>
 
-  <div class="card-body">
+  <mat-card-content>
     <form novalidate #form="ngForm" [formGroup]="categoryForm" (ngSubmit)="submitCategoryForm()">
       <div class="alert alert-{{categoryMessage.type}}" *ngIf="categoryMessage.text">
         {{categoryMessage.text}}
@@ -66,5 +63,5 @@
         {{"Cancel" | translate}}
       </button>
     </form>
-  </div>
+  </mat-card-content>
 </mat-card>

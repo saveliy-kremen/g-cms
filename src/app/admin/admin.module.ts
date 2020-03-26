@@ -14,10 +14,12 @@ import { ModalModule } from '../shared/modal/modal.module';
 import { LoaderService } from '../shared/services/loader.service';
 import { CategoryEditComponent } from './categories/category-edit/category-edit.component';
 import { ValidationModule } from '../shared/validation/validation.module';
+import { PropertiesComponent } from './properties/properties.component';
+import { TableModule } from '../shared/table/table.module';
 
 @NgModule({
   declarations: [
-    AdminLayoutComponent, IndexComponent, CategoriesComponent, CategoryEditComponent
+    AdminLayoutComponent, IndexComponent, CategoriesComponent, CategoryEditComponent, PropertiesComponent
   ],
   imports: [
     CommonModule,
@@ -28,8 +30,9 @@ import { ValidationModule } from '../shared/validation/validation.module';
     ValidationModule,
     NgxDropzoneModule,
     ReactiveFormsModule,
+    TableModule,
     RouterModule.forChild(AdminRoutes),
   ],
-  providers: [LoaderService]
+  providers: [LoaderService],
 })
 export class AdminModule { }

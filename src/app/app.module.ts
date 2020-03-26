@@ -31,6 +31,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       }
     })
   ],
+  exports: [TranslateModule],
   bootstrap: [AppComponent],
   providers: [AuthService, SessionService]
 })

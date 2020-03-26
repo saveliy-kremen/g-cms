@@ -1,0 +1,10 @@
+<mat-card>
+  <mat-card-title>{{"Properties" | translate}}</mat-card-title>
+
+  <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
+    <app-table [columnDefs]="displayedColumns" [displayedColumns]="displayedColumns" [dataSource]="dataSource"
+      [length]="length" (changePageHandler)="changePage($event)">
+    </app-table>
+  </mat-card-content>
+
+</mat-card>

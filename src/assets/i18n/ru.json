@@ -22,5 +22,6 @@
   "PAGINATOR.FIRST_PAGE": "Первая страница",
   "PAGINATOR.NEXT_PAGE": "Следующая страница",
   "PAGINATOR.PREVIOUS_PAGE": "Предыдущая страница",
-  "PAGINATOR.LAST_PAGE": "Последняя страница"
+  "PAGINATOR.LAST_PAGE": "Последняя страница",
+  "PAGINATOR.OF": "из"
 }

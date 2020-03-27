@@ -20,7 +20,7 @@ import { MatTable } from '@angular/material/table';
         <td mat-cell *matCellDef="let element" [innerHTML]="element[column.column] | safeHtml"></td>
     </ng-container>
 
-    <ng-container matColumnDef="actions" sticky>
+    <ng-container matColumnDef="actions" stickyEnd>
       <th mat-header-cell *matHeaderCellDef>{{"Actions" | translate}}</th>
       <td mat-cell *matCellDef="let element">
         <button *ngFor="let action of element.actions" mat-icon-button>
@@ -39,6 +39,14 @@ import { MatTable } from '@angular/material/table';
   styles: [
     `.mat-table-sticky:first-child {
       border-right: 1px solid #e0e0e0;
+      width: 30px;
+    }
+    .mat-table-sticky:last-child {
+      border-left: 1px solid #e0e0e0;
+      padding-right: 10px;
+      padding-left: 10px;
+      width: 120px;
+
     }
     th.mat-header-cell:first-of-type, td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type {
       padding-left: 10px;
@@ -46,9 +54,6 @@ import { MatTable } from '@angular/material/table';
     th.mat-header-cell, td.mat-cell, td.mat-footer-cell {
       padding-left: 10px;
       padding-right: 10px;
-    }
-    .mat-column-position {
-        width: 30px;
     }
     .button-edit {
       color: #9c27b0;

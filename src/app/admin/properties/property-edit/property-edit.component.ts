@@ -5,6 +5,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Message } from 'src/app/shared/models/message.model';
 import { environment } from 'src/environments/environment';
 import { PropertyGrpcService } from 'src/app/shared/services/property.service';
+import { LoaderService } from 'src/app/shared/services/loader.service';
 
 declare var $: any;
 
@@ -50,6 +51,7 @@ export class PropertyEditComponent implements OnInit {
   constructor(
     private router: Router,
     private propertyService: PropertyGrpcService,
+    private loaderService: LoaderService,
     private activeRoute: ActivatedRoute) {
   }
 
@@ -69,10 +71,11 @@ export class PropertyEditComponent implements OnInit {
       sort: new FormControl('', Validators.required),
     })
 
+    this.loaderService.showLoader()
     this.editing = this.activeRoute.snapshot.params["mode"] == "edit";
     if (this.editing) {
-      //const res: any = await this.propertyService.property(Number(this.activeRoute.snapshot.params["id"]));
-      // this.property = res.data.property;
+      const res: any = await this.propertyService.property(Number(this.activeRoute.snapshot.params["id"])).toPromise();
+      this.property = res.property;
       this.propertyForm.patchValue(this.property);
       this.propertyMessage = new Message("success", "");
       this.loading = false;
@@ -95,6 +98,7 @@ export class PropertyEditComponent implements OnInit {
     })
       .bind("select_node.jstree", this.bindProperty.bind(this))
       .bind("deselect_node.jstree", this.unbindProperty.bind(this))
+    this.loaderService.hideLoader()
   }
 
   async bindProperty(evt, data) {

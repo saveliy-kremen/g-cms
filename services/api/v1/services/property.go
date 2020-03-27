@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/golang/protobuf/ptypes/empty"
+	//"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	//"strconv"
@@ -20,12 +20,11 @@ import (
 type PropertyServiceImpl struct {
 }
 
-func (u *PropertyServiceImpl) Property(ctx context.Context, req *empty.Empty) (*v1.PropertyResponse, error) {
+func (u *PropertyServiceImpl) Property(ctx context.Context, req *v1.PropertyRequest) (*v1.PropertyResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	property := models.Property{}
-
-	if db.DB.Preload("Values").Where("user_id = ?", user_id).First(&property).RecordNotFound() {
+	if db.DB.Preload("Values").Where("user_id = ?", user_id).First(&property, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Property not found")
 	}
 	return &v1.PropertyResponse{Property: models.PropertyToResponse(property)}, nil

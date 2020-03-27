@@ -15,6 +15,7 @@ import {
   EditPropertyRequest,
   PropertiesRequest,
   PropertiesResponse,
+  PropertyRequest,
   PropertyResponse} from './property_pb';
 
 export class PropertyServiceClient {
@@ -38,14 +39,14 @@ export class PropertyServiceClient {
 
   methodInfoProperty = new grpcWeb.AbstractClientBase.MethodInfo(
     PropertyResponse,
-    (request: google_protobuf_empty_pb.Empty) => {
+    (request: PropertyRequest) => {
       return request.serializeBinary();
     },
     PropertyResponse.deserializeBinary
   );
 
   property(
-    request: google_protobuf_empty_pb.Empty,
+    request: PropertyRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
                response: PropertyResponse) => void) {

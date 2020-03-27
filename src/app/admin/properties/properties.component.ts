@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { PropertyGrpcService } from 'src/app/shared/services/property.service';
 import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-properties',
@@ -12,7 +13,7 @@ export class PropertiesComponent implements OnInit {
   displayedColumns: string[] = ['position', 'title', 'type', 'sort', 'actions']
   columnDefs = [
     { column: "title", title: "t_Title", sort: true },
-    { column: "type", title: "t_Type", sort: false },
+    { column: "type", title: "t_Type", sort: true },
     { column: "sort", title: "t_Sort", sort: true },
   ]
   actions = { "edit": this.editAction, "delete": this.deleteAction }
@@ -21,6 +22,7 @@ export class PropertiesComponent implements OnInit {
 
   constructor(
     private propertyService: PropertyGrpcService,
+    private router: Router
   ) { }
 
   async ngOnInit() {
@@ -34,7 +36,7 @@ export class PropertiesComponent implements OnInit {
   }
 
   editAction(id) {
-    console.log("edit", id)
+    this.router.navigate(["/admin/properties/edit", id])
   }
 
   deleteAction(id) {

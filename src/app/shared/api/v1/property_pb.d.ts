@@ -84,6 +84,24 @@ export namespace PropertyValue {
   }
 }
 
+export class PropertyRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PropertyRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: PropertyRequest): PropertyRequest.AsObject;
+  static serializeBinaryToWriter(message: PropertyRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PropertyRequest;
+  static deserializeBinaryFromReader(message: PropertyRequest, reader: jspb.BinaryReader): PropertyRequest;
+}
+
+export namespace PropertyRequest {
+  export type AsObject = {
+    id: number,
+  }
+}
+
 export class PropertiesRequest extends jspb.Message {
   getPage(): number;
   setPage(value: number): void;

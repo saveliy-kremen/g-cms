@@ -24,6 +24,10 @@ message PropertyValue{
   uint32 sort = 4;
 }
 
+message PropertyRequest {
+  uint32 id = 1;
+}
+
 message PropertiesRequest {
   uint32 page = 1;
   uint32 pageSize = 2;
@@ -52,7 +56,7 @@ message PropertiesResponse {
 }
 
 service PropertyService {
-  rpc Property(google.protobuf.Empty) returns (PropertyResponse);
+  rpc Property(PropertyRequest) returns (PropertyResponse);
   rpc Properties(PropertiesRequest) returns (PropertiesResponse);
   rpc EditProperty(EditPropertyRequest) returns (PropertyResponse);
 }

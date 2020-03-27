@@ -14,8 +14,8 @@ export const AdminRoutes: Routes = [
       { path: 'categories', component: CategoriesComponent },
       { path: 'categories/edit/:alias', component: CategoryEditComponent },
       { path: 'properties', component: PropertiesComponent },
-      { path: 'properties/create', component: PropertyEditComponent },
-      { path: 'properties/edit/:id', component: PropertyEditComponent },
+      { path: 'properties/:mode', component: PropertyEditComponent },
+      { path: 'properties/:mode/:id', component: PropertyEditComponent },
       { path: 'db', component: IndexComponent },
       { path: '**', redirectTo: '' }
     ]

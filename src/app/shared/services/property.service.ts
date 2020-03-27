@@ -44,6 +44,24 @@ export class PropertyGrpcService {
         return grpcUnary<GRPC.PropertiesResponse.AsObject>(promise);
     }
 
+    public property(id: number): Observable<GRPC.PropertyResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.PropertyRequest();
+            request.setId(id)
+            this.client.property(request, meta, (err: grpcWeb.Error, response: GRPC.PropertyResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<GRPC.PropertyResponse.AsObject>(promise);
+    }
+
     public editProperty(data): Observable<GRPC.PropertyResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()

@@ -10,7 +10,12 @@ import { environment } from 'src/environments/environment';
 })
 export class PropertiesComponent implements OnInit {
   displayedColumns: string[] = ['position', 'title', 'type', 'sort', 'actions']
-  columnDefs = ["position", "name", "weight", "symbol", 'actions']
+  columnDefs = [
+    { column: "title", title: "t_Title", sort: true },
+    { column: "type", title: "t_Type", sort: false },
+    { column: "sort", title: "t_Sort", sort: true },
+  ]
+  actions = { "edit": this.editAction, "delete": this.deleteAction }
   propertiesData: any
   total: number
 
@@ -28,11 +33,23 @@ export class PropertiesComponent implements OnInit {
     this.updatePropertiesData(res)
   }
 
+  editAction(id) {
+    console.log("edit", id)
+  }
+
+  deleteAction(id) {
+    console.log("delete", id)
+  }
+
   updatePropertiesData(data) {
     this.propertiesData = data.propertiesList.map((item, index) => {
       return {
-        ...item, position: data.position + index,
-        actions: `<button mat-raised-button><i class="glyphicon glyphicon-edit"></i></button><button mat-raised-button><i class="glyphicon glyphicon-trash"></i></button>`
+        ...item,
+        type: environment.propertyTypes[item.type],
+        actions: [
+          { icon: "edit", class: "button-edit", handler: this.editAction.bind(this), id: item.id },
+          { icon: "delete", class: "button-delete", handler: this.deleteAction.bind(this), id: item.id }
+        ],
       }
     })
     this.total = data.total

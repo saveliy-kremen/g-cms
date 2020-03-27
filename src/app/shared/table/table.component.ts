@@ -9,10 +9,25 @@ import { MatTable } from '@angular/material/table';
   template: `
   <table mat-table matSortDisableClear matSort (matSortChange)="sortChange($event)" [dataSource]="data" style="width: 100%;">
     <!-- Columns definition -->
-    <ng-container *ngFor="let column of columnDefs; let i = index" matColumnDef="{{column}}" [sticky]="i == 0">
-        <th mat-header-cell mat-sort-header *matHeaderCellDef>{{column}}</th>
-        <td mat-cell *matCellDef="let element" [innerHTML]="element[column] | safeHtml"></td>
+
+    <ng-container matColumnDef="position" sticky>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef>№</th>
+        <td mat-cell *matCellDef="let element">{{element.position}}</td>
     </ng-container>
+
+    <ng-container *ngFor="let column of columnDefs; let i = index" matColumnDef="{{column.column}}">
+        <th mat-header-cell mat-sort-header [disabled]="!column.sort" *matHeaderCellDef>{{column.title | translate}}</th>
+        <td mat-cell *matCellDef="let element" [innerHTML]="element[column.column] | safeHtml"></td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions" sticky>
+      <th mat-header-cell *matHeaderCellDef>{{"Actions" | translate}}</th>
+      <td mat-cell *matCellDef="let element">
+        <button *ngFor="let action of element.actions" mat-icon-button>
+          <mat-icon (click)="action.handler(action.id)" class="{{action.class}}">{{action.icon}}</mat-icon>
+        </button>
+      </td>
+  </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
@@ -35,10 +50,10 @@ import { MatTable } from '@angular/material/table';
     .mat-column-position {
         width: 30px;
     }
-    :host /deep/ .glyphicon-edit {
+    .button-edit {
       color: #9c27b0;
     }
-    :host /deep/ .glyphicon-trash {
+    .button-delete {
       color: red;
     }
     `
@@ -67,7 +82,7 @@ export class TableComponent {
   @ViewChild(MatTable, { static: true }) table: MatTable<any>
   data: any
   pageSizeOptions = environment.pageSizeOptions
-  pageIndex: number
+  pageIndex: number = 0
   pageSize: number = environment.pageSizeOptions[0]
   active: string = null
   direction: string = null
@@ -82,11 +97,19 @@ export class TableComponent {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.dataSource) {
+    if (changes.dataSource && this.dataSource) {
       if (this.active == "position") {
-        this.data = this.dataSource.sort(this.direction == "asc" ? compareNumericAsc : compareNumericDesc);
+        this.data = this.dataSource.map((item, index) => {
+          return {
+            ...item, position: this.pageIndex * this.pageSize + index + 1,
+          }
+        }).sort(this.direction == "asc" ? compareNumericAsc : compareNumericDesc)
       } else {
-        this.data = this.dataSource
+        this.data = this.dataSource.map((item, index) => {
+          return {
+            ...item, position: this.pageIndex * this.pageSize + index + 1,
+          }
+        })
       }
     }
   }

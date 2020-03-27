@@ -84,6 +84,36 @@ export namespace PropertyValue {
   }
 }
 
+export class PropertiesRequest extends jspb.Message {
+  getPage(): number;
+  setPage(value: number): void;
+
+  getPagesize(): number;
+  setPagesize(value: number): void;
+
+  getSort(): string;
+  setSort(value: string): void;
+
+  getDirection(): string;
+  setDirection(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PropertiesRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: PropertiesRequest): PropertiesRequest.AsObject;
+  static serializeBinaryToWriter(message: PropertiesRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PropertiesRequest;
+  static deserializeBinaryFromReader(message: PropertiesRequest, reader: jspb.BinaryReader): PropertiesRequest;
+}
+
+export namespace PropertiesRequest {
+  export type AsObject = {
+    page: number,
+    pagesize: number,
+    sort: string,
+    direction: string,
+  }
+}
+
 export class EditPropertyRequest extends jspb.Message {
   getId(): number;
   setId(value: number): void;
@@ -152,6 +182,12 @@ export class PropertiesResponse extends jspb.Message {
   clearPropertiesList(): void;
   addProperties(value?: Property, index?: number): Property;
 
+  getPosition(): number;
+  setPosition(value: number): void;
+
+  getTotal(): number;
+  setTotal(value: number): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PropertiesResponse.AsObject;
   static toObject(includeInstance: boolean, msg: PropertiesResponse): PropertiesResponse.AsObject;
@@ -163,6 +199,8 @@ export class PropertiesResponse extends jspb.Message {
 export namespace PropertiesResponse {
   export type AsObject = {
     propertiesList: Array<Property.AsObject>,
+    position: number,
+    total: number,
   }
 }
 

@@ -9,6 +9,7 @@ export const environment = {
   jwtCoockieName: "ngJWT",
   propertyTypes: ["Строка", "Число"],
   propertyDisplayTypes: ["Список", "Флажки", "Слайдер"],
+  pageSizeOptions: [2, 10, 20]
 };
 
 /*

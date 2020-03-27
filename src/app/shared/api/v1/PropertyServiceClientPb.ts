@@ -13,6 +13,7 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 
 import {
   EditPropertyRequest,
+  PropertiesRequest,
   PropertiesResponse,
   PropertyResponse} from './property_pb';
 
@@ -59,14 +60,14 @@ export class PropertyServiceClient {
 
   methodInfoProperties = new grpcWeb.AbstractClientBase.MethodInfo(
     PropertiesResponse,
-    (request: google_protobuf_empty_pb.Empty) => {
+    (request: PropertiesRequest) => {
       return request.serializeBinary();
     },
     PropertiesResponse.deserializeBinary
   );
 
   properties(
-    request: google_protobuf_empty_pb.Empty,
+    request: PropertiesRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
                response: PropertiesResponse) => void) {

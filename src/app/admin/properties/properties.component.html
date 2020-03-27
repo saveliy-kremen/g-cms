@@ -7,8 +7,8 @@
   </button>
 
   <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
-    <app-table [columnDefs]="displayedColumns" [displayedColumns]="displayedColumns" [dataSource]="dataSource"
-      [length]="length" (changePageHandler)="changePage($event)">
+    <app-table [columnDefs]="displayedColumns" [displayedColumns]="displayedColumns" [dataSource]="propertiesData"
+      [length]="total" (changePageHandler)="changePage($event)" (changeSortHandler)="changeSort($event)">
     </app-table>
   </mat-card-content>
 </mat-card>

@@ -1,21 +1,23 @@
-import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
+import { environment } from 'src/environments/environment';
+import { MatTable } from '@angular/material/table';
 
 @Component({
   selector: 'app-table',
   template: `
-  <table mat-table [dataSource]="dataSource" style="width: 100%;">
+  <table mat-table matSortDisableClear matSort (matSortChange)="sortChange($event)" [dataSource]="data" style="width: 100%;">
     <!-- Columns definition -->
     <ng-container *ngFor="let column of columnDefs; let i = index" matColumnDef="{{column}}" [sticky]="i == 0">
-        <th mat-header-cell *matHeaderCellDef>{{column}}</th>
+        <th mat-header-cell mat-sort-header *matHeaderCellDef>{{column}}</th>
         <td mat-cell *matCellDef="let element" [innerHTML]="element[column] | safeHtml"></td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
-  <mat-paginator [pageSizeOptions]="[5, 10, 20]" [length]="length" (page)="changePage($event)"
+  <mat-paginator [pageSizeOptions]="pageSizeOptions" [length]="length" (page)="changePage($event)"
     showFirstLastButtons>
   </mat-paginator>
   `,
@@ -56,17 +58,66 @@ export class TableComponent {
   length: number
 
   @Output()
-  changePageHandler = new EventEmitter<number>();
+  changePageHandler = new EventEmitter<any>();
 
   @Input()
   actions: any
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator
+  @ViewChild(MatTable, { static: true }) table: MatTable<any>
+  data: any
+  pageSizeOptions = environment.pageSizeOptions
+  pageIndex: number
+  pageSize: number = environment.pageSizeOptions[0]
+  active: string = null
+  direction: string = null
 
   constructor(private router: Router) {
   }
 
+  ngOnInit() {
+    if (this.length) {
+      this.table.renderRows()
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.dataSource) {
+      if (this.active == "position") {
+        this.data = this.dataSource.sort(this.direction == "asc" ? compareNumericAsc : compareNumericDesc);
+      } else {
+        this.data = this.dataSource
+      }
+    }
+  }
+
   changePage($event) {
-    this.changePageHandler.emit($event)
+    this.pageIndex = $event.pageIndex
+    this.pageSize = $event.pageSize
+    this.changePageHandler.emit({ pageIndex: this.pageIndex, pageSize: this.pageSize, sort: this.active != "position" ? this.active : null, direction: this.active != "position" ? this.direction : null })
+  }
+
+  sortChange($event) {
+    this.active = $event.active
+    this.direction = $event.direction
+    if ($event.active == "position") {
+      this.data.sort($event.direction == "asc" ? compareNumericAsc : compareNumericDesc);
+    } else {
+      this.changePageHandler.emit({ pageIndex: this.pageIndex, pageSize: this.pageSize, sort: this.active, direction: this.direction })
+    }
+    this.table.renderRows()
   }
 }
+
+function compareNumericAsc(a, b) {
+  if (Number(a.position) > Number(b.position)) return 1;
+  if (Number(a.position) == Number(b.position)) return 0;
+  if (Number(a.position) < Number(b.position)) return -1;
+}
+
+function compareNumericDesc(a, b) {
+  if (Number(a.position) < Number(b.position)) return 1;
+  if (Number(a.position) == Number(b.position)) return 0;
+  if (Number(a.position) > Number(b.position)) return -1;
+}
+

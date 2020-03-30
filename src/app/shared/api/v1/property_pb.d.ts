@@ -59,6 +59,9 @@ export class PropertyValue extends jspb.Message {
   getId(): number;
   setId(value: number): void;
 
+  getUserid(): number;
+  setUserid(value: number): void;
+
   getPropertyid(): number;
   setPropertyid(value: number): void;
 
@@ -82,6 +85,7 @@ export class PropertyValue extends jspb.Message {
 export namespace PropertyValue {
   export type AsObject = {
     id: number,
+    userid: number,
     propertyid: number,
     value: string,
     image: string,

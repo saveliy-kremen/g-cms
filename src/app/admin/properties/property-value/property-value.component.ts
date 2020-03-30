@@ -4,6 +4,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Message } from 'src/app/shared/models/message.model';
 import { PropertyGrpcService } from 'src/app/shared/services/grpc/property.service';
 import { environment } from 'src/environments/environment';
+import { LoaderService } from 'src/app/shared/services/loader.service';
 
 @Component({
   selector: 'app-property-value',
@@ -14,13 +15,15 @@ export class PropertyValueComponent implements OnInit {
   propertyValueForm: FormGroup
   propertyValueFormSubmitted: boolean
   propertyValueMessage: Message = new Message("success", "")
-  uploadUrl: string = environment.siteUrl + "/uploads/properties/";
+  uploadUrl: string = environment.siteUrl + "/uploads/properties/"
+  isImageProperty: boolean
   image: string
 
 
   constructor(
     private propertyService: PropertyGrpcService,
     public dialogRef: MatDialogRef<PropertyValueComponent>,
+    private loaderService: LoaderService,
     @Inject(MAT_DIALOG_DATA) public data) { }
 
   ngOnInit(): void {
@@ -34,7 +37,7 @@ export class PropertyValueComponent implements OnInit {
         this.image = base64image
       });
     }
-    console.log(this.image)
+    this.isImageProperty = this.data.property.type == environment.propertyTypes.findIndex(item => item === "Изображение");
   }
 
   onNoClick(): void {
@@ -53,6 +56,7 @@ export class PropertyValueComponent implements OnInit {
   }
 
   async submitPropertyValueForm() {
+    this.loaderService.showLoader()
     this.propertyValueFormSubmitted = true;
     if (this.propertyValueForm.valid) {
       try {
@@ -61,17 +65,16 @@ export class PropertyValueComponent implements OnInit {
           this.data,
           this.propertyValueForm.value,
         ).toPromise();
-        console.log(res)
-        //this.property = res.data.editPropertyValue;
         this.propertyValueFormSubmitted = false;
         this.propertyValueMessage = new Message("success", "");
         this.propertyValueForm.reset();
-        this.dialogRef.close();
+        this.dialogRef.close(res.property);
       } catch (err) {
         this.propertyValueMessage = new Message("danger", err.message);
         console.log(this.propertyValueMessage);
       }
     }
+    this.loaderService.hideLoader()
   }
 
   public getBase64Image(imgUrl, callback) {

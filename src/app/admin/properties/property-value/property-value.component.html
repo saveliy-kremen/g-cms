@@ -22,7 +22,7 @@
       </mat-error>
     </mat-form-field>
     <br>
-    <div style="position: relative;">
+    <div style="position: relative;" *ngIf="isImageProperty">
       <ngx-dropzone #dropzone class="custom-dropzone" [multiple]="false" [accept]="'image/png,image/jpeg'"
         [maxFileSize]="2000000" (change)="onSelect($event)">
       </ngx-dropzone>
@@ -39,7 +39,7 @@
     </div>
   </div>
   <div mat-dialog-actions>
+    <button mat-button class="btn btn-primary">{{"Save" | translate}}</button>
     <button mat-button type="button" (click)="onNoClick()" cdkFocusInitial>{{"Cancel" | translate}}</button>
-    <button mat-button>{{"Save" | translate}}</button>
   </div>
 </form>

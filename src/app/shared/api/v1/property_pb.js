@@ -669,10 +669,11 @@ proto.v1.PropertyValue.prototype.toObject = function(opt_includeInstance) {
 proto.v1.PropertyValue.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    propertyid: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    value: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    image: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    sort: jspb.Message.getFieldWithDefault(msg, 5, 0)
+    userid: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    propertyid: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    value: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    image: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    sort: jspb.Message.getFieldWithDefault(msg, 6, 0)
   };
 
   if (includeInstance) {
@@ -715,17 +716,21 @@ proto.v1.PropertyValue.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 2:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setPropertyid(value);
+      msg.setUserid(value);
       break;
     case 3:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setValue(value);
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setPropertyid(value);
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setImage(value);
+      msg.setValue(value);
       break;
     case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setImage(value);
+      break;
+    case 6:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSort(value);
       break;
@@ -765,31 +770,38 @@ proto.v1.PropertyValue.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getPropertyid();
+  f = message.getUserid();
   if (f !== 0) {
     writer.writeUint32(
       2,
       f
     );
   }
-  f = message.getValue();
-  if (f.length > 0) {
-    writer.writeString(
+  f = message.getPropertyid();
+  if (f !== 0) {
+    writer.writeUint32(
       3,
       f
     );
   }
-  f = message.getImage();
+  f = message.getValue();
   if (f.length > 0) {
     writer.writeString(
       4,
       f
     );
   }
+  f = message.getImage();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
   f = message.getSort();
   if (f !== 0) {
     writer.writeUint32(
-      5,
+      6,
       f
     );
   }
@@ -815,10 +827,10 @@ proto.v1.PropertyValue.prototype.setId = function(value) {
 
 
 /**
- * optional uint32 propertyID = 2;
+ * optional uint32 userID = 2;
  * @return {number}
  */
-proto.v1.PropertyValue.prototype.getPropertyid = function() {
+proto.v1.PropertyValue.prototype.getUserid = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
@@ -827,34 +839,34 @@ proto.v1.PropertyValue.prototype.getPropertyid = function() {
  * @param {number} value
  * @return {!proto.v1.PropertyValue} returns this
  */
-proto.v1.PropertyValue.prototype.setPropertyid = function(value) {
+proto.v1.PropertyValue.prototype.setUserid = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
 
 
 /**
- * optional string value = 3;
+ * optional uint32 propertyID = 3;
+ * @return {number}
+ */
+proto.v1.PropertyValue.prototype.getPropertyid = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.v1.PropertyValue} returns this
+ */
+proto.v1.PropertyValue.prototype.setPropertyid = function(value) {
+  return jspb.Message.setProto3IntField(this, 3, value);
+};
+
+
+/**
+ * optional string value = 4;
  * @return {string}
  */
 proto.v1.PropertyValue.prototype.getValue = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.v1.PropertyValue} returns this
- */
-proto.v1.PropertyValue.prototype.setValue = function(value) {
-  return jspb.Message.setProto3StringField(this, 3, value);
-};
-
-
-/**
- * optional string image = 4;
- * @return {string}
- */
-proto.v1.PropertyValue.prototype.getImage = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
@@ -863,17 +875,35 @@ proto.v1.PropertyValue.prototype.getImage = function() {
  * @param {string} value
  * @return {!proto.v1.PropertyValue} returns this
  */
-proto.v1.PropertyValue.prototype.setImage = function(value) {
+proto.v1.PropertyValue.prototype.setValue = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
 };
 
 
 /**
- * optional uint32 sort = 5;
+ * optional string image = 5;
+ * @return {string}
+ */
+proto.v1.PropertyValue.prototype.getImage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.PropertyValue} returns this
+ */
+proto.v1.PropertyValue.prototype.setImage = function(value) {
+  return jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * optional uint32 sort = 6;
  * @return {number}
  */
 proto.v1.PropertyValue.prototype.getSort = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
 };
 
 
@@ -882,7 +912,7 @@ proto.v1.PropertyValue.prototype.getSort = function() {
  * @return {!proto.v1.PropertyValue} returns this
  */
 proto.v1.PropertyValue.prototype.setSort = function(value) {
-  return jspb.Message.setProto3IntField(this, 5, value);
+  return jspb.Message.setProto3IntField(this, 6, value);
 };
 
 

@@ -60,7 +60,7 @@
           </button>
           <br>
           <app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns" [dataSource]="propertyValues"
-            [length]="propertyValues.length" (changePageHandler)="changePage($event)" actions="actions">
+            [length]="property.valuesList?.length" (changePageHandler)="changePage($event)" actions="actions">
           </app-table>
           <br>
         </mat-tab>

@@ -31,6 +31,8 @@ export class PropertyEditComponent implements OnInit {
   editing: boolean
   property: any = {}
   propertyValues: any = [];
+  propertyValuesPage: number = 0
+  propertyValuesPageSize: number = 0
 
   displayedColumns: string[] = ['position', 'value', 'sort', 'actions']
   columnDefs = [
@@ -72,7 +74,9 @@ export class PropertyEditComponent implements OnInit {
           ]
         }
       })
-      this.propertyValues = this.property.valuesList.slice(0, environment.pageSizeOptions[0])
+      this.propertyValuesPage = 0;
+      this.propertyValuesPageSize = environment.pageSizeOptions[0]
+      this.propertyValues = this.property.valuesList.slice(this.propertyValuesPage, this.propertyValuesPageSize)
       this.propertyForm.patchValue(this.property)
       this.propertyMessage = new Message("success", "")
       res = await this.propertyService.propertyCategories(Number(this.activeRoute.snapshot.params["id"])).toPromise()
@@ -140,8 +144,9 @@ export class PropertyEditComponent implements OnInit {
   }
 
   changePage($event) {
-    console.log($event)
-    //this.propertyValues = this.property.valuesList.slice(0, environment.pageSizeOptions[0])
+    this.propertyValuesPage = $event.pageIndex;
+    this.propertyValuesPageSize = $event.pageSize;
+    this.propertyValues = this.property.valuesList.slice(this.propertyValuesPage * this.propertyValuesPageSize, (this.propertyValuesPage + 1) * this.propertyValuesPageSize)
   }
 
   showPropertyValueModal(id): void {
@@ -155,7 +160,19 @@ export class PropertyEditComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed')
+      if (result) {
+        this.property = result
+        this.property.valuesList = this.property.valuesList.map((item, index) => {
+          return {
+            ...item,
+            actions: [
+              { icon: "edit", class: "button-edit", handler: this.showPropertyValueModal.bind(this), id: item.id },
+              { icon: "delete", class: "button-delete", handler: this.deletePropertyValueConfirm.bind(this), id: item.id }
+            ]
+          }
+        })
+        this.propertyValues = this.property.valuesList.slice(this.propertyValuesPage * this.propertyValuesPageSize, (this.propertyValuesPage + 1) * this.propertyValuesPageSize)
+      }
     });
   }
 

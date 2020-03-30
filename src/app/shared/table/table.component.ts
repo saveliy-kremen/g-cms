@@ -23,7 +23,7 @@ import { MatTable } from '@angular/material/table';
     <ng-container matColumnDef="actions" stickyEnd>
       <th mat-header-cell *matHeaderCellDef>{{"Actions" | translate}}</th>
       <td mat-cell *matCellDef="let element">
-        <button *ngFor="let action of element.actions" mat-icon-button>
+        <button *ngFor="let action of element.actions" mat-icon-button type="button">
           <mat-icon (click)="action.handler(action.id)" class="{{action.class}}">{{action.icon}}</mat-icon>
         </button>
       </td>

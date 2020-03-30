@@ -150,7 +150,7 @@ export class PropertyGrpcService {
 
         const promise = new Promise((resolve, reject) => {
             var request = new GRPC.EditPropertyValueRequest();
-            request.setId(propertyValue.id)
+            request.setId(data.propertyValue.id)
             request.setPropertyid(data.property.id)
             request.setValue(propertyValue.value)
             request.setSort(propertyValue.sort)

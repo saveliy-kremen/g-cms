@@ -208,6 +208,7 @@ func (u *PropertyServiceImpl) EditPropertyValue(ctx context.Context, req *v1.Edi
 		}
 	}
 
+	propertyValue.UserID = user_id
 	propertyValue.PropertyID = uint(req.PropertyID)
 	propertyValue.Value = req.Value
 	propertyValue.Sort = uint(req.Sort)
@@ -217,7 +218,7 @@ func (u *PropertyServiceImpl) EditPropertyValue(ctx context.Context, req *v1.Edi
 
 	if req.Image != "" {
 		directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(propertyValue.ID)) + "/"
-		file, err := upload.UploadImage(req.Image, directory, "property-"+strconv.Itoa(int(propertyValue.ID)))
+		file, err := upload.UploadImage(req.Image, directory, strconv.Itoa(int(propertyValue.ID)))
 		if err == nil {
 			propertyValue.Image = file
 			db.DB.Save(&propertyValue)

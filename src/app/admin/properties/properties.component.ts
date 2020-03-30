@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { PropertyGrpcService } from 'src/app/shared/services/grpc/property.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import { LoaderService } from 'src/app/shared/services/loader.service';
 
 @Component({
   selector: 'app-properties',
@@ -22,12 +23,15 @@ export class PropertiesComponent implements OnInit {
 
   constructor(
     private propertyService: PropertyGrpcService,
+    private loaderService: LoaderService,
     private router: Router
   ) { }
 
   async ngOnInit() {
+    this.loaderService.showLoader()
     let res = await this.propertyService.properties(0, environment.pageSizeOptions[0], null, null).toPromise()
     this.updatePropertiesData(res)
+    this.loaderService.hideLoader()
   }
 
   async changePage(event) {

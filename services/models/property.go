@@ -39,6 +39,7 @@ type Property struct {
 type PropertyValue struct {
 	gorm.Model
 
+	UserID     uint
 	PropertyID uint
 	Value      string
 	Image      string
@@ -53,6 +54,7 @@ type PropertiesCategories struct {
 func PropertyValueToResponse(propertyValue PropertyValue) *v1.PropertyValue {
 	return &v1.PropertyValue{
 		Id:         uint32(propertyValue.ID),
+		UserID:     uint32(propertyValue.UserID),
 		PropertyID: uint32(propertyValue.PropertyID),
 		Value:      propertyValue.Value,
 		Image:      propertyValue.Image,

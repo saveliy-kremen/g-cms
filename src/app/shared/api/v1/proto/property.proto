@@ -20,10 +20,11 @@ message Property{
 
 message PropertyValue{
   uint32 id = 1;
-  uint32 propertyID = 2;
-  string value = 3;
-  string image = 4;
-  uint32 sort = 5;
+  uint32 userID = 2;
+  uint32 propertyID = 3;
+  string value = 4;
+  string image = 5;
+  uint32 sort = 6;
 }
 
 message PropertyRequest {

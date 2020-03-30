@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
-import { Message } from '../../../shared/models/message.model';
+import { Message } from 'src/app/shared/models/message.model';
 import { environment } from 'src/environments/environment';
-import { CategoryGrpcService } from 'src/app/shared/services/category.service';
+import { CategoryGrpcService } from 'src/app/shared/services/grpc/category.service';
 import { LoaderService } from 'src/app/shared/services/loader.service';
 
 @Component({
@@ -68,14 +68,14 @@ export class CategoryEditComponent implements OnInit {
     this.loaderService.hideLoader()
   }
 
-  onSelect(event) {
-    if (event.addedFiles.length > 0) {
+  onSelect($event) {
+    if ($event.addedFiles.length > 0) {
       const reader = new FileReader();
       reader.onload = function (e: ProgressEvent) {
         const content = (e.target as FileReader).result;
         this.image = content;
       }.bind(this);
-      reader.readAsDataURL(event.addedFiles[0]);
+      reader.readAsDataURL($event.addedFiles[0]);
     }
   }
 }

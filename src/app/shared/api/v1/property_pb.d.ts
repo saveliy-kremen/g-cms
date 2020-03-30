@@ -1,6 +1,7 @@
 import * as jspb from "google-protobuf"
 
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
+import * as category_pb from './category_pb';
 
 export class Property extends jspb.Message {
   getId(): string;
@@ -55,14 +56,17 @@ export namespace Property {
 }
 
 export class PropertyValue extends jspb.Message {
-  getId(): string;
-  setId(value: string): void;
+  getId(): number;
+  setId(value: number): void;
 
   getPropertyid(): number;
   setPropertyid(value: number): void;
 
   getValue(): string;
   setValue(value: string): void;
+
+  getImage(): string;
+  setImage(value: string): void;
 
   getSort(): number;
   setSort(value: number): void;
@@ -77,9 +81,10 @@ export class PropertyValue extends jspb.Message {
 
 export namespace PropertyValue {
   export type AsObject = {
-    id: string,
+    id: number,
     propertyid: number,
     value: string,
+    image: string,
     sort: number,
   }
 }
@@ -99,6 +104,28 @@ export class PropertyRequest extends jspb.Message {
 export namespace PropertyRequest {
   export type AsObject = {
     id: number,
+  }
+}
+
+export class PropertyBindRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  getCategoryid(): string;
+  setCategoryid(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PropertyBindRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: PropertyBindRequest): PropertyBindRequest.AsObject;
+  static serializeBinaryToWriter(message: PropertyBindRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PropertyBindRequest;
+  static deserializeBinaryFromReader(message: PropertyBindRequest, reader: jspb.BinaryReader): PropertyBindRequest;
+}
+
+export namespace PropertyBindRequest {
+  export type AsObject = {
+    id: number,
+    categoryid: string,
   }
 }
 
@@ -174,6 +201,40 @@ export namespace EditPropertyRequest {
   }
 }
 
+export class EditPropertyValueRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  getPropertyid(): number;
+  setPropertyid(value: number): void;
+
+  getValue(): string;
+  setValue(value: string): void;
+
+  getSort(): number;
+  setSort(value: number): void;
+
+  getImage(): string;
+  setImage(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): EditPropertyValueRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: EditPropertyValueRequest): EditPropertyValueRequest.AsObject;
+  static serializeBinaryToWriter(message: EditPropertyValueRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): EditPropertyValueRequest;
+  static deserializeBinaryFromReader(message: EditPropertyValueRequest, reader: jspb.BinaryReader): EditPropertyValueRequest;
+}
+
+export namespace EditPropertyValueRequest {
+  export type AsObject = {
+    id: number,
+    propertyid: number,
+    value: string,
+    sort: number,
+    image: string,
+  }
+}
+
 export class PropertyResponse extends jspb.Message {
   getProperty(): Property | undefined;
   setProperty(value?: Property): void;
@@ -219,6 +280,26 @@ export namespace PropertiesResponse {
     propertiesList: Array<Property.AsObject>,
     position: number,
     total: number,
+  }
+}
+
+export class PropertyValueResponse extends jspb.Message {
+  getPropertyvalue(): PropertyValue | undefined;
+  setPropertyvalue(value?: PropertyValue): void;
+  hasPropertyvalue(): boolean;
+  clearPropertyvalue(): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PropertyValueResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: PropertyValueResponse): PropertyValueResponse.AsObject;
+  static serializeBinaryToWriter(message: PropertyValueResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PropertyValueResponse;
+  static deserializeBinaryFromReader(message: PropertyValueResponse, reader: jspb.BinaryReader): PropertyValueResponse;
+}
+
+export namespace PropertyValueResponse {
+  export type AsObject = {
+    propertyvalue?: PropertyValue.AsObject,
   }
 }
 

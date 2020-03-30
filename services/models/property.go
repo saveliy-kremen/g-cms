@@ -32,7 +32,8 @@ type Property struct {
 	Plural  bool
 	Sort    uint
 
-	Values []PropertyValue
+	Values     []PropertyValue
+	Categories []Category `gorm:"many2many:properties_categories;"`
 }
 
 type PropertyValue struct {
@@ -40,7 +41,8 @@ type PropertyValue struct {
 
 	PropertyID uint
 	Value      string
-	Sort       int
+	Image      string
+	Sort       uint
 }
 
 type PropertiesCategories struct {
@@ -50,8 +52,10 @@ type PropertiesCategories struct {
 
 func PropertyValueToResponse(propertyValue PropertyValue) *v1.PropertyValue {
 	return &v1.PropertyValue{
+		Id:         uint32(propertyValue.ID),
 		PropertyID: uint32(propertyValue.PropertyID),
 		Value:      propertyValue.Value,
+		Image:      propertyValue.Image,
 		Sort:       uint32(propertyValue.Sort),
 	}
 }
@@ -74,6 +78,7 @@ func PropertyToResponse(property Property) *v1.Property {
 		Display: uint32(property.Display),
 		Plural:  property.Plural,
 		Sort:    uint32(property.Sort),
+		Values:  PropertyValuesToResponse(property.Values),
 	}
 }
 

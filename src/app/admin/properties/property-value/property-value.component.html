@@ -1,0 +1,45 @@
+<h2 mat-dialog-title>Добавление значения</h2>
+<form novalidate #form="ngForm" [formGroup]="propertyValueForm" (ngSubmit)="submitPropertyValueForm()">
+  <div mat-dialog-content>
+    <div class="alert alert-{{propertyValueMessage.type}}" *ngIf="propertyValueMessage.text">
+      {{propertyValueMessage.text}}
+    </div>
+    <mat-form-field class="full-width">
+      <input matInput formControlName="value" placeholder="{{'Value' | translate}}">
+      <mat-error>
+        <validator-message [field]="propertyValueForm.get('value')" [submitted]="propertyValueFormSubmitted"
+          title="value">
+        </validator-message>
+      </mat-error>
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+      <input matInput formControlName="sort" placeholder="Сортировка">
+      <mat-error>
+        <validator-message [field]="propertyValueForm.get('sort')" [submitted]="propertyValueFormSubmitted"
+          title="sort">
+        </validator-message>
+      </mat-error>
+    </mat-form-field>
+    <br>
+    <div style="position: relative;">
+      <ngx-dropzone #dropzone class="custom-dropzone" [multiple]="false" [accept]="'image/png,image/jpeg'"
+        [maxFileSize]="2000000" (change)="onSelect($event)">
+      </ngx-dropzone>
+      <div class="dropzone-inner" style="position: absolute; top: 0">
+        <button mat-stroked-button type="button" class="btn btn-secondary"
+          (click)="dropzone.showFileSelector()">{{"Add" | translate}}</button>
+        <div class="dropzone" *ngIf="image">
+          <div class="preview" style="margin: 20px;">
+            <img src={{image}} height="30" width="30">
+          </div>
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button type="button" (click)="onNoClick()" cdkFocusInitial>{{"Cancel" | translate}}</button>
+    <button mat-button>{{"Save" | translate}}</button>
+  </div>
+</form>

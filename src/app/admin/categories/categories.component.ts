@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewChild, NgZone } from '@angular/core';
 
-import { CategoryGrpcService } from 'src/app/shared/services/category.service';
+import { CategoryGrpcService } from 'src/app/shared/services/grpc/category.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { LoaderService } from 'src/app/shared/services/loader.service';

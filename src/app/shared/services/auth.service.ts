@@ -3,7 +3,7 @@ import { Observable, Observer, BehaviorSubject } from 'rxjs';
 
 import { SessionService } from 'src/app/shared/services/session.service';
 import { User } from 'src/app/shared/api/v1/user_pb';
-import { UserGrpcService } from './user.service';
+import { UserGrpcService } from 'src/app/shared/services/grpc/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

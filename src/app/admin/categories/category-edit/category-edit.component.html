@@ -26,10 +26,10 @@
               </validator-message>
             </mat-error>
           </mat-form-field>
-
+          <br>
           <div style="position: relative;">
             <ngx-dropzone #dropzone class="custom-dropzone" [multiple]="false" [accept]="'image/png,image/jpeg'"
-              [maxFileSize]="2000000" (change)="onSelect($event)" (change)="onSelect($event)">
+              [maxFileSize]="2000000" (change)="onSelect($event)">
             </ngx-dropzone>
             <div class="dropzone-inner" style="position: absolute; top: 0">
               <button mat-stroked-button type="button" class="btn btn-secondary"

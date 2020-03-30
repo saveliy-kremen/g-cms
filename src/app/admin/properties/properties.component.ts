@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { PropertyGrpcService } from 'src/app/shared/services/property.service';
+import { PropertyGrpcService } from 'src/app/shared/services/grpc/property.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 
@@ -16,7 +16,7 @@ export class PropertiesComponent implements OnInit {
     { column: "type", title: "t_Type", sort: true },
     { column: "sort", title: "t_Sort", sort: true },
   ]
-  actions = { "edit": this.editAction, "delete": this.deleteAction }
+  actions = []
   propertiesData: any
   total: number
 

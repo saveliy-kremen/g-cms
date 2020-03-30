@@ -8,7 +8,7 @@
         {{propertyMessage.text}}
       </div>
 
-      <mat-tab-group>
+      <mat-tab-group (selectedTabChange)="onTabChange($event)">
         <mat-tab label="{{'Основные характеристики'}}">
           <br>
           <mat-form-field class="full-width">
@@ -53,10 +53,21 @@
             </mat-error>
           </mat-form-field>
         </mat-tab>
-        <mat-tab label="{{'Категория'}}">
+        <mat-tab label="{{'Values' | translate}}" *ngIf="editing">
+          <button mat-mini-fab color="accent" type="button" style="margin: 20px;"
+            (click)="showPropertyValueModal(null)">
+            <mat-icon>add</mat-icon>
+          </button>
           <br>
-          <div id="categoryTree">
-          </div>
+          <app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns" [dataSource]="propertyValues"
+            [length]="propertyValues.length" (changePageHandler)="changePage($event)" actions="actions">
+          </app-table>
+          <br>
+        </mat-tab>
+        <mat-tab label="{{'Категория'}}" *ngIf="editing">
+          <br>
+          <div id="categoryTree"></div>
+          <br>
         </mat-tab>
       </mat-tab-group>
       <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;">

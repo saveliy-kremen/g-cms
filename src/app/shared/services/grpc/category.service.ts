@@ -5,11 +5,11 @@ import * as grpcWeb from 'grpc-web';
 
 import { grpcUnary } from './helpers/grpc-unary';
 
-import { Empty } from '../../shared/api/v1/google/protobuf/empty_pb';
-import * as GRPC from '../../shared/api/v1/category_pb';
-import { CategoryServiceClient } from '../../shared/api/v1/CategoryServiceClientPb';
+import { Empty } from 'src/app/shared/api/v1/google/protobuf/empty_pb';
+import * as GRPC from 'src/app/shared/api/v1/category_pb';
+import { CategoryServiceClient } from 'src/app/shared/api/v1/CategoryServiceClientPb';
 import { environment } from 'src/environments/environment';
-import { SessionService } from './session.service';
+import { SessionService } from 'src/app/shared/services/session.service';
 
 @Injectable({
     providedIn: 'root',

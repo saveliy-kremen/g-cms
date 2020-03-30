@@ -129,10 +129,11 @@ func (m *Property) GetValues() []*PropertyValue {
 }
 
 type PropertyValue struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	PropertyID           uint32   `protobuf:"varint,2,opt,name=propertyID,proto3" json:"propertyID,omitempty"`
 	Value                string   `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
-	Sort                 uint32   `protobuf:"varint,4,opt,name=sort,proto3" json:"sort,omitempty"`
+	Image                string   `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
+	Sort                 uint32   `protobuf:"varint,5,opt,name=sort,proto3" json:"sort,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -163,11 +164,11 @@ func (m *PropertyValue) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PropertyValue proto.InternalMessageInfo
 
-func (m *PropertyValue) GetId() string {
+func (m *PropertyValue) GetId() uint32 {
 	if m != nil {
 		return m.Id
 	}
-	return ""
+	return 0
 }
 
 func (m *PropertyValue) GetPropertyID() uint32 {
@@ -180,6 +181,13 @@ func (m *PropertyValue) GetPropertyID() uint32 {
 func (m *PropertyValue) GetValue() string {
 	if m != nil {
 		return m.Value
+	}
+	return ""
+}
+
+func (m *PropertyValue) GetImage() string {
+	if m != nil {
+		return m.Image
 	}
 	return ""
 }
@@ -230,6 +238,53 @@ func (m *PropertyRequest) GetId() uint32 {
 	return 0
 }
 
+type PropertyBindRequest struct {
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	CategoryID           string   `protobuf:"bytes,2,opt,name=categoryID,proto3" json:"categoryID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PropertyBindRequest) Reset()         { *m = PropertyBindRequest{} }
+func (m *PropertyBindRequest) String() string { return proto.CompactTextString(m) }
+func (*PropertyBindRequest) ProtoMessage()    {}
+func (*PropertyBindRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c191a4a5f523572b, []int{3}
+}
+
+func (m *PropertyBindRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PropertyBindRequest.Unmarshal(m, b)
+}
+func (m *PropertyBindRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PropertyBindRequest.Marshal(b, m, deterministic)
+}
+func (m *PropertyBindRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PropertyBindRequest.Merge(m, src)
+}
+func (m *PropertyBindRequest) XXX_Size() int {
+	return xxx_messageInfo_PropertyBindRequest.Size(m)
+}
+func (m *PropertyBindRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_PropertyBindRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PropertyBindRequest proto.InternalMessageInfo
+
+func (m *PropertyBindRequest) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *PropertyBindRequest) GetCategoryID() string {
+	if m != nil {
+		return m.CategoryID
+	}
+	return ""
+}
+
 type PropertiesRequest struct {
 	Page                 uint32   `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize             uint32   `protobuf:"varint,2,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
@@ -244,7 +299,7 @@ func (m *PropertiesRequest) Reset()         { *m = PropertiesRequest{} }
 func (m *PropertiesRequest) String() string { return proto.CompactTextString(m) }
 func (*PropertiesRequest) ProtoMessage()    {}
 func (*PropertiesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c191a4a5f523572b, []int{3}
+	return fileDescriptor_c191a4a5f523572b, []int{4}
 }
 
 func (m *PropertiesRequest) XXX_Unmarshal(b []byte) error {
@@ -310,7 +365,7 @@ func (m *EditPropertyRequest) Reset()         { *m = EditPropertyRequest{} }
 func (m *EditPropertyRequest) String() string { return proto.CompactTextString(m) }
 func (*EditPropertyRequest) ProtoMessage()    {}
 func (*EditPropertyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c191a4a5f523572b, []int{4}
+	return fileDescriptor_c191a4a5f523572b, []int{5}
 }
 
 func (m *EditPropertyRequest) XXX_Unmarshal(b []byte) error {
@@ -380,6 +435,77 @@ func (m *EditPropertyRequest) GetSort() uint32 {
 	return 0
 }
 
+type EditPropertyValueRequest struct {
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	PropertyID           uint32   `protobuf:"varint,2,opt,name=propertyID,proto3" json:"propertyID,omitempty"`
+	Value                string   `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	Sort                 uint32   `protobuf:"varint,4,opt,name=sort,proto3" json:"sort,omitempty"`
+	Image                string   `protobuf:"bytes,5,opt,name=image,proto3" json:"image,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *EditPropertyValueRequest) Reset()         { *m = EditPropertyValueRequest{} }
+func (m *EditPropertyValueRequest) String() string { return proto.CompactTextString(m) }
+func (*EditPropertyValueRequest) ProtoMessage()    {}
+func (*EditPropertyValueRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c191a4a5f523572b, []int{6}
+}
+
+func (m *EditPropertyValueRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EditPropertyValueRequest.Unmarshal(m, b)
+}
+func (m *EditPropertyValueRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EditPropertyValueRequest.Marshal(b, m, deterministic)
+}
+func (m *EditPropertyValueRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EditPropertyValueRequest.Merge(m, src)
+}
+func (m *EditPropertyValueRequest) XXX_Size() int {
+	return xxx_messageInfo_EditPropertyValueRequest.Size(m)
+}
+func (m *EditPropertyValueRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_EditPropertyValueRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EditPropertyValueRequest proto.InternalMessageInfo
+
+func (m *EditPropertyValueRequest) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *EditPropertyValueRequest) GetPropertyID() uint32 {
+	if m != nil {
+		return m.PropertyID
+	}
+	return 0
+}
+
+func (m *EditPropertyValueRequest) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+func (m *EditPropertyValueRequest) GetSort() uint32 {
+	if m != nil {
+		return m.Sort
+	}
+	return 0
+}
+
+func (m *EditPropertyValueRequest) GetImage() string {
+	if m != nil {
+		return m.Image
+	}
+	return ""
+}
+
 type PropertyResponse struct {
 	Property             *Property `protobuf:"bytes,1,opt,name=property,proto3" json:"property,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
@@ -391,7 +517,7 @@ func (m *PropertyResponse) Reset()         { *m = PropertyResponse{} }
 func (m *PropertyResponse) String() string { return proto.CompactTextString(m) }
 func (*PropertyResponse) ProtoMessage()    {}
 func (*PropertyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c191a4a5f523572b, []int{5}
+	return fileDescriptor_c191a4a5f523572b, []int{7}
 }
 
 func (m *PropertyResponse) XXX_Unmarshal(b []byte) error {
@@ -432,7 +558,7 @@ func (m *PropertiesResponse) Reset()         { *m = PropertiesResponse{} }
 func (m *PropertiesResponse) String() string { return proto.CompactTextString(m) }
 func (*PropertiesResponse) ProtoMessage()    {}
 func (*PropertiesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c191a4a5f523572b, []int{6}
+	return fileDescriptor_c191a4a5f523572b, []int{8}
 }
 
 func (m *PropertiesResponse) XXX_Unmarshal(b []byte) error {
@@ -474,14 +600,56 @@ func (m *PropertiesResponse) GetTotal() uint32 {
 	return 0
 }
 
+type PropertyValueResponse struct {
+	PropertyValue        *PropertyValue `protobuf:"bytes,1,opt,name=propertyValue,proto3" json:"propertyValue,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *PropertyValueResponse) Reset()         { *m = PropertyValueResponse{} }
+func (m *PropertyValueResponse) String() string { return proto.CompactTextString(m) }
+func (*PropertyValueResponse) ProtoMessage()    {}
+func (*PropertyValueResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c191a4a5f523572b, []int{9}
+}
+
+func (m *PropertyValueResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PropertyValueResponse.Unmarshal(m, b)
+}
+func (m *PropertyValueResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PropertyValueResponse.Marshal(b, m, deterministic)
+}
+func (m *PropertyValueResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PropertyValueResponse.Merge(m, src)
+}
+func (m *PropertyValueResponse) XXX_Size() int {
+	return xxx_messageInfo_PropertyValueResponse.Size(m)
+}
+func (m *PropertyValueResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_PropertyValueResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PropertyValueResponse proto.InternalMessageInfo
+
+func (m *PropertyValueResponse) GetPropertyValue() *PropertyValue {
+	if m != nil {
+		return m.PropertyValue
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Property)(nil), "v1.Property")
 	proto.RegisterType((*PropertyValue)(nil), "v1.PropertyValue")
 	proto.RegisterType((*PropertyRequest)(nil), "v1.PropertyRequest")
+	proto.RegisterType((*PropertyBindRequest)(nil), "v1.PropertyBindRequest")
 	proto.RegisterType((*PropertiesRequest)(nil), "v1.PropertiesRequest")
 	proto.RegisterType((*EditPropertyRequest)(nil), "v1.EditPropertyRequest")
+	proto.RegisterType((*EditPropertyValueRequest)(nil), "v1.EditPropertyValueRequest")
 	proto.RegisterType((*PropertyResponse)(nil), "v1.PropertyResponse")
 	proto.RegisterType((*PropertiesResponse)(nil), "v1.PropertiesResponse")
+	proto.RegisterType((*PropertyValueResponse)(nil), "v1.PropertyValueResponse")
 }
 
 func init() {
@@ -489,37 +657,46 @@ func init() {
 }
 
 var fileDescriptor_c191a4a5f523572b = []byte{
-	// 472 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x54, 0xc1, 0x8e, 0xd3, 0x30,
-	0x10, 0x55, 0xd2, 0x34, 0x4d, 0x67, 0xb7, 0x0b, 0xeb, 0x5d, 0x16, 0xab, 0x20, 0x54, 0x72, 0x0a,
-	0x12, 0xea, 0x6a, 0x8b, 0x38, 0x01, 0x37, 0x38, 0x70, 0x43, 0x59, 0x89, 0x7b, 0xb6, 0x19, 0x2a,
-	0x4b, 0x61, 0x1d, 0x62, 0xa7, 0x52, 0xf9, 0x23, 0xfe, 0x83, 0x1f, 0xe1, 0x4f, 0x90, 0x27, 0x76,
-	0xe2, 0x42, 0x10, 0xa7, 0x7a, 0x9e, 0x9f, 0x3d, 0x6f, 0xde, 0x73, 0x03, 0x67, 0x75, 0x23, 0x6b,
-	0x6c, 0xf4, 0x61, 0x5d, 0x37, 0x52, 0x4b, 0x16, 0xee, 0x6f, 0x96, 0x4f, 0x76, 0x52, 0xee, 0x2a,
-	0xbc, 0x26, 0xe4, 0xae, 0xfd, 0x72, 0x8d, 0x5f, 0x6b, 0x47, 0x48, 0x7f, 0x05, 0x90, 0x7c, 0xb2,
-	0x67, 0xd8, 0x19, 0x84, 0xa2, 0xe4, 0xc1, 0x2a, 0xc8, 0xe6, 0x79, 0x28, 0x4a, 0x76, 0x05, 0x71,
-	0xab, 0xb0, 0xf9, 0xf8, 0x9e, 0x87, 0xab, 0x20, 0x5b, 0xe4, 0xb6, 0x62, 0x97, 0x30, 0xd5, 0x42,
-	0x57, 0xc8, 0x27, 0x44, 0xed, 0x0a, 0xc6, 0x20, 0xda, 0xca, 0x12, 0x79, 0x44, 0x20, 0xad, 0x0d,
-	0xa6, 0x0f, 0x35, 0xf2, 0x29, 0x9d, 0xa7, 0x35, 0xe3, 0x30, 0x2b, 0x85, 0xaa, 0xab, 0xe2, 0xc0,
-	0x63, 0x82, 0x5d, 0x69, 0xfa, 0xd5, 0x55, 0xdb, 0x14, 0x15, 0x9f, 0xad, 0x82, 0x2c, 0xc9, 0x6d,
-	0x65, 0x6e, 0x51, 0xb2, 0xd1, 0x3c, 0xe9, 0x6e, 0x31, 0x6b, 0xf6, 0x02, 0xe2, 0x7d, 0x51, 0xb5,
-	0xa8, 0xf8, 0x7c, 0x35, 0xc9, 0x4e, 0x36, 0xe7, 0xeb, 0xfd, 0xcd, 0xda, 0x4d, 0xf2, 0xd9, 0xec,
-	0xe4, 0x96, 0x90, 0x0a, 0x58, 0x1c, 0x6d, 0xfc, 0x35, 0xe7, 0x33, 0x00, 0xe7, 0x5b, 0x3f, 0xab,
-	0x87, 0x98, 0x79, 0xe9, 0x2a, 0x37, 0x2f, 0x15, 0xbd, 0xaa, 0x68, 0x50, 0x95, 0x3e, 0x87, 0x07,
-	0xae, 0x55, 0x8e, 0xdf, 0x5a, 0x54, 0xda, 0x6b, 0xb6, 0x30, 0xcd, 0xd2, 0x16, 0xce, 0x2d, 0x45,
-	0xa0, 0x72, 0x24, 0x06, 0x51, 0x5d, 0xec, 0xd0, 0xd2, 0x68, 0xcd, 0x96, 0x90, 0x98, 0xdf, 0x5b,
-	0xf1, 0x1d, 0xad, 0xa6, 0xbe, 0xee, 0x7b, 0x77, 0x82, 0x3a, 0x47, 0x9e, 0xc2, 0xbc, 0x14, 0x0d,
-	0x6e, 0xb5, 0x90, 0xf7, 0x36, 0x84, 0x01, 0x48, 0x7f, 0x04, 0x70, 0xf1, 0xa1, 0x14, 0xfa, 0x3f,
-	0xf2, 0x86, 0x6c, 0xc3, 0xb1, 0x6c, 0x27, 0x23, 0xd9, 0x46, 0xe3, 0xd9, 0x4e, 0xff, 0x95, 0x6d,
-	0x3c, 0x9a, 0xed, 0xcc, 0x73, 0xf1, 0x2d, 0x3c, 0x1c, 0x64, 0xaa, 0x5a, 0xde, 0x2b, 0x64, 0x19,
-	0x24, 0x2e, 0x11, 0x52, 0x7b, 0xb2, 0x39, 0xf5, 0x13, 0xcf, 0xfb, 0xdd, 0x54, 0x03, 0xf3, 0x0d,
-	0xb6, 0xe7, 0x5f, 0xf6, 0x19, 0x0b, 0x54, 0x3c, 0xa0, 0x37, 0x73, 0x7c, 0x83, 0xb7, 0x4f, 0xde,
-	0x4b, 0x25, 0xc8, 0x4a, 0xe7, 0xbd, 0xad, 0xc9, 0x21, 0xa9, 0x8b, 0x8a, 0xcc, 0x58, 0xe4, 0x5d,
-	0xb1, 0xf9, 0x19, 0x0c, 0xd1, 0xdf, 0x62, 0xb3, 0x17, 0x5b, 0x64, 0xaf, 0xbd, 0xff, 0xd6, 0xc5,
-	0x51, 0xaf, 0xce, 0xfc, 0xe5, 0xe5, 0x31, 0x68, 0xa5, 0xbe, 0x01, 0x18, 0x06, 0x60, 0x8f, 0x3c,
-	0xce, 0xf0, 0x62, 0x96, 0x57, 0x7f, 0xc2, 0xf6, 0xf0, 0x3b, 0x38, 0xf5, 0x63, 0x66, 0x8f, 0x0d,
-	0x6f, 0x24, 0xf8, 0xf1, 0xde, 0x77, 0x31, 0x7d, 0x16, 0x5e, 0xfd, 0x0e, 0x00, 0x00, 0xff, 0xff,
-	0x25, 0x55, 0xe0, 0x79, 0x49, 0x04, 0x00, 0x00,
+	// 610 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x55, 0x4d, 0x8f, 0xd3, 0x30,
+	0x10, 0x55, 0xfa, 0xdd, 0xd9, 0x6d, 0xa1, 0x6e, 0xb7, 0x58, 0x65, 0x85, 0x4a, 0x4e, 0x45, 0x42,
+	0x5d, 0x6d, 0x11, 0xe2, 0x00, 0x1c, 0xf8, 0x58, 0xa1, 0xbd, 0xad, 0xb2, 0x82, 0x7b, 0xda, 0x98,
+	0xca, 0x52, 0xb6, 0x0e, 0xb1, 0x53, 0xa9, 0x5c, 0xb8, 0xf3, 0x4f, 0xf8, 0x59, 0x48, 0xfc, 0x10,
+	0xe4, 0xaf, 0xc4, 0x29, 0x89, 0x90, 0xe0, 0x54, 0xcf, 0x78, 0xf2, 0xfc, 0xde, 0xcc, 0xb3, 0x0b,
+	0xc3, 0x24, 0x65, 0x09, 0x49, 0xc5, 0x61, 0x99, 0xa4, 0x4c, 0x30, 0xd4, 0xd8, 0x5f, 0xce, 0x1e,
+	0x6e, 0x19, 0xdb, 0xc6, 0xe4, 0x42, 0x65, 0xd6, 0xd9, 0xe7, 0x0b, 0x72, 0x97, 0xd8, 0x82, 0xd9,
+	0x70, 0x13, 0x0a, 0xb2, 0x65, 0xa9, 0x89, 0xfd, 0x9f, 0x1e, 0xf4, 0x6e, 0x0c, 0x06, 0x1a, 0x42,
+	0x83, 0x46, 0xd8, 0x9b, 0x7b, 0x8b, 0x7e, 0xd0, 0xa0, 0x11, 0x9a, 0x42, 0x27, 0xe3, 0x24, 0xbd,
+	0x7e, 0x8f, 0x1b, 0x73, 0x6f, 0x31, 0x08, 0x4c, 0x84, 0x26, 0xd0, 0x16, 0x54, 0xc4, 0x04, 0x37,
+	0x55, 0xa9, 0x0e, 0x10, 0x82, 0xd6, 0x86, 0x45, 0x04, 0xb7, 0x54, 0x52, 0xad, 0x65, 0x4e, 0x1c,
+	0x12, 0x82, 0xdb, 0xea, 0x7b, 0xb5, 0x46, 0x18, 0xba, 0x11, 0xe5, 0x49, 0x1c, 0x1e, 0x70, 0x47,
+	0xa5, 0x6d, 0x28, 0xcf, 0x4b, 0xe2, 0x2c, 0x0d, 0x63, 0xdc, 0x9d, 0x7b, 0x8b, 0x5e, 0x60, 0x22,
+	0x89, 0xc2, 0x59, 0x2a, 0x70, 0x4f, 0xa3, 0xc8, 0x35, 0x7a, 0x02, 0x9d, 0x7d, 0x18, 0x67, 0x84,
+	0xe3, 0xfe, 0xbc, 0xb9, 0x38, 0x59, 0x8d, 0x96, 0xfb, 0xcb, 0xa5, 0x55, 0xf2, 0x49, 0xee, 0x04,
+	0xa6, 0xc0, 0xff, 0x06, 0x83, 0xd2, 0x86, 0xa3, 0x73, 0xa0, 0x74, 0x3e, 0x02, 0xb0, 0x7d, 0xcc,
+	0xb5, 0x3a, 0x19, 0xa9, 0x57, 0x41, 0x59, 0xbd, 0x2a, 0x90, 0x59, 0x7a, 0x17, 0x6e, 0xad, 0x60,
+	0x1d, 0xe4, 0x5c, 0xdb, 0x05, 0x57, 0xff, 0x31, 0xdc, 0xb3, 0x04, 0x02, 0xf2, 0x25, 0x23, 0x5c,
+	0x1c, 0x53, 0xf0, 0xaf, 0x60, 0x6c, 0x4b, 0xde, 0xd2, 0x5d, 0x54, 0x53, 0x26, 0x99, 0xda, 0x01,
+	0x1a, 0xa6, 0xfd, 0xc0, 0xc9, 0xf8, 0x19, 0x8c, 0x0c, 0x0c, 0x25, 0xdc, 0x82, 0x20, 0x68, 0x25,
+	0x92, 0xa7, 0x86, 0x51, 0x6b, 0x34, 0x83, 0x9e, 0xfc, 0xbd, 0xa5, 0x5f, 0x89, 0x11, 0x9c, 0xc7,
+	0xb9, 0x04, 0xad, 0x56, 0xb7, 0xfb, 0x1c, 0xfa, 0x11, 0x4d, 0xc9, 0x46, 0x50, 0xb6, 0x33, 0x82,
+	0x8b, 0x84, 0xff, 0xc3, 0x83, 0xf1, 0x55, 0x44, 0xc5, 0x5f, 0x54, 0x16, 0xc6, 0x69, 0x54, 0x19,
+	0xa7, 0x59, 0x61, 0x9c, 0x56, 0xb5, 0x71, 0xda, 0x75, 0xc6, 0xe9, 0x54, 0x1a, 0xa7, 0xeb, 0x0c,
+	0xe3, 0xbb, 0x07, 0xd8, 0xe5, 0xaa, 0xbd, 0x52, 0xdf, 0xef, 0x7f, 0x70, 0x86, 0x3d, 0xb6, 0xe5,
+	0xf8, 0x35, 0x77, 0x4b, 0xdb, 0x71, 0x8b, 0xff, 0x0a, 0xee, 0x17, 0x3d, 0xe3, 0x09, 0xdb, 0x71,
+	0x82, 0x16, 0xd0, 0xb3, 0x27, 0x28, 0x26, 0x27, 0xab, 0x53, 0xd7, 0xdb, 0x41, 0xbe, 0xeb, 0x0b,
+	0x40, 0xee, 0xb4, 0xcd, 0xf7, 0x4f, 0x73, 0xce, 0x94, 0x70, 0xec, 0xa9, 0xdb, 0x51, 0x46, 0x70,
+	0xf6, 0x95, 0x11, 0x18, 0xa7, 0x6a, 0xae, 0xd6, 0x08, 0x26, 0x56, 0xe3, 0x62, 0x22, 0x8c, 0x95,
+	0xba, 0x41, 0xa0, 0x03, 0xff, 0x06, 0xce, 0x8e, 0x7a, 0x67, 0x0e, 0x7e, 0x01, 0x83, 0xc4, 0xdd,
+	0x30, 0xec, 0x2b, 0x6e, 0x66, 0xb9, 0x6e, 0xf5, 0xab, 0x59, 0x5c, 0x90, 0x5b, 0x92, 0xee, 0xe9,
+	0x86, 0xa0, 0xe7, 0xce, 0xbb, 0x34, 0x2e, 0xb1, 0xd7, 0xa3, 0x9a, 0x4d, 0xca, 0x49, 0xc3, 0xe1,
+	0x25, 0x40, 0xd1, 0x12, 0x74, 0xe6, 0xd4, 0x14, 0x17, 0x62, 0x36, 0x3d, 0x4e, 0x9b, 0x8f, 0x5f,
+	0xc3, 0xa9, 0xeb, 0x0c, 0xf4, 0x40, 0xd6, 0x55, 0xf8, 0xba, 0xe6, 0xec, 0x0f, 0x30, 0xfa, 0xc3,
+	0x58, 0xe8, 0xfc, 0x18, 0xc3, 0xf5, 0x5b, 0x0d, 0xd0, 0x9b, 0x7c, 0xae, 0x87, 0x77, 0xfa, 0x6e,
+	0x4b, 0x31, 0x95, 0x5d, 0x50, 0x52, 0x8a, 0x22, 0x87, 0xcb, 0xc4, 0x7d, 0x4f, 0x4c, 0x85, 0x91,
+	0x54, 0xf1, 0xd2, 0xd4, 0x02, 0x5d, 0xc3, 0xd4, 0x96, 0x7f, 0xdc, 0xad, 0xff, 0x07, 0x6a, 0xdd,
+	0x51, 0x7f, 0x39, 0xcf, 0x7e, 0x07, 0x00, 0x00, 0xff, 0xff, 0xa2, 0xcb, 0x2e, 0x1d, 0xb5, 0x06,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -537,6 +714,10 @@ type PropertyServiceClient interface {
 	Property(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error)
 	Properties(ctx context.Context, in *PropertiesRequest, opts ...grpc.CallOption) (*PropertiesResponse, error)
 	EditProperty(ctx context.Context, in *EditPropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error)
+	EditPropertyValue(ctx context.Context, in *EditPropertyValueRequest, opts ...grpc.CallOption) (*PropertyResponse, error)
+	PropertyCategories(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*CategoriesResponse, error)
+	PropertyBindCategory(ctx context.Context, in *PropertyBindRequest, opts ...grpc.CallOption) (*CategoriesResponse, error)
+	PropertyUnbindCategory(ctx context.Context, in *PropertyBindRequest, opts ...grpc.CallOption) (*CategoriesResponse, error)
 }
 
 type propertyServiceClient struct {
@@ -574,11 +755,51 @@ func (c *propertyServiceClient) EditProperty(ctx context.Context, in *EditProper
 	return out, nil
 }
 
+func (c *propertyServiceClient) EditPropertyValue(ctx context.Context, in *EditPropertyValueRequest, opts ...grpc.CallOption) (*PropertyResponse, error) {
+	out := new(PropertyResponse)
+	err := c.cc.Invoke(ctx, "/v1.PropertyService/EditPropertyValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *propertyServiceClient) PropertyCategories(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*CategoriesResponse, error) {
+	out := new(CategoriesResponse)
+	err := c.cc.Invoke(ctx, "/v1.PropertyService/PropertyCategories", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *propertyServiceClient) PropertyBindCategory(ctx context.Context, in *PropertyBindRequest, opts ...grpc.CallOption) (*CategoriesResponse, error) {
+	out := new(CategoriesResponse)
+	err := c.cc.Invoke(ctx, "/v1.PropertyService/PropertyBindCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *propertyServiceClient) PropertyUnbindCategory(ctx context.Context, in *PropertyBindRequest, opts ...grpc.CallOption) (*CategoriesResponse, error) {
+	out := new(CategoriesResponse)
+	err := c.cc.Invoke(ctx, "/v1.PropertyService/PropertyUnbindCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PropertyServiceServer is the server API for PropertyService service.
 type PropertyServiceServer interface {
 	Property(context.Context, *PropertyRequest) (*PropertyResponse, error)
 	Properties(context.Context, *PropertiesRequest) (*PropertiesResponse, error)
 	EditProperty(context.Context, *EditPropertyRequest) (*PropertyResponse, error)
+	EditPropertyValue(context.Context, *EditPropertyValueRequest) (*PropertyResponse, error)
+	PropertyCategories(context.Context, *PropertyRequest) (*CategoriesResponse, error)
+	PropertyBindCategory(context.Context, *PropertyBindRequest) (*CategoriesResponse, error)
+	PropertyUnbindCategory(context.Context, *PropertyBindRequest) (*CategoriesResponse, error)
 }
 
 // UnimplementedPropertyServiceServer can be embedded to have forward compatible implementations.
@@ -593,6 +814,18 @@ func (*UnimplementedPropertyServiceServer) Properties(ctx context.Context, req *
 }
 func (*UnimplementedPropertyServiceServer) EditProperty(ctx context.Context, req *EditPropertyRequest) (*PropertyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EditProperty not implemented")
+}
+func (*UnimplementedPropertyServiceServer) EditPropertyValue(ctx context.Context, req *EditPropertyValueRequest) (*PropertyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditPropertyValue not implemented")
+}
+func (*UnimplementedPropertyServiceServer) PropertyCategories(ctx context.Context, req *PropertyRequest) (*CategoriesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PropertyCategories not implemented")
+}
+func (*UnimplementedPropertyServiceServer) PropertyBindCategory(ctx context.Context, req *PropertyBindRequest) (*CategoriesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PropertyBindCategory not implemented")
+}
+func (*UnimplementedPropertyServiceServer) PropertyUnbindCategory(ctx context.Context, req *PropertyBindRequest) (*CategoriesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PropertyUnbindCategory not implemented")
 }
 
 func RegisterPropertyServiceServer(s *grpc.Server, srv PropertyServiceServer) {
@@ -653,6 +886,78 @@ func _PropertyService_EditProperty_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PropertyService_EditPropertyValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditPropertyValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PropertyServiceServer).EditPropertyValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.PropertyService/EditPropertyValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PropertyServiceServer).EditPropertyValue(ctx, req.(*EditPropertyValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PropertyService_PropertyCategories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PropertyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PropertyServiceServer).PropertyCategories(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.PropertyService/PropertyCategories",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PropertyServiceServer).PropertyCategories(ctx, req.(*PropertyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PropertyService_PropertyBindCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PropertyBindRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PropertyServiceServer).PropertyBindCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.PropertyService/PropertyBindCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PropertyServiceServer).PropertyBindCategory(ctx, req.(*PropertyBindRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PropertyService_PropertyUnbindCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PropertyBindRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PropertyServiceServer).PropertyUnbindCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.PropertyService/PropertyUnbindCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PropertyServiceServer).PropertyUnbindCategory(ctx, req.(*PropertyBindRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _PropertyService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "v1.PropertyService",
 	HandlerType: (*PropertyServiceServer)(nil),
@@ -668,6 +973,22 @@ var _PropertyService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EditProperty",
 			Handler:    _PropertyService_EditProperty_Handler,
+		},
+		{
+			MethodName: "EditPropertyValue",
+			Handler:    _PropertyService_EditPropertyValue_Handler,
+		},
+		{
+			MethodName: "PropertyCategories",
+			Handler:    _PropertyService_PropertyCategories_Handler,
+		},
+		{
+			MethodName: "PropertyBindCategory",
+			Handler:    _PropertyService_PropertyBindCategory_Handler,
+		},
+		{
+			MethodName: "PropertyUnbindCategory",
+			Handler:    _PropertyService_PropertyUnbindCategory_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

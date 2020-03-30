@@ -3,6 +3,7 @@ syntax = "proto3";
 package v1;
 
 import "google/protobuf/empty.proto";
+import "category.proto";
 //import "google/protobuf/wrappers.proto";
 
 message Property{
@@ -18,14 +19,20 @@ message Property{
 }
 
 message PropertyValue{
-  string id = 1;
+  uint32 id = 1;
   uint32 propertyID = 2;
   string value = 3;
-  uint32 sort = 4;
+  string image = 4;
+  uint32 sort = 5;
 }
 
 message PropertyRequest {
   uint32 id = 1;
+}
+
+message PropertyBindRequest {
+  uint32 id = 1;
+  string categoryID = 2;
 }
 
 message PropertiesRequest {
@@ -45,6 +52,14 @@ message EditPropertyRequest {
   uint32 sort = 7;
 }
 
+message EditPropertyValueRequest {
+  uint32 id = 1;
+  uint32 propertyID = 2;
+  string value = 3;
+  uint32 sort = 4;
+  string image = 5;
+}
+
 message PropertyResponse {
   Property property = 1;
 }
@@ -55,8 +70,16 @@ message PropertiesResponse {
   uint32 total = 3;
 }
 
+message PropertyValueResponse {
+  PropertyValue propertyValue = 1;
+}
+
 service PropertyService {
   rpc Property(PropertyRequest) returns (PropertyResponse);
   rpc Properties(PropertiesRequest) returns (PropertiesResponse);
   rpc EditProperty(EditPropertyRequest) returns (PropertyResponse);
+  rpc EditPropertyValue(EditPropertyValueRequest) returns (PropertyResponse);
+  rpc PropertyCategories(PropertyRequest) returns (CategoriesResponse);
+  rpc PropertyBindCategory(PropertyBindRequest) returns (CategoriesResponse);
+  rpc PropertyUnbindCategory(PropertyBindRequest) returns (CategoriesResponse);
 }

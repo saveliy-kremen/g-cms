@@ -18,10 +18,11 @@ import { PropertiesComponent } from './properties/properties.component';
 import { TableModule } from '../shared/table/table.module';
 import { PropertyEditComponent } from './properties/property-edit/property-edit.component';
 import { PropertyValueComponent } from './properties/property-value/property-value.component';
+import { ItemsComponent } from './items/items.component';
 
 @NgModule({
   declarations: [
-    AdminLayoutComponent, IndexComponent, CategoriesComponent, CategoryEditComponent, PropertiesComponent, PropertyEditComponent, PropertyValueComponent
+    AdminLayoutComponent, IndexComponent, CategoriesComponent, CategoryEditComponent, PropertiesComponent, PropertyEditComponent, PropertyValueComponent, ItemsComponent
   ],
   imports: [
     CommonModule,

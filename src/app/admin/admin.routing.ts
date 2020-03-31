@@ -6,6 +6,7 @@ import { CategoriesComponent } from './categories/categories.component';
 import { CategoryEditComponent } from './categories/category-edit/category-edit.component';
 import { PropertiesComponent } from './properties/properties.component';
 import { PropertyEditComponent } from './properties/property-edit/property-edit.component';
+import { ItemsComponent } from './items/items.component';
 
 export const AdminRoutes: Routes = [
   {
@@ -16,6 +17,7 @@ export const AdminRoutes: Routes = [
       { path: 'properties', component: PropertiesComponent },
       { path: 'properties/:mode', component: PropertyEditComponent },
       { path: 'properties/:mode/:id', component: PropertyEditComponent },
+      { path: 'items', component: ItemsComponent },
       { path: 'db', component: IndexComponent },
       { path: '**', redirectTo: '' }
     ]

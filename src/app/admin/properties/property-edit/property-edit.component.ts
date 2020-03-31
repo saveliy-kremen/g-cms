@@ -29,6 +29,7 @@ export class PropertyEditComponent implements OnInit {
   propertyDisplayTypes = environment.propertyDisplayTypes
 
   categoriesData: any
+  uploadUrl: string = environment.siteUrl + "/uploads/properties/"
 
   editing: boolean
   property: any = {}
@@ -72,6 +73,14 @@ export class PropertyEditComponent implements OnInit {
     if (this.editing) {
       let res: any = await this.propertyService.property(Number(this.activeRoute.snapshot.params["id"])).toPromise()
       this.property = res.property
+      if (this.property.type == environment.propertyTypes.findIndex(item => item === "Изображение")) {
+        this.displayedColumns = ['position', 'value', 'imageElement', 'sort', 'actions']
+        this.columnDefs = [
+          { column: "value", title: "t_Value", sort: true },
+          { column: "imageElement", title: "t_Image", sort: false },
+          { column: "sort", title: "t_Sort", sort: true },
+        ]
+      }
       this.propertyValuesPage = 0;
       this.propertyValuesPageSize = environment.pageSizeOptions[0]
       this.updatePropertyValues()
@@ -87,6 +96,7 @@ export class PropertyEditComponent implements OnInit {
     this.property.valuesList = this.property.valuesList.map((item, index) => {
       return {
         ...item,
+        imageElement: `<img src="${this.uploadUrl + this.property.id}/${item.image}" width="30" height="30">`,
         actions: [
           { icon: "edit", class: "button-edit", handler: this.showPropertyValueModal.bind(this), id: item.id },
           { icon: "delete", class: "button-delete", handler: this.deletePropertyValueConfirm.bind(this), id: item.id }

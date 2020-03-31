@@ -22,6 +22,7 @@
   "t_Type": "Тип",
   "t_Sort": "Сортировка",
   "t_Value": "Значение",
+  "t_Image": "Изображение",
   "Actions": "Действия",
   "PAGINATOR.ITEMS_PER_PAGE": "На странице",
   "PAGINATOR.FIRST_PAGE": "Первая страница",

@@ -85,11 +85,13 @@ export class PropertiesComponent implements OnInit {
     this.modalService.showModal(modalData);
   }
 
-  async deletePropertyValue() {
+  async deletePropertyValue(confirm) {
     this.loaderService.showLoader()
     try {
-      const res = await this.propertyService.deleteProperty(this.propertyID, this.propertyPage, this.propertyPageSize, this.propertySort, this.propertyDirection).toPromise()
-      this.updatePropertiesData(res)
+      if (confirm) {
+        const res = await this.propertyService.deleteProperty(this.propertyID, this.propertyPage, this.propertyPageSize, this.propertySort, this.propertyDirection).toPromise()
+        this.updatePropertiesData(res)
+      }
     } catch (err) {
       this.propertiesMessage = new Message("danger", err.message);
       console.log(this.propertiesMessage);

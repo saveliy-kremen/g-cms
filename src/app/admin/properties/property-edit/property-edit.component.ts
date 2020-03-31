@@ -35,6 +35,8 @@ export class PropertyEditComponent implements OnInit {
   propertyValues: any = [];
   propertyValuesPage: number = 0
   propertyValuesPageSize: number = 0
+  propertyValuesSort: string
+  propertyValuesDirection: string
   propertyValueID: number;
 
   displayedColumns: string[] = ['position', 'value', 'sort', 'actions']
@@ -161,7 +163,20 @@ export class PropertyEditComponent implements OnInit {
   changePage($event) {
     this.propertyValuesPage = $event.pageIndex;
     this.propertyValuesPageSize = $event.pageSize;
-    this.propertyValues = this.property.valuesList.slice(this.propertyValuesPage * this.propertyValuesPageSize, (this.propertyValuesPage + 1) * this.propertyValuesPageSize)
+    this.propertyValuesSort = $event.sort
+    this.propertyValuesDirection = $event.direction
+    let propertyValues = this.property.valuesList
+    propertyValues.sort(function (a, b) {
+      let res = 0
+      if (a[this.propertyValuesSort] < b[this.propertyValuesSort]) {
+        res = -1
+      }
+      if (a[this.propertyValuesSort] > b[this.propertyValuesSort]) {
+        res = 1
+      }
+      return this.propertyValuesDirection == "asc" ? res : -res
+    }.bind(this))
+    this.propertyValues = propertyValues.slice(this.propertyValuesPage * this.propertyValuesPageSize, (this.propertyValuesPage + 1) * this.propertyValuesPageSize)
   }
 
   showPropertyValueModal(id): void {
@@ -203,12 +218,14 @@ export class PropertyEditComponent implements OnInit {
     this.modalService.showModal(modalData);
   }
 
-  async deletePropertyValue() {
+  async deletePropertyValue(confirm) {
     this.loaderService.showLoader()
     try {
-      const res = await this.propertyService.deletePropertyValue(this.propertyValueID).toPromise()
-      this.property = res.property
-      this.updatePropertyValues()
+      if (confirm) {
+        const res = await this.propertyService.deletePropertyValue(this.propertyValueID).toPromise()
+        this.property = res.property
+        this.updatePropertyValues()
+      }
     } catch (err) {
       this.propertyMessage = new Message("danger", err.message);
       console.log(this.propertyMessage);

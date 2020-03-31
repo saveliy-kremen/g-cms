@@ -111,6 +111,24 @@ export namespace PropertyRequest {
   }
 }
 
+export class PropertyValueRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PropertyValueRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: PropertyValueRequest): PropertyValueRequest.AsObject;
+  static serializeBinaryToWriter(message: PropertyValueRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PropertyValueRequest;
+  static deserializeBinaryFromReader(message: PropertyValueRequest, reader: jspb.BinaryReader): PropertyValueRequest;
+}
+
+export namespace PropertyValueRequest {
+  export type AsObject = {
+    id: number,
+  }
+}
+
 export class PropertyBindRequest extends jspb.Message {
   getId(): number;
   setId(value: number): void;
@@ -202,6 +220,40 @@ export namespace EditPropertyRequest {
     display: number,
     plural: boolean,
     sort: number,
+  }
+}
+
+export class DeletePropertyRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  getPage(): number;
+  setPage(value: number): void;
+
+  getPagesize(): number;
+  setPagesize(value: number): void;
+
+  getSort(): string;
+  setSort(value: string): void;
+
+  getDirection(): string;
+  setDirection(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeletePropertyRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DeletePropertyRequest): DeletePropertyRequest.AsObject;
+  static serializeBinaryToWriter(message: DeletePropertyRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeletePropertyRequest;
+  static deserializeBinaryFromReader(message: DeletePropertyRequest, reader: jspb.BinaryReader): DeletePropertyRequest;
+}
+
+export namespace DeletePropertyRequest {
+  export type AsObject = {
+    id: number,
+    page: number,
+    pagesize: number,
+    sort: string,
+    direction: string,
   }
 }
 

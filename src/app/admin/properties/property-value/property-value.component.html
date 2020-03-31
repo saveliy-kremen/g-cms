@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Добавление значения</h2>
+<h2 mat-dialog-title>{{data.propertyValue?.id ? ("Edit" | translate) : ("Add" | translate)}} значение</h2>
 <form novalidate #form="ngForm" [formGroup]="propertyValueForm" (ngSubmit)="submitPropertyValueForm()">
   <div mat-dialog-content>
     <div class="alert alert-{{propertyValueMessage.type}}" *ngIf="propertyValueMessage.text">

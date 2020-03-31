@@ -31,6 +31,10 @@ message PropertyRequest {
   uint32 id = 1;
 }
 
+message PropertyValueRequest {
+  uint32 id = 1;
+}
+
 message PropertyBindRequest {
   uint32 id = 1;
   string categoryID = 2;
@@ -51,6 +55,14 @@ message EditPropertyRequest {
   uint32 display = 5;
   bool plural = 6;
   uint32 sort = 7;
+}
+
+message DeletePropertyRequest {
+  uint32 id = 1;
+  uint32 page = 2;
+  uint32 pageSize = 3;
+  string sort = 4;
+  string direction = 5;
 }
 
 message EditPropertyValueRequest {
@@ -79,7 +91,9 @@ service PropertyService {
   rpc Property(PropertyRequest) returns (PropertyResponse);
   rpc Properties(PropertiesRequest) returns (PropertiesResponse);
   rpc EditProperty(EditPropertyRequest) returns (PropertyResponse);
+  rpc DeleteProperty(DeletePropertyRequest) returns (PropertiesResponse);
   rpc EditPropertyValue(EditPropertyValueRequest) returns (PropertyResponse);
+  rpc DeletePropertyValue(PropertyValueRequest) returns (PropertyResponse);
   rpc PropertyCategories(PropertyRequest) returns (CategoriesResponse);
   rpc PropertyBindCategory(PropertyBindRequest) returns (CategoriesResponse);
   rpc PropertyUnbindCategory(PropertyBindRequest) returns (CategoriesResponse);

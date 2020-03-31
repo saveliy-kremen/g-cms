@@ -13,13 +13,15 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 import * as category_pb from './category_pb';
 
 import {
+  DeletePropertyRequest,
   EditPropertyRequest,
   EditPropertyValueRequest,
   PropertiesRequest,
   PropertiesResponse,
   PropertyBindRequest,
   PropertyRequest,
-  PropertyResponse} from './property_pb';
+  PropertyResponse,
+  PropertyValueRequest} from './property_pb';
 
 export class PropertyServiceClient {
   client_: grpcWeb.AbstractClientBase;
@@ -106,6 +108,28 @@ export class PropertyServiceClient {
       callback);
   }
 
+  methodInfoDeleteProperty = new grpcWeb.AbstractClientBase.MethodInfo(
+    PropertiesResponse,
+    (request: DeletePropertyRequest) => {
+      return request.serializeBinary();
+    },
+    PropertiesResponse.deserializeBinary
+  );
+
+  deleteProperty(
+    request: DeletePropertyRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: PropertiesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.PropertyService/DeleteProperty',
+      request,
+      metadata || {},
+      this.methodInfoDeleteProperty,
+      callback);
+  }
+
   methodInfoEditPropertyValue = new grpcWeb.AbstractClientBase.MethodInfo(
     PropertyResponse,
     (request: EditPropertyValueRequest) => {
@@ -125,6 +149,28 @@ export class PropertyServiceClient {
       request,
       metadata || {},
       this.methodInfoEditPropertyValue,
+      callback);
+  }
+
+  methodInfoDeletePropertyValue = new grpcWeb.AbstractClientBase.MethodInfo(
+    PropertyResponse,
+    (request: PropertyValueRequest) => {
+      return request.serializeBinary();
+    },
+    PropertyResponse.deserializeBinary
+  );
+
+  deletePropertyValue(
+    request: PropertyValueRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: PropertyResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.PropertyService/DeletePropertyValue',
+      request,
+      metadata || {},
+      this.methodInfoDeletePropertyValue,
       callback);
   }
 

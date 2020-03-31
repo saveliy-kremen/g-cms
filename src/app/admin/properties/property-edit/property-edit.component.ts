@@ -9,6 +9,8 @@ import { LoaderService } from 'src/app/shared/services/loader.service'
 
 import { PropertyValueComponent } from '../property-value/property-value.component';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
+import { ModalService } from 'src/app/shared/modal/modal.service';
 
 declare var $: any
 
@@ -33,6 +35,7 @@ export class PropertyEditComponent implements OnInit {
   propertyValues: any = [];
   propertyValuesPage: number = 0
   propertyValuesPageSize: number = 0
+  propertyValueID: number;
 
   displayedColumns: string[] = ['position', 'value', 'sort', 'actions']
   columnDefs = [
@@ -45,7 +48,9 @@ export class PropertyEditComponent implements OnInit {
     private router: Router,
     private propertyService: PropertyGrpcService,
     private loaderService: LoaderService,
+    private modalService: ModalService,
     public dialog: MatDialog,
+    private translateService: TranslateService,
     private activeRoute: ActivatedRoute) {
   }
 
@@ -65,24 +70,28 @@ export class PropertyEditComponent implements OnInit {
     if (this.editing) {
       let res: any = await this.propertyService.property(Number(this.activeRoute.snapshot.params["id"])).toPromise()
       this.property = res.property
-      this.property.valuesList = this.property.valuesList.map((item, index) => {
-        return {
-          ...item,
-          actions: [
-            { icon: "edit", class: "button-edit", handler: this.showPropertyValueModal.bind(this), id: item.id },
-            { icon: "delete", class: "button-delete", handler: this.deletePropertyValueConfirm.bind(this), id: item.id }
-          ]
-        }
-      })
       this.propertyValuesPage = 0;
       this.propertyValuesPageSize = environment.pageSizeOptions[0]
-      this.propertyValues = this.property.valuesList.slice(this.propertyValuesPage, this.propertyValuesPageSize)
+      this.updatePropertyValues()
       this.propertyForm.patchValue(this.property)
       this.propertyMessage = new Message("success", "")
       res = await this.propertyService.propertyCategories(Number(this.activeRoute.snapshot.params["id"])).toPromise()
       this.categoriesData = res.categoriesList
     }
     this.loaderService.hideLoader()
+  }
+
+  updatePropertyValues() {
+    this.property.valuesList = this.property.valuesList.map((item, index) => {
+      return {
+        ...item,
+        actions: [
+          { icon: "edit", class: "button-edit", handler: this.showPropertyValueModal.bind(this), id: item.id },
+          { icon: "delete", class: "button-delete", handler: this.deletePropertyValueConfirm.bind(this), id: item.id }
+        ]
+      }
+    })
+    this.propertyValues = this.property.valuesList.slice(this.propertyValuesPage, this.propertyValuesPageSize)
   }
 
   onTabChange(event) {
@@ -105,6 +114,7 @@ export class PropertyEditComponent implements OnInit {
   }
 
   async bindProperty(evt, data) {
+    this.loaderService.showLoader()
     try {
       await this.propertyService.propertyBindCategory(
         Number(this.activeRoute.snapshot.params["id"]),
@@ -113,9 +123,11 @@ export class PropertyEditComponent implements OnInit {
     } catch (err) {
       console.log(err)
     }
+    this.loaderService.hideLoader()
   }
 
   async unbindProperty(evt, data) {
+    this.loaderService.showLoader()
     try {
       await this.propertyService.propertyUnbindCategory(
         Number(this.activeRoute.snapshot.params["id"]),
@@ -124,9 +136,11 @@ export class PropertyEditComponent implements OnInit {
     } catch (err) {
       console.log(err)
     }
+    this.loaderService.hideLoader()
   }
 
   async submitPropertyForm() {
+    this.loaderService.showLoader()
     this.propertyFormSubmitted = true;
     if (this.propertyForm.valid) {
       try {
@@ -141,6 +155,7 @@ export class PropertyEditComponent implements OnInit {
         console.log(this.propertyMessage);
       }
     }
+    this.loaderService.hideLoader()
   }
 
   changePage($event) {
@@ -177,26 +192,27 @@ export class PropertyEditComponent implements OnInit {
   }
 
 
-  deletePropertyValueConfirm(id) {
-    /*
+  async deletePropertyValueConfirm(id) {
     this.propertyValueID = id;
-    const value = this.property.values.filter(item => item.id === id)[0];
-    this.modalPropertyValueDeleteTitle = "Delete Property Value";
-    this.modalPropertyValueDeleteText = `Delete property value"${value.value}" ?`;
-    $('#modalPropertyValueDelete').modal('show');
-    */
+    const value = this.property.valuesList.filter(item => item.id === id)[0];
+    const modalData = {
+      title: await this.translateService.get("Delete property value").toPromise(),
+      text: await this.translateService.get("Delete property value").toPromise() + ` "${value.value}"?`,
+      callBackFunction: this.deletePropertyValue.bind(this)
+    };
+    this.modalService.showModal(modalData);
   }
 
-  /*
   async deletePropertyValue() {
+    this.loaderService.showLoader()
     try {
-      //const res = await this.graphql.deletePropertyValue(this.propertyValueID);
-      //this.property = res.data.deletePropertyValue;
-      $('#modalPropertyValueDelete').modal('hide');
+      const res = await this.propertyService.deletePropertyValue(this.propertyValueID).toPromise()
+      this.property = res.property
+      this.updatePropertyValues()
     } catch (err) {
-      console.log(err)
-      this.modalPropertyValueDeleteTitle = err.message;
+      this.propertyMessage = new Message("danger", err.message);
+      console.log(this.propertyMessage);
     }
+    this.loaderService.hideLoader()
   }
-  */
 }

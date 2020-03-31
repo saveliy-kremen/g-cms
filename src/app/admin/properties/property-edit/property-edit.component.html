@@ -54,14 +54,18 @@
           </mat-form-field>
         </mat-tab>
         <mat-tab label="{{'Values' | translate}}" *ngIf="editing">
-          <button mat-mini-fab color="accent" type="button" style="margin: 20px;"
-            (click)="showPropertyValueModal(null)">
-            <mat-icon>add</mat-icon>
-          </button>
-          <br>
-          <app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns" [dataSource]="propertyValues"
-            [length]="property.valuesList?.length" (changePageHandler)="changePage($event)" actions="actions">
-          </app-table>
+          <mat-card>
+            <button mat-mini-fab color="accent" type="button" style="margin: 20px;"
+              (click)="showPropertyValueModal(null)">
+              <mat-icon>add</mat-icon>
+            </button>
+            <br>
+            <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
+              <app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns" [dataSource]="propertyValues"
+                [length]="property.valuesList?.length" (changePageHandler)="changePage($event)" actions="actions">
+              </app-table>
+            </mat-card-content>
+          </mat-card>
           <br>
         </mat-tab>
         <mat-tab label="{{'Категория'}}" *ngIf="editing">

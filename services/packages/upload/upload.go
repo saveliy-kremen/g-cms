@@ -95,7 +95,7 @@ func UploadImage(data string, directory string, file string) (string, error) {
 		return "", err
 	}
 	jpeg.Encode(img, src, nil)
-	thumb := thumbs.CreateThumb(directory+file, config.AppConfig.CategoryThumbSize, directory, file+"-thumb")
+	thumb := thumbs.CreateThumb(directory+file, config.AppConfig.CategoryThumbSize, directory, file)
 	os.Remove(directory + file)
 	return thumb + "?" + strconv.Itoa(int(secs)), nil
 }

@@ -87,6 +87,28 @@ export class PropertyGrpcService {
         return grpcUnary<GRPC.PropertyResponse.AsObject>(promise);
     }
 
+    public deleteProperty(id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.PropertiesResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.DeletePropertyRequest();
+            request.setId(id)
+            request.setPage(page)
+            request.setPagesize(pageSize)
+            request.setSort(sort)
+            request.setDirection(direction)
+            this.client.deleteProperty(request, meta, (err: grpcWeb.Error, response: GRPC.PropertiesResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<GRPC.PropertiesResponse.AsObject>(promise);
+    }
+
     public propertyCategories(id: number): Observable<CategoryGRPC.CategoriesResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
@@ -156,6 +178,24 @@ export class PropertyGrpcService {
             request.setSort(propertyValue.sort)
             request.setImage(propertyValue.image)
             this.client.editPropertyValue(request, meta, (err: grpcWeb.Error, response: GRPC.PropertyResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<GRPC.PropertyResponse.AsObject>(promise);
+    }
+
+    public deletePropertyValue(id: number): Observable<GRPC.PropertyResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.PropertyValueRequest();
+            request.setId(id)
+            this.client.deletePropertyValue(request, meta, (err: grpcWeb.Error, response: GRPC.PropertyResponse) => {
                 if (err) {
                     return reject(err);
                 }

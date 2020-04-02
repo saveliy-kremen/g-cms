@@ -24,7 +24,7 @@ const (
 type Property struct {
 	gorm.Model
 
-	UserID  uint
+	UserID  uint32
 	Title   string
 	Code    string
 	Type    PropertyType
@@ -39,7 +39,7 @@ type Property struct {
 type PropertyValue struct {
 	gorm.Model
 
-	UserID     uint
+	UserID     uint32
 	PropertyID uint
 	Value      string
 	Image      string

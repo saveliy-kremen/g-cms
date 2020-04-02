@@ -42,8 +42,8 @@ export class PropertyEditComponent implements OnInit {
 
   displayedColumns: string[] = ['position', 'value', 'sort', 'actions']
   columnDefs = [
-    { column: "value", title: "t_Value", sort: true },
-    { column: "sort", title: "t_Sort", sort: true },
+    { column: "value", title: "Value", translate: true, sort: true },
+    { column: "sort", title: "Sort", translate: true, sort: true },
   ]
   actions = []
 
@@ -76,9 +76,9 @@ export class PropertyEditComponent implements OnInit {
       if (this.property.type == environment.propertyTypes.findIndex(item => item === "Изображение")) {
         this.displayedColumns = ['position', 'value', 'imageElement', 'sort', 'actions']
         this.columnDefs = [
-          { column: "value", title: "t_Value", sort: true },
-          { column: "imageElement", title: "t_Image", sort: false },
-          { column: "sort", title: "t_Sort", sort: true },
+          { column: "value", title: "Value", translate: true, sort: true },
+          { column: "imageElement", title: "Image", translate: true, sort: false },
+          { column: "sort", title: "Sort", translate: true, sort: true },
         ]
       }
       this.propertyValuesPage = 0;

@@ -16,9 +16,9 @@ import { Message } from 'src/app/shared/models/message.model';
 export class PropertiesComponent implements OnInit {
   displayedColumns: string[] = ['position', 'title', 'type', 'sort', 'actions']
   columnDefs = [
-    { column: "title", title: "t_Title", sort: true },
-    { column: "type", title: "t_Type", sort: true },
-    { column: "sort", title: "t_Sort", sort: true },
+    { column: "title", title: "Title", translate: true, sort: true },
+    { column: "type", title: "Type", translate: true, sort: true },
+    { column: "sort", title: "Sort", translate: true, sort: true },
   ]
   actions = []
   propertiesData: any

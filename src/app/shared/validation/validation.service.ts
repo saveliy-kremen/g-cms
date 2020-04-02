@@ -18,7 +18,7 @@ export class ValidationService {
         switch (errorName) {
           case "required":
             this.translate.get(thing).subscribe((res: string) => {
-              messages.push(`Вы должны заполнить ${res}`);
+              messages.push(`Вы должны заполнить "${res}"`);
             });
             break;
           case "email":

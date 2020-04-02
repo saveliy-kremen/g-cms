@@ -16,7 +16,7 @@ import { MatTable } from '@angular/material/table';
     </ng-container>
 
     <ng-container *ngFor="let column of columnDefs; let i = index" matColumnDef="{{column.column}}">
-        <th mat-header-cell mat-sort-header [disabled]="!column.sort" *matHeaderCellDef>{{column.title | translate}}</th>
+        <th mat-header-cell mat-sort-header [disabled]="!column.sort" *matHeaderCellDef>{{column.translate ? (column.title | translate) : column.title}}</th>
         <td mat-cell *matCellDef="let element" [innerHTML]="element[column.column] | safeHtml"></td>
     </ng-container>
 

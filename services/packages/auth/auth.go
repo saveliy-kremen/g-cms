@@ -160,10 +160,10 @@ func GetUser(ctx context.Context) models.User {
 	return user
 }
 
-func GetUserUID(ctx context.Context) uint {
+func GetUserUID(ctx context.Context) uint32 {
 	userData, _ := ctx.Value(UserAuthKey).(AuthContext)
 	uid, _ := strconv.Atoi(userData.UserID)
-	return uint(uid)
+	return uint32(uid)
 }
 
 func HashAndSalt(pwd []byte) string {

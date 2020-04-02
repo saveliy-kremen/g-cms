@@ -236,7 +236,7 @@ func (u *CategoryServiceImpl) MoveCategory(ctx context.Context, req *v1.MoveCate
 	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
 }
 
-func deleteCategory(user_id uint, category models.Category) {
+func deleteCategory(user_id uint32, category models.Category) {
 	parent_id := category.ID
 	children := []models.Category{}
 	db.DB.Where("user_id = ? AND parent = ?", user_id, parent_id).Find(&children)

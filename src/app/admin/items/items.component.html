@@ -1,1 +1,14 @@
-<p>items works!</p>
+<mat-card>
+    <mat-card-title>{{"Items" | translate}}</mat-card-title>
+    <mat-card-subtitle>Управление товарами</mat-card-subtitle>
+
+    <button mat-mini-fab color="accent" style="margin: 20px;" routerLink="/admin/items/create">
+        <mat-icon>add</mat-icon>
+    </button>
+
+    <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
+        <app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns" [dataSource]="itemsData"
+            [length]="total" (changePageHandler)="changePage($event)" actions="actions">
+        </app-table>
+    </mat-card-content>
+</mat-card>

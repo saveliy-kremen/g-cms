@@ -1,0 +1,112 @@
+<mat-card>
+  <mat-card-title>{{"Items" | translate}}</mat-card-title>
+  <mat-card-subtitle>{{editing ? ("Edit" | translate) : ("Add" | translate)}} {{'item' | translate}}</mat-card-subtitle>
+
+  <mat-card-content>
+    <form novalidate #form="ngForm" [formGroup]="itemForm" (ngSubmit)="submitItemForm()">
+      <div class="alert alert-{{itemMessage.type}}" *ngIf="itemMessage.text">
+        {{itemMessage.text}}
+      </div>
+
+      <mat-tab-group (selectedTabChange)="onTabChange($event)">
+        <mat-tab label="{{'Основные характеристики'}}">
+          <br>
+          <mat-form-field class="half-width">
+            <input matInput formControlName="title" placeholder="{{'Title' | translate}}">
+            <mat-error>
+              <validator-message [field]="itemForm.get('title')" [submitted]="itemFormSubmitted" title="Title">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="half-width">
+            <input matInput formControlName="article" placeholder="{{'Article' | translate}}">
+            <mat-error>
+              <validator-message [field]="itemForm.get('article')" [submitted]="itemFormSubmitted" title="Article">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="half-width">
+            <input matInput formControlName="alias" placeholder="Alias">
+            <mat-error>
+              <validator-message [field]="itemForm.get('alias')" [submitted]="itemFormSubmitted" title="Alias">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="half-width">
+            <input matInput formControlName="count" type="number" placeholder="{{'Count' | translate}}">
+            <mat-error>
+              <validator-message [field]="itemForm.get('count')" [submitted]="itemFormSubmitted" title="Count">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width">
+            <mat-label>Описание</mat-label>
+            <textarea matInput formControlName="description" rows="5"
+              placeholder="{{'Description' | translate}}"></textarea>
+            <mat-error>
+              <validator-message [field]="itemForm.get('description')" [submitted]="itemFormSubmitted"
+                title="Description">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <br>
+          <mat-form-field class="third-width">
+            <input matInput formControlName="price" type="number" placeholder="{{'Price' | translate}}">
+            <mat-error>
+              <validator-message [field]="itemForm.get('price')" [submitted]="itemFormSubmitted" title="Price">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="third-width">
+            <input matInput formControlName="oldPrice" type="number" placeholder="{{'OldPrice' | translate}}">
+            <mat-error>
+              <validator-message [field]="itemForm.get('oldPrice')" [submitted]="itemFormSubmitted" title="OldPrice">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="third-width">
+            <input matInput formControlName="currencyID" placeholder="{{'Currency' | translate}}">
+            <mat-error>
+              <validator-message [field]="itemForm.get('currencyID')" [submitted]="itemFormSubmitted"
+                title="currencyID">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <mat-checkbox labelPosition="before" formControlName="disable">{{"Disabled" | translate}}
+          </mat-checkbox>
+          <br>
+          <mat-form-field>
+            <input matInput formControlName="sort" type="number" placeholder="{{'Sort' | translate}}">
+            <mat-error>
+              <validator-message [field]="itemForm.get('sort')" [submitted]="itemFormSubmitted" title="Sort">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <br><br><br>
+        </mat-tab>
+        <mat-tab label="{{'Values' | translate}}" *ngIf="editing">
+          <mat-card>
+            <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
+              <!--app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns"
+                                [dataSource]="itemValues" [length]="item.valuesList?.length"
+                                (changePageHandler)="changePage($event)" actions="actions">
+                            </app-table-->
+            </mat-card-content>
+          </mat-card>
+          <br>
+        </mat-tab>
+        <mat-tab label="{{'Категория'}}" *ngIf="editing">
+          <br>
+          <div id="categoryTree"></div>
+          <br>
+        </mat-tab>
+      </mat-tab-group>
+      <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;">
+        {{editing ? ("Save" | translate) : ("Add" | translate)}}
+      </button>
+      <button mat-raised-button type="reset" class="btn btn-secondary" routerLink="/admin/items">
+        {{"Cancel" | translate}}
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>

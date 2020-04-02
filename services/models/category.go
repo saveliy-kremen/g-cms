@@ -9,7 +9,7 @@ import (
 type Category struct {
 	gorm.Model `json:"-"`
 
-	UserID         uint
+	UserID         uint32
 	Title          string
 	Alias          string `gorm:"unique;not null"`
 	Description    string

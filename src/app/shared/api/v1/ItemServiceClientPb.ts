@@ -15,6 +15,7 @@ import * as category_pb from './category_pb';
 import {
   DeleteItemRequest,
   EditItemRequest,
+  ItemImagesResponse,
   ItemRequest,
   ItemResponse,
   ItemsRequest,
@@ -124,6 +125,28 @@ export class ItemServiceClient {
       request,
       metadata || {},
       this.methodInfoItems,
+      callback);
+  }
+
+  methodInfoGetUploadImages = new grpcWeb.AbstractClientBase.MethodInfo(
+    ItemImagesResponse,
+    (request: google_protobuf_empty_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    ItemImagesResponse.deserializeBinary
+  );
+
+  getUploadImages(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: ItemImagesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.ItemService/GetUploadImages',
+      request,
+      metadata || {},
+      this.methodInfoGetUploadImages,
       callback);
   }
 

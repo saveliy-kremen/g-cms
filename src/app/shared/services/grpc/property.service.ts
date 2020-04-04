@@ -32,7 +32,7 @@ export class PropertyGrpcService {
         const promise = new Promise((resolve, reject) => {
             var request = new GRPC.PropertiesRequest();
             request.setPage(page)
-            request.setPagesize(pageSize)
+            request.setPageSize(pageSize)
             request.setSort(sort)
             request.setDirection(direction)
             this.client.properties(request, meta, (err: grpcWeb.Error, response: GRPC.PropertiesResponse) => {
@@ -96,7 +96,7 @@ export class PropertyGrpcService {
             var request = new GRPC.DeletePropertyRequest();
             request.setId(id)
             request.setPage(page)
-            request.setPagesize(pageSize)
+            request.setPageSize(pageSize)
             request.setSort(sort)
             request.setDirection(direction)
             this.client.deleteProperty(request, meta, (err: grpcWeb.Error, response: GRPC.PropertiesResponse) => {
@@ -135,7 +135,7 @@ export class PropertyGrpcService {
         const promise = new Promise((resolve, reject) => {
             var request = new GRPC.PropertyBindRequest();
             request.setId(id)
-            request.setCategoryid(categoryID)
+            request.setCategoryId(categoryID)
             this.client.propertyBindCategory(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.CategoriesResponse) => {
                 if (err) {
                     return reject(err);
@@ -154,7 +154,7 @@ export class PropertyGrpcService {
         const promise = new Promise((resolve, reject) => {
             var request = new GRPC.PropertyBindRequest();
             request.setId(id)
-            request.setCategoryid(categoryID)
+            request.setCategoryId(categoryID)
             this.client.propertyUnbindCategory(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.CategoriesResponse) => {
                 if (err) {
                     return reject(err);
@@ -173,7 +173,7 @@ export class PropertyGrpcService {
         const promise = new Promise((resolve, reject) => {
             var request = new GRPC.EditPropertyValueRequest();
             request.setId(data.propertyValue.id)
-            request.setPropertyid(data.property.id)
+            request.setPropertyId(data.property.id)
             request.setValue(propertyValue.value)
             request.setSort(propertyValue.sort)
             request.setImage(propertyValue.image)

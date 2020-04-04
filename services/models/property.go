@@ -54,8 +54,8 @@ type PropertiesCategories struct {
 func PropertyValueToResponse(propertyValue PropertyValue) *v1.PropertyValue {
 	return &v1.PropertyValue{
 		Id:         uint32(propertyValue.ID),
-		UserID:     uint32(propertyValue.UserID),
-		PropertyID: uint32(propertyValue.PropertyID),
+		UserId:     uint32(propertyValue.UserID),
+		PropertyId: uint32(propertyValue.PropertyID),
 		Value:      propertyValue.Value,
 		Image:      propertyValue.Image,
 		Sort:       uint32(propertyValue.Sort),
@@ -73,7 +73,7 @@ func PropertyValuesToResponse(propertyValues []PropertyValue) []*v1.PropertyValu
 func PropertyToResponse(property Property) *v1.Property {
 	return &v1.Property{
 		Id:      strconv.Itoa(int(property.ID)),
-		UserID:  uint32(property.UserID),
+		UserId:  uint32(property.UserID),
 		Title:   property.Title,
 		Code:    property.Code,
 		Type:    uint32(property.Type),

@@ -33,7 +33,7 @@ export class PropertyValueComponent implements OnInit {
     })
     this.propertyValueForm.patchValue(this.data.propertyValue);
     if (this.data.propertyValue.image) {
-      this.getBase64Image(this.uploadUrl + this.data.propertyValue.propertyid + "/" + this.data.propertyValue.image, base64image => {
+      this.getBase64Image(this.uploadUrl + this.data.propertyValue.propertyId + "/" + this.data.propertyValue.image, base64image => {
         this.image = base64image
       });
     }

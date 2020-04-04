@@ -2,10 +2,13 @@ package services
 
 import (
 	"context"
+
 	//"github.com/davecgh/go-spew/spew"
-	//"github.com/golang/protobuf/ptypes/empty"
+
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
 	//"os"
 	//"strconv"
 	"strings"
@@ -66,7 +69,7 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 	item.Description = req.Description
 	item.Price = req.Price
 	item.OldPrice = req.OldPrice
-	item.CurrencyID = req.CurrencyID
+	item.CurrencyID = req.CurrencyId
 	item.Disable = req.Disable
 	item.Sort = req.Sort
 	if db.DB.Save(&item).Error != nil {
@@ -92,6 +95,14 @@ func (u *ItemServiceImpl) DeleteItem(ctx context.Context, req *v1.DeleteItemRequ
 		*/
 	}
 	return u.Items(ctx, &v1.ItemsRequest{Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
+}
+
+func (u *ItemServiceImpl) GetUploadImages(ctx context.Context, req *empty.Empty) (*v1.ItemImagesResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	images := []models.ItemImage{}
+	db.DB.Where("user_id = ? AND item_id = ?", user_id, 0).Order("sort").Find(&images)
+	return &v1.ItemImagesResponse{Images: models.ItemImagesToResponse(images)}, nil
 }
 
 // compile-type check that our new type provides the

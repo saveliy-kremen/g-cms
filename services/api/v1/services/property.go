@@ -134,12 +134,12 @@ func (u *PropertyServiceImpl) PropertyBindCategory(ctx context.Context, req *v1.
 	}
 
 	category := models.Category{}
-	if db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryID).RecordNotFound() {
+	if db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryId).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Category_not_found")
 	}
 
 	item := models.PropertiesCategories{}
-	if db.DB.Where("property_id = ? AND category_id = ?", req.Id, req.CategoryID).First(&item).RecordNotFound() {
+	if db.DB.Where("property_id = ? AND category_id = ?", req.Id, req.CategoryId).First(&item).RecordNotFound() {
 		item.PropertyID = uint(req.Id)
 		item.CategoryID = category.ID
 		if db.DB.Save(&item).Error != nil {
@@ -181,12 +181,12 @@ func (u *PropertyServiceImpl) PropertyUnbindCategory(ctx context.Context, req *v
 	}
 
 	category := models.Category{}
-	if db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryID).RecordNotFound() {
+	if db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryId).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Category_not_found")
 	}
 
 	item := models.PropertiesCategories{}
-	if db.DB.Unscoped().Where("property_id = ? AND category_id = ?", req.Id, req.CategoryID).Delete(&item).Error != nil {
+	if db.DB.Unscoped().Where("property_id = ? AND category_id = ?", req.Id, req.CategoryId).Delete(&item).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error unbind category")
 	}
 
@@ -226,7 +226,7 @@ func (u *PropertyServiceImpl) EditPropertyValue(ctx context.Context, req *v1.Edi
 	}
 
 	propertyValue.UserID = user_id
-	propertyValue.PropertyID = uint(req.PropertyID)
+	propertyValue.PropertyID = uint(req.PropertyId)
 	propertyValue.Value = req.Value
 	propertyValue.Sort = uint(req.Sort)
 	if db.DB.Save(&propertyValue).Error != nil {
@@ -241,7 +241,7 @@ func (u *PropertyServiceImpl) EditPropertyValue(ctx context.Context, req *v1.Edi
 			db.DB.Save(&propertyValue)
 		}
 	}
-	return u.Property(ctx, &v1.PropertyRequest{Id: req.PropertyID})
+	return u.Property(ctx, &v1.PropertyRequest{Id: req.PropertyId})
 }
 
 func (u *PropertyServiceImpl) DeletePropertyValue(ctx context.Context, req *v1.PropertyValueRequest) (*v1.PropertyResponse, error) {

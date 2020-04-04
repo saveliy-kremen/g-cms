@@ -84,6 +84,34 @@
           </mat-form-field>
           <br><br><br>
         </mat-tab>
+
+        <mat-tab label="{{'Images' | translate}}" *ngIf="editing">
+          <br>
+          <div class="sort-grid" droppable [dropScope]="'item'" (onDrop)="onItemDrop($event, 'item')">
+            <img *ngFor="let image of itemImages" class="upload-images" src="{{uploadUrl + '0/' + image?.filename}}"
+              alt="{{image?.filename}}" ngSortgridItem [ngSortGridItems]="itemImages"
+              (sorted)="storeNewOrder($event, 'item')" ngSortGridGroup="item" draggable [dragData]="image"
+              [dragScope]="'upload'">
+          </div>
+          <br>
+          <div style="position: relative;">
+            <ngx-dropzone #dropzone class="custom-dropzone" [multiple]="true" [accept]="'image/png,image/jpeg'"
+              [maxFileSize]="2000000" (change)="onSelect($event)" droppable [dropScope]="'upload'"
+              (onDrop)="onItemDrop($event, 'upload')">
+              <div class="dropzone-inner" style="position: absolute; top: 0">
+                <button mat-stroked-button type="button" class="btn btn-secondary">{{"Add" | translate}}</button>
+                <div class="dropzone">
+                  <img *ngFor="let image of uploadImages" class="upload-images"
+                    src="{{uploadUrl + '0/' + image?.filename}}" alt="{{image?.filename}}" ngSortgridItem
+                    [ngSortGridItems]="uploadImages" (sorted)="storeNewOrder($event, 'upload')" ngSortGridGroup="upload"
+                    draggable [dragData]="image" [dragScope]="'item'">
+                </div>
+              </div>
+            </ngx-dropzone>
+          </div>
+          <br>
+        </mat-tab>
+
         <mat-tab label="{{'Values' | translate}}" *ngIf="editing">
           <mat-card>
             <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">

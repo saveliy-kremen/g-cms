@@ -7,8 +7,8 @@ export class Property extends jspb.Message {
   getId(): string;
   setId(value: string): void;
 
-  getUserid(): number;
-  setUserid(value: number): void;
+  getUserId(): number;
+  setUserId(value: number): void;
 
   getTitle(): string;
   setTitle(value: string): void;
@@ -44,7 +44,7 @@ export class Property extends jspb.Message {
 export namespace Property {
   export type AsObject = {
     id: string,
-    userid: number,
+    userId: number,
     title: string,
     code: string,
     type: number,
@@ -59,11 +59,11 @@ export class PropertyValue extends jspb.Message {
   getId(): number;
   setId(value: number): void;
 
-  getUserid(): number;
-  setUserid(value: number): void;
+  getUserId(): number;
+  setUserId(value: number): void;
 
-  getPropertyid(): number;
-  setPropertyid(value: number): void;
+  getPropertyId(): number;
+  setPropertyId(value: number): void;
 
   getValue(): string;
   setValue(value: string): void;
@@ -85,8 +85,8 @@ export class PropertyValue extends jspb.Message {
 export namespace PropertyValue {
   export type AsObject = {
     id: number,
-    userid: number,
-    propertyid: number,
+    userId: number,
+    propertyId: number,
     value: string,
     image: string,
     sort: number,
@@ -133,8 +133,8 @@ export class PropertyBindRequest extends jspb.Message {
   getId(): number;
   setId(value: number): void;
 
-  getCategoryid(): string;
-  setCategoryid(value: string): void;
+  getCategoryId(): string;
+  setCategoryId(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PropertyBindRequest.AsObject;
@@ -147,7 +147,7 @@ export class PropertyBindRequest extends jspb.Message {
 export namespace PropertyBindRequest {
   export type AsObject = {
     id: number,
-    categoryid: string,
+    categoryId: string,
   }
 }
 
@@ -155,8 +155,8 @@ export class PropertiesRequest extends jspb.Message {
   getPage(): number;
   setPage(value: number): void;
 
-  getPagesize(): number;
-  setPagesize(value: number): void;
+  getPageSize(): number;
+  setPageSize(value: number): void;
 
   getSort(): string;
   setSort(value: string): void;
@@ -175,7 +175,7 @@ export class PropertiesRequest extends jspb.Message {
 export namespace PropertiesRequest {
   export type AsObject = {
     page: number,
-    pagesize: number,
+    pageSize: number,
     sort: string,
     direction: string,
   }
@@ -230,8 +230,8 @@ export class DeletePropertyRequest extends jspb.Message {
   getPage(): number;
   setPage(value: number): void;
 
-  getPagesize(): number;
-  setPagesize(value: number): void;
+  getPageSize(): number;
+  setPageSize(value: number): void;
 
   getSort(): string;
   setSort(value: string): void;
@@ -251,7 +251,7 @@ export namespace DeletePropertyRequest {
   export type AsObject = {
     id: number,
     page: number,
-    pagesize: number,
+    pageSize: number,
     sort: string,
     direction: string,
   }
@@ -261,8 +261,8 @@ export class EditPropertyValueRequest extends jspb.Message {
   getId(): number;
   setId(value: number): void;
 
-  getPropertyid(): number;
-  setPropertyid(value: number): void;
+  getPropertyId(): number;
+  setPropertyId(value: number): void;
 
   getValue(): string;
   setValue(value: string): void;
@@ -284,7 +284,7 @@ export class EditPropertyValueRequest extends jspb.Message {
 export namespace EditPropertyValueRequest {
   export type AsObject = {
     id: number,
-    propertyid: number,
+    propertyId: number,
     value: string,
     sort: number,
     image: string,
@@ -340,10 +340,10 @@ export namespace PropertiesResponse {
 }
 
 export class PropertyValueResponse extends jspb.Message {
-  getPropertyvalue(): PropertyValue | undefined;
-  setPropertyvalue(value?: PropertyValue): void;
-  hasPropertyvalue(): boolean;
-  clearPropertyvalue(): void;
+  getPropertyValue(): PropertyValue | undefined;
+  setPropertyValue(value?: PropertyValue): void;
+  hasPropertyValue(): boolean;
+  clearPropertyValue(): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PropertyValueResponse.AsObject;
@@ -355,7 +355,7 @@ export class PropertyValueResponse extends jspb.Message {
 
 export namespace PropertyValueResponse {
   export type AsObject = {
-    propertyvalue?: PropertyValue.AsObject,
+    propertyValue?: PropertyValue.AsObject,
   }
 }
 

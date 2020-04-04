@@ -7,17 +7,17 @@ export class Item extends jspb.Message {
   getId(): string;
   setId(value: string): void;
 
-  getUserid(): number;
-  setUserid(value: number): void;
+  getUserId(): number;
+  setUserId(value: number): void;
 
-  getVendorid(): number;
-  setVendorid(value: number): void;
+  getVendorId(): number;
+  setVendorId(value: number): void;
 
-  getParentid(): number;
-  setParentid(value: number): void;
+  getParentId(): number;
+  setParentId(value: number): void;
 
-  getCategoryid(): number;
-  setCategoryid(value: number): void;
+  getCategoryId(): number;
+  setCategoryId(value: number): void;
 
   getTitle(): string;
   setTitle(value: string): void;
@@ -34,11 +34,11 @@ export class Item extends jspb.Message {
   getPrice(): number;
   setPrice(value: number): void;
 
-  getOldprice(): number;
-  setOldprice(value: number): void;
+  getOldPrice(): number;
+  setOldPrice(value: number): void;
 
-  getCurrencyid(): number;
-  setCurrencyid(value: number): void;
+  getCurrencyId(): number;
+  setCurrencyId(value: number): void;
 
   getCount(): number;
   setCount(value: number): void;
@@ -49,14 +49,14 @@ export class Item extends jspb.Message {
   getSort(): number;
   setSort(value: number): void;
 
-  getSeotitle(): string;
-  setSeotitle(value: string): void;
+  getSeoTitle(): string;
+  setSeoTitle(value: string): void;
 
-  getSeodescription(): string;
-  setSeodescription(value: string): void;
+  getSeoDescription(): string;
+  setSeoDescription(value: string): void;
 
-  getSeokeywords(): string;
-  setSeokeywords(value: string): void;
+  getSeoKeywords(): string;
+  setSeoKeywords(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Item.AsObject;
@@ -69,23 +69,65 @@ export class Item extends jspb.Message {
 export namespace Item {
   export type AsObject = {
     id: string,
-    userid: number,
-    vendorid: number,
-    parentid: number,
-    categoryid: number,
+    userId: number,
+    vendorId: number,
+    parentId: number,
+    categoryId: number,
     title: string,
     article: string,
     alias: string,
     description: string,
     price: number,
-    oldprice: number,
-    currencyid: number,
+    oldPrice: number,
+    currencyId: number,
     count: number,
     disable: boolean,
     sort: number,
-    seotitle: string,
-    seodescription: string,
-    seokeywords: string,
+    seoTitle: string,
+    seoDescription: string,
+    seoKeywords: string,
+  }
+}
+
+export class ItemImage extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  getUserId(): number;
+  setUserId(value: number): void;
+
+  getItemId(): number;
+  setItemId(value: number): void;
+
+  getFilename(): string;
+  setFilename(value: string): void;
+
+  getSort(): number;
+  setSort(value: number): void;
+
+  getPropertyValueId(): number;
+  setPropertyValueId(value: number): void;
+
+  getMain(): boolean;
+  setMain(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ItemImage.AsObject;
+  static toObject(includeInstance: boolean, msg: ItemImage): ItemImage.AsObject;
+  static serializeBinaryToWriter(message: ItemImage, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ItemImage;
+  static deserializeBinaryFromReader(message: ItemImage, reader: jspb.BinaryReader): ItemImage;
+}
+
+export namespace ItemImage {
+  export type AsObject = {
+    id: number,
+    userId: number,
+    itemId: number,
+    filename: string,
+    sort: number,
+    propertyValueId: number,
+    main: boolean,
   }
 }
 
@@ -111,8 +153,8 @@ export class ItemsRequest extends jspb.Message {
   getPage(): number;
   setPage(value: number): void;
 
-  getPagesize(): number;
-  setPagesize(value: number): void;
+  getPageSize(): number;
+  setPageSize(value: number): void;
 
   getSort(): string;
   setSort(value: string): void;
@@ -131,7 +173,7 @@ export class ItemsRequest extends jspb.Message {
 export namespace ItemsRequest {
   export type AsObject = {
     page: number,
-    pagesize: number,
+    pageSize: number,
     sort: string,
     direction: string,
   }
@@ -159,11 +201,11 @@ export class EditItemRequest extends jspb.Message {
   getPrice(): number;
   setPrice(value: number): void;
 
-  getOldprice(): number;
-  setOldprice(value: number): void;
+  getOldPrice(): number;
+  setOldPrice(value: number): void;
 
-  getCurrencyid(): number;
-  setCurrencyid(value: number): void;
+  getCurrencyId(): number;
+  setCurrencyId(value: number): void;
 
   getDisable(): boolean;
   setDisable(value: boolean): void;
@@ -188,8 +230,8 @@ export namespace EditItemRequest {
     count: number,
     description: string,
     price: number,
-    oldprice: number,
-    currencyid: number,
+    oldPrice: number,
+    currencyId: number,
     disable: boolean,
     sort: number,
   }
@@ -202,8 +244,8 @@ export class DeleteItemRequest extends jspb.Message {
   getPage(): number;
   setPage(value: number): void;
 
-  getPagesize(): number;
-  setPagesize(value: number): void;
+  getPageSize(): number;
+  setPageSize(value: number): void;
 
   getSort(): string;
   setSort(value: string): void;
@@ -223,7 +265,7 @@ export namespace DeleteItemRequest {
   export type AsObject = {
     id: number,
     page: number,
-    pagesize: number,
+    pageSize: number,
     sort: string,
     direction: string,
   }
@@ -270,6 +312,26 @@ export namespace ItemsResponse {
   export type AsObject = {
     itemsList: Array<Item.AsObject>,
     total: number,
+  }
+}
+
+export class ItemImagesResponse extends jspb.Message {
+  getImagesList(): Array<ItemImage>;
+  setImagesList(value: Array<ItemImage>): void;
+  clearImagesList(): void;
+  addImages(value?: ItemImage, index?: number): ItemImage;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ItemImagesResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: ItemImagesResponse): ItemImagesResponse.AsObject;
+  static serializeBinaryToWriter(message: ItemImagesResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ItemImagesResponse;
+  static deserializeBinaryFromReader(message: ItemImagesResponse, reader: jspb.BinaryReader): ItemImagesResponse;
+}
+
+export namespace ItemImagesResponse {
+  export type AsObject = {
+    imagesList: Array<ItemImage.AsObject>,
   }
 }
 

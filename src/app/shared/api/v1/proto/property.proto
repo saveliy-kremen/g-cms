@@ -8,7 +8,7 @@ import "category.proto";
 
 message Property{
   string id = 1;
-  uint32 userID = 2;
+  uint32 user_id = 2;
   string title = 3;
   string code = 4;
   uint32 type = 5;
@@ -20,8 +20,8 @@ message Property{
 
 message PropertyValue{
   uint32 id = 1;
-  uint32 userID = 2;
-  uint32 propertyID = 3;
+  uint32 user_id = 2;
+  uint32 property_id = 3;
   string value = 4;
   string image = 5;
   uint32 sort = 6;
@@ -37,12 +37,12 @@ message PropertyValueRequest {
 
 message PropertyBindRequest {
   uint32 id = 1;
-  string categoryID = 2;
+  string category_id = 2;
 }
 
 message PropertiesRequest {
   uint32 page = 1;
-  uint32 pageSize = 2;
+  uint32 page_size = 2;
   string sort = 3;
   string direction = 4;
 }
@@ -60,14 +60,14 @@ message EditPropertyRequest {
 message DeletePropertyRequest {
   uint32 id = 1;
   uint32 page = 2;
-  uint32 pageSize = 3;
+  uint32 page_size = 3;
   string sort = 4;
   string direction = 5;
 }
 
 message EditPropertyValueRequest {
   uint32 id = 1;
-  uint32 propertyID = 2;
+  uint32 property_id = 2;
   string value = 3;
   uint32 sort = 4;
   string image = 5;
@@ -84,7 +84,7 @@ message PropertiesResponse {
 }
 
 message PropertyValueResponse {
-  PropertyValue propertyValue = 1;
+  PropertyValue property_value = 1;
 }
 
 service PropertyService {

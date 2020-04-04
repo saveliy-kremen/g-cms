@@ -157,7 +157,7 @@ export class CategoryGrpcService {
         const promise = new Promise((resolve, reject) => {
             var request = new GRPC.EditCategoryRequest();
             request.setTitle(data.title);
-            request.setOldalias(data.oldAlias);
+            request.setOldAlias(data.oldAlias);
             request.setAlias(data.alias);
             request.setDescription(data.description);
             request.setImage(data.image);

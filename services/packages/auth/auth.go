@@ -2,6 +2,8 @@ package auth
 
 import (
 	"context"
+	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"regexp"
@@ -11,9 +13,6 @@ import (
 	"../../config"
 	"../../db"
 	"../../models"
-	"golang.org/x/crypto/bcrypt"
-
-	"github.com/dgrijalva/jwt-go"
 )
 
 const UserAuthKey contextKey = "UserData"

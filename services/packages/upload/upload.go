@@ -16,6 +16,8 @@ import (
 	"time"
 
 	"../../config"
+	"../../db"
+	"../../models"
 	"../../packages/auth"
 	"../../packages/thumbs"
 )
@@ -48,9 +50,8 @@ func UploadFileHandler() http.HandlerFunc {
 		ctx := r.Context()
 		userID := auth.GetUserUID(ctx)
 
-		path := r.Form.Get("path")
 		dir, _ := filepath.Abs(config.AppConfig.UploadPath)
-		directory := dir + "/users/" + strconv.Itoa(int(userID)) + "/" + path + "/"
+		directory := dir + "/users/" + strconv.Itoa(int(userID)) + "/items/0/"
 		if _, err := os.Stat(directory); err != nil {
 			os.MkdirAll(directory, 0775)
 		}
@@ -68,10 +69,15 @@ func UploadFileHandler() http.HandlerFunc {
 			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
 			return
 		}
+		image := models.ItemImage{}
+		db.DB.Where("user_id = ? AND filename = ?", userID, handler.Filename).First(&image)
+		image.UserID = userID
+		image.Filename = handler.Filename
+		db.DB.Save(&image)
 
 		// return that we have successfully uploaded our file!
 		resp := Response{
-			Url: "/users/" + strconv.Itoa(int(userID)) + "/" + path + "/" + handler.Filename,
+			Url: "/users/" + strconv.Itoa(int(userID)) + "/items/0/" + handler.Filename,
 		}
 		json.NewEncoder(w).Encode(resp)
 	})

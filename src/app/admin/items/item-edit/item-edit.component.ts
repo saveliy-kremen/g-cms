@@ -6,6 +6,8 @@ import { LoaderService } from 'src/app/shared/services/loader.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { ItemGrpcService } from 'src/app/shared/services/grpc/item.service';
+import { UploadService } from 'src/app/shared/services/upload.service';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 declare var $: any
 
@@ -20,15 +22,22 @@ export class ItemEditComponent implements OnInit {
   itemMessage: Message = new Message("success", "")
   item: any = {}
   categoriesData: any
-  uploadUrl: string = environment.siteUrl + "/uploads/properties/"
+  uploadUrl: string = environment.siteUrl
 
   editing: boolean
+
+  itemImages: any = []
+  uploadImages: any = []
+  requestItemImages: any
+  requestUploadImages: any
 
   constructor(
     private router: Router,
     private loaderService: LoaderService,
     private itemService: ItemGrpcService,
-    private activeRoute: ActivatedRoute
+    private activeRoute: ActivatedRoute,
+    private authService: AuthService,
+    private uploadService: UploadService,
   ) { }
 
   async ngOnInit() {
@@ -51,6 +60,11 @@ export class ItemEditComponent implements OnInit {
       let res: any = await this.itemService.item(Number(this.activeRoute.snapshot.params["id"])).toPromise()
       this.item = res.item
       this.itemForm.patchValue(this.item)
+      res = await this.authService.getUser()
+      this.uploadUrl += `/uploads/users/${res.id}/items/`
+      res = await this.itemService.getUploadImages().toPromise()
+      this.uploadImages = res.imagesList.slice(0, 2)
+      this.itemImages = res.imagesList.slice(2, 4)
     }
     this.loaderService.hideLoader()
   }
@@ -79,7 +93,6 @@ export class ItemEditComponent implements OnInit {
     this.itemFormSubmitted = true;
     if (this.itemForm.valid) {
       try {
-        console.log(this.itemForm.value)
         this.itemForm.value.id = this.editing ? Number(this.activeRoute.snapshot.params["id"]) : null
         await this.itemService.editItem(this.itemForm.value)
         this.itemFormSubmitted = false;
@@ -92,5 +105,51 @@ export class ItemEditComponent implements OnInit {
       }
     }
     this.loaderService.hideLoader()
+  }
+
+  async onSelect($event) {
+    if ($event.addedFiles.length > 0) {
+      this.loaderService.showLoader()
+      for (let i = 0; i < $event.addedFiles.length; i++) {
+        const formData = new FormData();
+        formData.append('file', $event.addedFiles[i]);
+        const res: any = await this.uploadService.upload(formData).toPromise()
+        if (typeof (res) === 'object') {
+          console.log(res.body);
+        }
+      }
+      const res: any = await this.itemService.getUploadImages().toPromise()
+      this.uploadImages = res.imagesList
+      this.loaderService.hideLoader()
+    }
+  }
+
+  storeNewOrder($event, dst: string) {
+    if ($event.currentOrder.length === $event.previousOrder.length) {
+      if (!this.requestUploadImages && !this.requestItemImages) {
+        if (dst == "item") {
+          this.itemImages = $event.currentOrder.filter(item => item != undefined)
+        } else {
+          this.uploadImages = $event.currentOrder.filter(item => item != undefined)
+        }
+      } else {
+        this.itemImages = this.requestItemImages
+        this.uploadImages = this.requestUploadImages
+        this.requestItemImages = null
+        this.requestUploadImages = null
+      }
+    }
+  }
+
+  onItemDrop($event, dst: string) {
+    if (dst == "item") {
+      this.requestUploadImages = this.uploadImages.filter(item => item.id != $event.dragData.id)
+      this.requestItemImages = this.itemImages
+      this.requestItemImages.push($event.dragData)
+    } else {
+      this.requestUploadImages = this.uploadImages
+      this.requestUploadImages.push($event.dragData)
+      this.requestItemImages = this.itemImages.filter(item => item.id != $event.dragData.id)
+    }
   }
 }

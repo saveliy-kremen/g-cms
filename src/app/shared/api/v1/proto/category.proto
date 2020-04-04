@@ -13,7 +13,7 @@ message State {
 
 message Category{
   string id = 1;
-  uint32 userID = 2;
+  uint32 user_id = 2;
   string text = 3;
   string alias = 4;
   string description = 5;
@@ -21,9 +21,9 @@ message Category{
   string parent = 7;
   uint32 sort = 8;
   State state = 9;
-  string seoTitle = 10;
-  string seoDescription = 11;
-  string seoKeywords = 12;
+  string seo_title = 10;
+  string seo_description = 11;
+  string seo_keywords = 12;
 }
 
 message AddCategoryRequest {
@@ -48,7 +48,7 @@ message CategoryRequest {
 
 message EditCategoryRequest {
   string title = 1;
-  string oldAlias = 2;
+  string old_alias = 2;
   string alias = 3;
   string description = 4;
   string image = 5;

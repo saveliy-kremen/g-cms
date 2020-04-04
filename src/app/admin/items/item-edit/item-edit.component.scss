@@ -12,3 +12,35 @@
     margin-right: 2%;
     width: 31%;
 }
+
+.upload-images {
+    width: 100px;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.sort-grid {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    min-height: 100px;
+    cursor: pointer;
+    color: #717386;
+    border: 2px dashed #717386;
+    border-radius: 5px;
+    font-size: 16px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.custom-dropzone {
+    min-height: 120px;
+    height: auto;
+    flex-wrap: wrap;
+    align-items: start;
+    padding: 0px 0px 10px 0px;
+}
+
+:host ::ng-deep .dropzone-inner {
+    position: relative !important;
+}

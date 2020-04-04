@@ -35,6 +35,7 @@ type Item struct {
 type ItemImage struct {
 	gorm.Model
 
+	UserID          uint32
 	ItemID          uint32
 	Filename        string
 	Sort            uint32
@@ -70,22 +71,42 @@ func ItemsToResponse(items []Item) []*v1.Item {
 func ItemToResponse(item Item) *v1.Item {
 	return &v1.Item{
 		Id:             strconv.Itoa(int(item.ID)),
-		UserID:         item.UserID,
-		VendorID:       item.VendorID,
-		ParentID:       item.ParentID,
-		CategoryID:     item.CategoryID,
+		UserId:         item.UserID,
+		VendorId:       item.VendorID,
+		ParentId:       item.ParentID,
+		CategoryId:     item.CategoryID,
 		Title:          item.Title,
 		Article:        item.Article,
 		Alias:          item.Alias,
 		Description:    item.Description,
 		Price:          item.Price,
 		OldPrice:       item.OldPrice,
-		CurrencyID:     item.CurrencyID,
+		CurrencyId:     item.CurrencyID,
 		Count:          item.Count,
 		Disable:        item.Disable,
 		Sort:           item.Sort,
 		SeoTitle:       item.SeoTitle,
 		SeoDescription: item.SeoDescription,
 		SeoKeywords:    item.SeoKeywords,
+	}
+}
+
+func ItemImagesToResponse(images []ItemImage) []*v1.ItemImage {
+	respImages := []*v1.ItemImage{}
+	for _, image := range images {
+		respImages = append(respImages, ItemImageToResponse(image))
+	}
+	return respImages
+}
+
+func ItemImageToResponse(image ItemImage) *v1.ItemImage {
+	return &v1.ItemImage{
+		Id:              uint32(image.ID),
+		UserId:          image.UserID,
+		ItemId:          image.ItemID,
+		Filename:        image.Filename,
+		Sort:            image.Sort,
+		PropertyValueId: image.PropertyValueID,
+		Main:            image.Main,
 	}
 }

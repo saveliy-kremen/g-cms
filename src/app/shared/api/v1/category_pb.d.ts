@@ -32,8 +32,8 @@ export class Category extends jspb.Message {
   getId(): string;
   setId(value: string): void;
 
-  getUserid(): number;
-  setUserid(value: number): void;
+  getUserId(): number;
+  setUserId(value: number): void;
 
   getText(): string;
   setText(value: string): void;
@@ -58,14 +58,14 @@ export class Category extends jspb.Message {
   hasState(): boolean;
   clearState(): void;
 
-  getSeotitle(): string;
-  setSeotitle(value: string): void;
+  getSeoTitle(): string;
+  setSeoTitle(value: string): void;
 
-  getSeodescription(): string;
-  setSeodescription(value: string): void;
+  getSeoDescription(): string;
+  setSeoDescription(value: string): void;
 
-  getSeokeywords(): string;
-  setSeokeywords(value: string): void;
+  getSeoKeywords(): string;
+  setSeoKeywords(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Category.AsObject;
@@ -78,7 +78,7 @@ export class Category extends jspb.Message {
 export namespace Category {
   export type AsObject = {
     id: string,
-    userid: number,
+    userId: number,
     text: string,
     alias: string,
     description: string,
@@ -86,9 +86,9 @@ export namespace Category {
     parent: string,
     sort: number,
     state?: State.AsObject,
-    seotitle: string,
-    seodescription: string,
-    seokeywords: string,
+    seoTitle: string,
+    seoDescription: string,
+    seoKeywords: string,
   }
 }
 
@@ -184,8 +184,8 @@ export class EditCategoryRequest extends jspb.Message {
   getTitle(): string;
   setTitle(value: string): void;
 
-  getOldalias(): string;
-  setOldalias(value: string): void;
+  getOldAlias(): string;
+  setOldAlias(value: string): void;
 
   getAlias(): string;
   setAlias(value: string): void;
@@ -207,7 +207,7 @@ export class EditCategoryRequest extends jspb.Message {
 export namespace EditCategoryRequest {
   export type AsObject = {
     title: string,
-    oldalias: string,
+    oldAlias: string,
     alias: string,
     description: string,
     image: string,

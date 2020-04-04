@@ -29,7 +29,7 @@ type Category struct {
 func CategoryToResponse(category Category) *v1.Category {
 	return &v1.Category{
 		Id:          strconv.Itoa(int(category.ID)),
-		UserID:      uint32(category.UserID),
+		UserId:      uint32(category.UserID),
 		Text:        category.Title,
 		Alias:       category.Alias,
 		Description: category.Description,

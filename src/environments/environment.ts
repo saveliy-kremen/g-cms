@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   siteUrl: "http://alllead.best",
+  uploadURL: "http://alllead.best/upload/",
   grpcUrl: "http://alllead.best:2091",
   jwtCoockieName: "ngJWT",
   propertyTypes: ["Строка", "Число", "Изображение"],

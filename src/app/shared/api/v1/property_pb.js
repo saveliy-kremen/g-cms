@@ -320,7 +320,7 @@ proto.v1.Property.prototype.toObject = function(opt_includeInstance) {
 proto.v1.Property.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    userid: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    userId: jspb.Message.getFieldWithDefault(msg, 2, 0),
     title: jspb.Message.getFieldWithDefault(msg, 3, ""),
     code: jspb.Message.getFieldWithDefault(msg, 4, ""),
     type: jspb.Message.getFieldWithDefault(msg, 5, 0),
@@ -371,7 +371,7 @@ proto.v1.Property.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 2:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setUserid(value);
+      msg.setUserId(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
@@ -438,7 +438,7 @@ proto.v1.Property.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getUserid();
+  f = message.getUserId();
   if (f !== 0) {
     writer.writeUint32(
       2,
@@ -517,10 +517,10 @@ proto.v1.Property.prototype.setId = function(value) {
 
 
 /**
- * optional uint32 userID = 2;
+ * optional uint32 user_id = 2;
  * @return {number}
  */
-proto.v1.Property.prototype.getUserid = function() {
+proto.v1.Property.prototype.getUserId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
@@ -529,7 +529,7 @@ proto.v1.Property.prototype.getUserid = function() {
  * @param {number} value
  * @return {!proto.v1.Property} returns this
  */
-proto.v1.Property.prototype.setUserid = function(value) {
+proto.v1.Property.prototype.setUserId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
 
@@ -713,8 +713,8 @@ proto.v1.PropertyValue.prototype.toObject = function(opt_includeInstance) {
 proto.v1.PropertyValue.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    userid: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    propertyid: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    userId: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    propertyId: jspb.Message.getFieldWithDefault(msg, 3, 0),
     value: jspb.Message.getFieldWithDefault(msg, 4, ""),
     image: jspb.Message.getFieldWithDefault(msg, 5, ""),
     sort: jspb.Message.getFieldWithDefault(msg, 6, 0)
@@ -760,11 +760,11 @@ proto.v1.PropertyValue.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 2:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setUserid(value);
+      msg.setUserId(value);
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setPropertyid(value);
+      msg.setPropertyId(value);
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
@@ -814,14 +814,14 @@ proto.v1.PropertyValue.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getUserid();
+  f = message.getUserId();
   if (f !== 0) {
     writer.writeUint32(
       2,
       f
     );
   }
-  f = message.getPropertyid();
+  f = message.getPropertyId();
   if (f !== 0) {
     writer.writeUint32(
       3,
@@ -871,10 +871,10 @@ proto.v1.PropertyValue.prototype.setId = function(value) {
 
 
 /**
- * optional uint32 userID = 2;
+ * optional uint32 user_id = 2;
  * @return {number}
  */
-proto.v1.PropertyValue.prototype.getUserid = function() {
+proto.v1.PropertyValue.prototype.getUserId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
@@ -883,16 +883,16 @@ proto.v1.PropertyValue.prototype.getUserid = function() {
  * @param {number} value
  * @return {!proto.v1.PropertyValue} returns this
  */
-proto.v1.PropertyValue.prototype.setUserid = function(value) {
+proto.v1.PropertyValue.prototype.setUserId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
 
 
 /**
- * optional uint32 propertyID = 3;
+ * optional uint32 property_id = 3;
  * @return {number}
  */
-proto.v1.PropertyValue.prototype.getPropertyid = function() {
+proto.v1.PropertyValue.prototype.getPropertyId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
@@ -901,7 +901,7 @@ proto.v1.PropertyValue.prototype.getPropertyid = function() {
  * @param {number} value
  * @return {!proto.v1.PropertyValue} returns this
  */
-proto.v1.PropertyValue.prototype.setPropertyid = function(value) {
+proto.v1.PropertyValue.prototype.setPropertyId = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
 
@@ -1253,7 +1253,7 @@ proto.v1.PropertyBindRequest.prototype.toObject = function(opt_includeInstance) 
 proto.v1.PropertyBindRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    categoryid: jspb.Message.getFieldWithDefault(msg, 2, "")
+    categoryId: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -1296,7 +1296,7 @@ proto.v1.PropertyBindRequest.deserializeBinaryFromReader = function(msg, reader)
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setCategoryid(value);
+      msg.setCategoryId(value);
       break;
     default:
       reader.skipField();
@@ -1334,7 +1334,7 @@ proto.v1.PropertyBindRequest.serializeBinaryToWriter = function(message, writer)
       f
     );
   }
-  f = message.getCategoryid();
+  f = message.getCategoryId();
   if (f.length > 0) {
     writer.writeString(
       2,
@@ -1363,10 +1363,10 @@ proto.v1.PropertyBindRequest.prototype.setId = function(value) {
 
 
 /**
- * optional string categoryID = 2;
+ * optional string category_id = 2;
  * @return {string}
  */
-proto.v1.PropertyBindRequest.prototype.getCategoryid = function() {
+proto.v1.PropertyBindRequest.prototype.getCategoryId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
@@ -1375,7 +1375,7 @@ proto.v1.PropertyBindRequest.prototype.getCategoryid = function() {
  * @param {string} value
  * @return {!proto.v1.PropertyBindRequest} returns this
  */
-proto.v1.PropertyBindRequest.prototype.setCategoryid = function(value) {
+proto.v1.PropertyBindRequest.prototype.setCategoryId = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
 
@@ -1413,7 +1413,7 @@ proto.v1.PropertiesRequest.prototype.toObject = function(opt_includeInstance) {
 proto.v1.PropertiesRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     page: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    pagesize: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    pageSize: jspb.Message.getFieldWithDefault(msg, 2, 0),
     sort: jspb.Message.getFieldWithDefault(msg, 3, ""),
     direction: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
@@ -1458,7 +1458,7 @@ proto.v1.PropertiesRequest.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 2:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setPagesize(value);
+      msg.setPageSize(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
@@ -1504,7 +1504,7 @@ proto.v1.PropertiesRequest.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getPagesize();
+  f = message.getPageSize();
   if (f !== 0) {
     writer.writeUint32(
       2,
@@ -1547,10 +1547,10 @@ proto.v1.PropertiesRequest.prototype.setPage = function(value) {
 
 
 /**
- * optional uint32 pageSize = 2;
+ * optional uint32 page_size = 2;
  * @return {number}
  */
-proto.v1.PropertiesRequest.prototype.getPagesize = function() {
+proto.v1.PropertiesRequest.prototype.getPageSize = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
@@ -1559,7 +1559,7 @@ proto.v1.PropertiesRequest.prototype.getPagesize = function() {
  * @param {number} value
  * @return {!proto.v1.PropertiesRequest} returns this
  */
-proto.v1.PropertiesRequest.prototype.setPagesize = function(value) {
+proto.v1.PropertiesRequest.prototype.setPageSize = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
 
@@ -1944,7 +1944,7 @@ proto.v1.DeletePropertyRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, 0),
     page: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    pagesize: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    pageSize: jspb.Message.getFieldWithDefault(msg, 3, 0),
     sort: jspb.Message.getFieldWithDefault(msg, 4, ""),
     direction: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
@@ -1993,7 +1993,7 @@ proto.v1.DeletePropertyRequest.deserializeBinaryFromReader = function(msg, reade
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setPagesize(value);
+      msg.setPageSize(value);
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
@@ -2046,7 +2046,7 @@ proto.v1.DeletePropertyRequest.serializeBinaryToWriter = function(message, write
       f
     );
   }
-  f = message.getPagesize();
+  f = message.getPageSize();
   if (f !== 0) {
     writer.writeUint32(
       3,
@@ -2107,10 +2107,10 @@ proto.v1.DeletePropertyRequest.prototype.setPage = function(value) {
 
 
 /**
- * optional uint32 pageSize = 3;
+ * optional uint32 page_size = 3;
  * @return {number}
  */
-proto.v1.DeletePropertyRequest.prototype.getPagesize = function() {
+proto.v1.DeletePropertyRequest.prototype.getPageSize = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
@@ -2119,7 +2119,7 @@ proto.v1.DeletePropertyRequest.prototype.getPagesize = function() {
  * @param {number} value
  * @return {!proto.v1.DeletePropertyRequest} returns this
  */
-proto.v1.DeletePropertyRequest.prototype.setPagesize = function(value) {
+proto.v1.DeletePropertyRequest.prototype.setPageSize = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
 
@@ -2193,7 +2193,7 @@ proto.v1.EditPropertyValueRequest.prototype.toObject = function(opt_includeInsta
 proto.v1.EditPropertyValueRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    propertyid: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    propertyId: jspb.Message.getFieldWithDefault(msg, 2, 0),
     value: jspb.Message.getFieldWithDefault(msg, 3, ""),
     sort: jspb.Message.getFieldWithDefault(msg, 4, 0),
     image: jspb.Message.getFieldWithDefault(msg, 5, "")
@@ -2239,7 +2239,7 @@ proto.v1.EditPropertyValueRequest.deserializeBinaryFromReader = function(msg, re
       break;
     case 2:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setPropertyid(value);
+      msg.setPropertyId(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
@@ -2289,7 +2289,7 @@ proto.v1.EditPropertyValueRequest.serializeBinaryToWriter = function(message, wr
       f
     );
   }
-  f = message.getPropertyid();
+  f = message.getPropertyId();
   if (f !== 0) {
     writer.writeUint32(
       2,
@@ -2339,10 +2339,10 @@ proto.v1.EditPropertyValueRequest.prototype.setId = function(value) {
 
 
 /**
- * optional uint32 propertyID = 2;
+ * optional uint32 property_id = 2;
  * @return {number}
  */
-proto.v1.EditPropertyValueRequest.prototype.getPropertyid = function() {
+proto.v1.EditPropertyValueRequest.prototype.getPropertyId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
@@ -2351,7 +2351,7 @@ proto.v1.EditPropertyValueRequest.prototype.getPropertyid = function() {
  * @param {number} value
  * @return {!proto.v1.EditPropertyValueRequest} returns this
  */
-proto.v1.EditPropertyValueRequest.prototype.setPropertyid = function(value) {
+proto.v1.EditPropertyValueRequest.prototype.setPropertyId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
 
@@ -2813,7 +2813,7 @@ proto.v1.PropertyValueResponse.prototype.toObject = function(opt_includeInstance
  */
 proto.v1.PropertyValueResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    propertyvalue: (f = msg.getPropertyvalue()) && proto.v1.PropertyValue.toObject(includeInstance, f)
+    propertyValue: (f = msg.getPropertyValue()) && proto.v1.PropertyValue.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2853,7 +2853,7 @@ proto.v1.PropertyValueResponse.deserializeBinaryFromReader = function(msg, reade
     case 1:
       var value = new proto.v1.PropertyValue;
       reader.readMessage(value,proto.v1.PropertyValue.deserializeBinaryFromReader);
-      msg.setPropertyvalue(value);
+      msg.setPropertyValue(value);
       break;
     default:
       reader.skipField();
@@ -2884,7 +2884,7 @@ proto.v1.PropertyValueResponse.prototype.serializeBinary = function() {
  */
 proto.v1.PropertyValueResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getPropertyvalue();
+  f = message.getPropertyValue();
   if (f != null) {
     writer.writeMessage(
       1,
@@ -2896,10 +2896,10 @@ proto.v1.PropertyValueResponse.serializeBinaryToWriter = function(message, write
 
 
 /**
- * optional PropertyValue propertyValue = 1;
+ * optional PropertyValue property_value = 1;
  * @return {?proto.v1.PropertyValue}
  */
-proto.v1.PropertyValueResponse.prototype.getPropertyvalue = function() {
+proto.v1.PropertyValueResponse.prototype.getPropertyValue = function() {
   return /** @type{?proto.v1.PropertyValue} */ (
     jspb.Message.getWrapperField(this, proto.v1.PropertyValue, 1));
 };
@@ -2909,7 +2909,7 @@ proto.v1.PropertyValueResponse.prototype.getPropertyvalue = function() {
  * @param {?proto.v1.PropertyValue|undefined} value
  * @return {!proto.v1.PropertyValueResponse} returns this
 */
-proto.v1.PropertyValueResponse.prototype.setPropertyvalue = function(value) {
+proto.v1.PropertyValueResponse.prototype.setPropertyValue = function(value) {
   return jspb.Message.setWrapperField(this, 1, value);
 };
 
@@ -2918,8 +2918,8 @@ proto.v1.PropertyValueResponse.prototype.setPropertyvalue = function(value) {
  * Clears the message field making it undefined.
  * @return {!proto.v1.PropertyValueResponse} returns this
  */
-proto.v1.PropertyValueResponse.prototype.clearPropertyvalue = function() {
-  return this.setPropertyvalue(undefined);
+proto.v1.PropertyValueResponse.prototype.clearPropertyValue = function() {
+  return this.setPropertyValue(undefined);
 };
 
 
@@ -2927,7 +2927,7 @@ proto.v1.PropertyValueResponse.prototype.clearPropertyvalue = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.v1.PropertyValueResponse.prototype.hasPropertyvalue = function() {
+proto.v1.PropertyValueResponse.prototype.hasPropertyValue = function() {
   return jspb.Message.getField(this, 1) != null;
 };
 

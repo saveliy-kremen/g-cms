@@ -7,6 +7,7 @@ import { grpcUnary } from './helpers/grpc-unary';
 
 import * as GRPC from 'src/app/shared/api/v1/item_pb';
 import * as CategoryGRPC from 'src/app/shared/api/v1/category_pb';
+import { Empty } from 'src/app/shared/api/v1/google/protobuf/empty_pb';
 import { ItemServiceClient } from 'src/app/shared/api/v1/ItemServiceClientPb';
 import { environment } from 'src/environments/environment';
 import { SessionService } from 'src/app/shared/services/session.service';
@@ -31,7 +32,7 @@ export class ItemGrpcService {
         const promise = new Promise((resolve, reject) => {
             var request = new GRPC.ItemsRequest()
             request.setPage(page)
-            request.setPagesize(pageSize)
+            request.setPageSize(pageSize)
             request.setSort(sort)
             request.setDirection(direction)
             this.client.items(request, meta, (err: grpcWeb.Error, response: GRPC.ItemsResponse) => {
@@ -76,8 +77,8 @@ export class ItemGrpcService {
             request.setCount(data.count)
             request.setDescription(data.description)
             request.setPrice(data.price)
-            request.setOldprice(data.oldPrice)
-            request.setCurrencyid(data.currencyID)
+            request.setOldPrice(data.oldPrice)
+            request.setCurrencyId(data.currencyID)
             request.setDisable(data.disable)
             request.setSort(data.sort);
             this.client.editItem(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
@@ -99,7 +100,7 @@ export class ItemGrpcService {
             var request = new GRPC.DeleteItemRequest();
             request.setId(id)
             request.setPage(page)
-            request.setPagesize(pageSize)
+            request.setPageSize(pageSize)
             request.setSort(sort)
             request.setDirection(direction)
             this.client.deleteItem(request, meta, (err: grpcWeb.Error, response: GRPC.ItemsResponse) => {
@@ -110,5 +111,22 @@ export class ItemGrpcService {
             });
         });
         return grpcUnary<GRPC.ItemsResponse.AsObject>(promise);
+    }
+
+    public getUploadImages(): Observable<GRPC.ItemImagesResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new Empty();
+            this.client.getUploadImages(request, meta, (err: grpcWeb.Error, response: GRPC.ItemImagesResponse) => {
+                if (err) {
+                    return reject(err)
+                }
+                resolve(response)
+            });
+        });
+        return grpcUnary<GRPC.ItemImagesResponse.AsObject>(promise);
     }
 }

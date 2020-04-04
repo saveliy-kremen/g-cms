@@ -435,7 +435,7 @@ proto.v1.Category.prototype.toObject = function(opt_includeInstance) {
 proto.v1.Category.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    userid: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    userId: jspb.Message.getFieldWithDefault(msg, 2, 0),
     text: jspb.Message.getFieldWithDefault(msg, 3, ""),
     alias: jspb.Message.getFieldWithDefault(msg, 4, ""),
     description: jspb.Message.getFieldWithDefault(msg, 5, ""),
@@ -443,9 +443,9 @@ proto.v1.Category.toObject = function(includeInstance, msg) {
     parent: jspb.Message.getFieldWithDefault(msg, 7, ""),
     sort: jspb.Message.getFieldWithDefault(msg, 8, 0),
     state: (f = msg.getState()) && proto.v1.State.toObject(includeInstance, f),
-    seotitle: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    seodescription: jspb.Message.getFieldWithDefault(msg, 11, ""),
-    seokeywords: jspb.Message.getFieldWithDefault(msg, 12, "")
+    seoTitle: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    seoDescription: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    seoKeywords: jspb.Message.getFieldWithDefault(msg, 12, "")
   };
 
   if (includeInstance) {
@@ -488,7 +488,7 @@ proto.v1.Category.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 2:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setUserid(value);
+      msg.setUserId(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
@@ -521,15 +521,15 @@ proto.v1.Category.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 10:
       var value = /** @type {string} */ (reader.readString());
-      msg.setSeotitle(value);
+      msg.setSeoTitle(value);
       break;
     case 11:
       var value = /** @type {string} */ (reader.readString());
-      msg.setSeodescription(value);
+      msg.setSeoDescription(value);
       break;
     case 12:
       var value = /** @type {string} */ (reader.readString());
-      msg.setSeokeywords(value);
+      msg.setSeoKeywords(value);
       break;
     default:
       reader.skipField();
@@ -567,7 +567,7 @@ proto.v1.Category.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getUserid();
+  f = message.getUserId();
   if (f !== 0) {
     writer.writeUint32(
       2,
@@ -624,21 +624,21 @@ proto.v1.Category.serializeBinaryToWriter = function(message, writer) {
       proto.v1.State.serializeBinaryToWriter
     );
   }
-  f = message.getSeotitle();
+  f = message.getSeoTitle();
   if (f.length > 0) {
     writer.writeString(
       10,
       f
     );
   }
-  f = message.getSeodescription();
+  f = message.getSeoDescription();
   if (f.length > 0) {
     writer.writeString(
       11,
       f
     );
   }
-  f = message.getSeokeywords();
+  f = message.getSeoKeywords();
   if (f.length > 0) {
     writer.writeString(
       12,
@@ -667,10 +667,10 @@ proto.v1.Category.prototype.setId = function(value) {
 
 
 /**
- * optional uint32 userID = 2;
+ * optional uint32 user_id = 2;
  * @return {number}
  */
-proto.v1.Category.prototype.getUserid = function() {
+proto.v1.Category.prototype.getUserId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
@@ -679,7 +679,7 @@ proto.v1.Category.prototype.getUserid = function() {
  * @param {number} value
  * @return {!proto.v1.Category} returns this
  */
-proto.v1.Category.prototype.setUserid = function(value) {
+proto.v1.Category.prototype.setUserId = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
 
@@ -830,10 +830,10 @@ proto.v1.Category.prototype.hasState = function() {
 
 
 /**
- * optional string seoTitle = 10;
+ * optional string seo_title = 10;
  * @return {string}
  */
-proto.v1.Category.prototype.getSeotitle = function() {
+proto.v1.Category.prototype.getSeoTitle = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
 };
 
@@ -842,16 +842,16 @@ proto.v1.Category.prototype.getSeotitle = function() {
  * @param {string} value
  * @return {!proto.v1.Category} returns this
  */
-proto.v1.Category.prototype.setSeotitle = function(value) {
+proto.v1.Category.prototype.setSeoTitle = function(value) {
   return jspb.Message.setProto3StringField(this, 10, value);
 };
 
 
 /**
- * optional string seoDescription = 11;
+ * optional string seo_description = 11;
  * @return {string}
  */
-proto.v1.Category.prototype.getSeodescription = function() {
+proto.v1.Category.prototype.getSeoDescription = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
 };
 
@@ -860,16 +860,16 @@ proto.v1.Category.prototype.getSeodescription = function() {
  * @param {string} value
  * @return {!proto.v1.Category} returns this
  */
-proto.v1.Category.prototype.setSeodescription = function(value) {
+proto.v1.Category.prototype.setSeoDescription = function(value) {
   return jspb.Message.setProto3StringField(this, 11, value);
 };
 
 
 /**
- * optional string seoKeywords = 12;
+ * optional string seo_keywords = 12;
  * @return {string}
  */
-proto.v1.Category.prototype.getSeokeywords = function() {
+proto.v1.Category.prototype.getSeoKeywords = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
 };
 
@@ -878,7 +878,7 @@ proto.v1.Category.prototype.getSeokeywords = function() {
  * @param {string} value
  * @return {!proto.v1.Category} returns this
  */
-proto.v1.Category.prototype.setSeokeywords = function(value) {
+proto.v1.Category.prototype.setSeoKeywords = function(value) {
   return jspb.Message.setProto3StringField(this, 12, value);
 };
 
@@ -1556,7 +1556,7 @@ proto.v1.EditCategoryRequest.prototype.toObject = function(opt_includeInstance) 
 proto.v1.EditCategoryRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     title: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    oldalias: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    oldAlias: jspb.Message.getFieldWithDefault(msg, 2, ""),
     alias: jspb.Message.getFieldWithDefault(msg, 3, ""),
     description: jspb.Message.getFieldWithDefault(msg, 4, ""),
     image: jspb.Message.getFieldWithDefault(msg, 5, "")
@@ -1602,7 +1602,7 @@ proto.v1.EditCategoryRequest.deserializeBinaryFromReader = function(msg, reader)
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setOldalias(value);
+      msg.setOldAlias(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
@@ -1652,7 +1652,7 @@ proto.v1.EditCategoryRequest.serializeBinaryToWriter = function(message, writer)
       f
     );
   }
-  f = message.getOldalias();
+  f = message.getOldAlias();
   if (f.length > 0) {
     writer.writeString(
       2,
@@ -1702,10 +1702,10 @@ proto.v1.EditCategoryRequest.prototype.setTitle = function(value) {
 
 
 /**
- * optional string oldAlias = 2;
+ * optional string old_alias = 2;
  * @return {string}
  */
-proto.v1.EditCategoryRequest.prototype.getOldalias = function() {
+proto.v1.EditCategoryRequest.prototype.getOldAlias = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
@@ -1714,7 +1714,7 @@ proto.v1.EditCategoryRequest.prototype.getOldalias = function() {
  * @param {string} value
  * @return {!proto.v1.EditCategoryRequest} returns this
  */
-proto.v1.EditCategoryRequest.prototype.setOldalias = function(value) {
+proto.v1.EditCategoryRequest.prototype.setOldAlias = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
 

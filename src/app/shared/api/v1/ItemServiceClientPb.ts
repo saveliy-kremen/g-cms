@@ -15,6 +15,7 @@ import * as category_pb from './category_pb';
 import {
   DeleteItemRequest,
   EditItemRequest,
+  ItemBindRequest,
   ItemImagesResponse,
   ItemRequest,
   ItemResponse,
@@ -147,6 +148,72 @@ export class ItemServiceClient {
       request,
       metadata || {},
       this.methodInfoGetUploadImages,
+      callback);
+  }
+
+  methodInfoItemCategories = new grpcWeb.AbstractClientBase.MethodInfo(
+    category_pb.CategoriesResponse,
+    (request: ItemRequest) => {
+      return request.serializeBinary();
+    },
+    category_pb.CategoriesResponse.deserializeBinary
+  );
+
+  itemCategories(
+    request: ItemRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: category_pb.CategoriesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.ItemService/ItemCategories',
+      request,
+      metadata || {},
+      this.methodInfoItemCategories,
+      callback);
+  }
+
+  methodInfoItemBindCategory = new grpcWeb.AbstractClientBase.MethodInfo(
+    category_pb.CategoriesResponse,
+    (request: ItemBindRequest) => {
+      return request.serializeBinary();
+    },
+    category_pb.CategoriesResponse.deserializeBinary
+  );
+
+  itemBindCategory(
+    request: ItemBindRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: category_pb.CategoriesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.ItemService/ItemBindCategory',
+      request,
+      metadata || {},
+      this.methodInfoItemBindCategory,
+      callback);
+  }
+
+  methodInfoItemUnbindCategory = new grpcWeb.AbstractClientBase.MethodInfo(
+    category_pb.CategoriesResponse,
+    (request: ItemBindRequest) => {
+      return request.serializeBinary();
+    },
+    category_pb.CategoriesResponse.deserializeBinary
+  );
+
+  itemUnbindCategory(
+    request: ItemBindRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: category_pb.CategoriesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.ItemService/ItemUnbindCategory',
+      request,
+      metadata || {},
+      this.methodInfoItemUnbindCategory,
       callback);
   }
 

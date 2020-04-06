@@ -2,19 +2,18 @@ package services
 
 import (
 	"context"
-
 	//"github.com/davecgh/go-spew/spew"
-
+	"fmt"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	//"os"
-	//"strconv"
+	"os"
+	"strconv"
 	"strings"
 
 	v1 "../../../api/v1"
-	//"../../../config"
+	"../../../config"
 	"../../../db"
 	"../../../models"
 	"../../../packages/auth"
@@ -28,7 +27,9 @@ func (u *ItemServiceImpl) Item(ctx context.Context, req *v1.ItemRequest) (*v1.It
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
-	if db.DB.Preload("Images").Where("user_id = ?", user_id).First(&item, req.Id).RecordNotFound() {
+	if db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
+		return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
+	}).Where("user_id = ?", user_id).First(&item, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
 	return &v1.ItemResponse{Item: models.ItemToResponse(item)}, nil
@@ -44,7 +45,9 @@ func (u *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.
 		order = req.Sort + " " + req.Direction
 	}
 	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&items).Count(&total)
-	db.DB.Where("user_id = ?", user_id).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&items)
+	db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
+		return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
+	}).Where("user_id = ?", user_id).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&items)
 	return &v1.ItemsResponse{Items: models.ItemsToResponse(items), Total: total}, nil
 }
 
@@ -75,6 +78,39 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 	if db.DB.Save(&item).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error create item")
 	}
+	directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/images/"
+	itemImages := []models.ItemImage{}
+	orderValues := strings.Replace(strings.Trim(fmt.Sprint(req.ItemImages), "[]"), " ", ",", -1)
+	db.DB.Where("user_id = ? AND id IN(?)", user_id, req.ItemImages).Order(gorm.Expr(fmt.Sprintf("FIELD(id, %s)", orderValues))).Find(&itemImages)
+	for i, itemImage := range itemImages {
+		if uint(itemImage.ItemID) != item.ID {
+			itemImage.ItemID = uint32(item.ID)
+			os.Rename(directory+"0/"+itemImage.Filename, directory+strconv.Itoa(int(item.ID))+"/"+itemImage.Filename)
+		}
+		itemImage.Sort = uint32(i * 10)
+		db.DB.Save(&itemImage)
+	}
+	uploadImages := []models.ItemImage{}
+	orderValues = strings.Replace(strings.Trim(fmt.Sprint(req.UploadImages), "[]"), " ", ",", -1)
+	db.DB.Where("user_id = ? AND id IN(?)", user_id, req.UploadImages).Order(gorm.Expr(fmt.Sprintf("FIELD(id, %s)", orderValues))).Find(&uploadImages)
+	for i, uploadImage := range uploadImages {
+		if uploadImage.ItemID != 0 {
+			uploadImage.ItemID = 0
+			os.Rename(directory+strconv.Itoa(int(item.ID))+"/"+uploadImage.Filename, directory+"0/"+uploadImage.Filename)
+		}
+		uploadImage.Sort = uint32(i * 10)
+		db.DB.Save(&uploadImage)
+	}
+	deleteImages := []models.ItemImage{}
+	db.DB.Where("user_id = ? AND id NOT IN(?) AND id NOT IN(?)", user_id, req.ItemImages, req.UploadImages).Find(&deleteImages)
+	for _, deleteImage := range deleteImages {
+		if deleteImage.ItemID == 0 {
+			os.Remove(directory + "0/" + deleteImage.Filename)
+		} else {
+			os.Remove(directory + strconv.Itoa(int(item.ID)) + "/" + deleteImage.Filename)
+		}
+		db.DB.Delete(&deleteImage)
+	}
 	return &v1.ItemResponse{Item: models.ItemToResponse(item)}, nil
 }
 
@@ -103,6 +139,132 @@ func (u *ItemServiceImpl) GetUploadImages(ctx context.Context, req *empty.Empty)
 	images := []models.ItemImage{}
 	db.DB.Where("user_id = ? AND item_id = ?", user_id, 0).Order("sort").Find(&images)
 	return &v1.ItemImagesResponse{Images: models.ItemImagesToResponse(images)}, nil
+}
+
+func (u *ItemServiceImpl) ItemCategories(ctx context.Context, req *v1.ItemRequest) (*v1.CategoriesResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	item := models.Item{}
+	if req.Id != 0 {
+		if db.DB.Where("user_id = ?", user_id).First(&item, req.Id).RecordNotFound() {
+			return nil, status.Errorf(codes.NotFound, "Item not found")
+		}
+	}
+
+	categories := []models.Category{}
+	db.DB.Model(&item).Related(&categories, "Categories")
+	var cat []uint
+	for _, category := range categories {
+		cat = append(cat, category.ID)
+	}
+	categories = []models.Category{}
+	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
+
+	for i, category := range categories {
+		if utils.HasElement(cat, category.ID) {
+			categories[i].Selected = true
+		} else {
+			categories[i].Selected = false
+		}
+
+		if category.Parent == "#" {
+			categories[i].Opened = true
+		} else {
+			categories[i].Opened = false
+		}
+	}
+	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+}
+
+func (u *ItemServiceImpl) ItemBindCategory(ctx context.Context, req *v1.ItemBindRequest) (*v1.CategoriesResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	item := models.Item{}
+	if db.DB.Where("user_id = ?", user_id).First(&item, req.Id).RecordNotFound() {
+		return nil, status.Errorf(codes.NotFound, "Item not found")
+	}
+
+	category := models.Category{}
+	if db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryId).RecordNotFound() {
+		return nil, status.Errorf(codes.NotFound, "Category_not_found")
+	}
+
+	itemCategory := models.ItemsCategories{}
+	if db.DB.Where("user_id = ? AND item_id = ? AND category_id = ?", user_id, req.Id, req.CategoryId).First(&itemCategory).RecordNotFound() {
+		itemCategory.UserID = user_id
+		itemCategory.ItemID = uint(req.Id)
+		itemCategory.CategoryID = category.ID
+		if db.DB.Save(&itemCategory).Error != nil {
+			return nil, status.Errorf(codes.Aborted, "Error bind category")
+		}
+	}
+
+	categories := []models.Category{}
+	db.DB.Model(&item).Related(&categories, "Categories")
+	var cat []uint
+	for _, category := range categories {
+		cat = append(cat, category.ID)
+	}
+	categories = []models.Category{}
+	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
+
+	for i, category := range categories {
+		if utils.HasElement(cat, category.ID) {
+			categories[i].Selected = true
+		} else {
+			categories[i].Selected = false
+		}
+
+		if category.Parent == "#" {
+			categories[i].Opened = true
+		} else {
+			categories[i].Opened = false
+		}
+	}
+	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+}
+
+func (u *ItemServiceImpl) ItemUnbindCategory(ctx context.Context, req *v1.ItemBindRequest) (*v1.CategoriesResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	item := models.Item{}
+	if db.DB.Where("user_id = ?", user_id).First(&item, req.Id).RecordNotFound() {
+		return nil, status.Errorf(codes.NotFound, "Item not found")
+	}
+
+	category := models.Category{}
+	if db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryId).RecordNotFound() {
+		return nil, status.Errorf(codes.NotFound, "Category_not_found")
+	}
+
+	itemCategory := models.ItemsCategories{}
+	if db.DB.Unscoped().Where("user_id = ? AND item_id = ? AND category_id = ?", user_id, req.Id, req.CategoryId).Delete(&itemCategory).Error != nil {
+		return nil, status.Errorf(codes.Aborted, "Error unbind category")
+	}
+
+	categories := []models.Category{}
+	db.DB.Model(&item).Related(&categories, "Categories")
+	var cat []uint
+	for _, category := range categories {
+		cat = append(cat, category.ID)
+	}
+	categories = []models.Category{}
+	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
+
+	for i, category := range categories {
+		if utils.HasElement(cat, category.ID) {
+			categories[i].Selected = true
+		} else {
+			categories[i].Selected = false
+		}
+
+		if category.Parent == "#" {
+			categories[i].Opened = true
+		} else {
+			categories[i].Opened = false
+		}
+	}
+	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
 }
 
 // compile-type check that our new type provides the

@@ -58,6 +58,11 @@ export class Item extends jspb.Message {
   getSeoKeywords(): string;
   setSeoKeywords(value: string): void;
 
+  getImagesList(): Array<ItemImage>;
+  setImagesList(value: Array<ItemImage>): void;
+  clearImagesList(): void;
+  addImages(value?: ItemImage, index?: number): ItemImage;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Item.AsObject;
   static toObject(includeInstance: boolean, msg: Item): Item.AsObject;
@@ -86,6 +91,7 @@ export namespace Item {
     seoTitle: string,
     seoDescription: string,
     seoKeywords: string,
+    imagesList: Array<ItemImage.AsObject>,
   }
 }
 
@@ -213,6 +219,16 @@ export class EditItemRequest extends jspb.Message {
   getSort(): number;
   setSort(value: number): void;
 
+  getItemImagesList(): Array<number>;
+  setItemImagesList(value: Array<number>): void;
+  clearItemImagesList(): void;
+  addItemImages(value: number, index?: number): void;
+
+  getUploadImagesList(): Array<number>;
+  setUploadImagesList(value: Array<number>): void;
+  clearUploadImagesList(): void;
+  addUploadImages(value: number, index?: number): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): EditItemRequest.AsObject;
   static toObject(includeInstance: boolean, msg: EditItemRequest): EditItemRequest.AsObject;
@@ -234,6 +250,8 @@ export namespace EditItemRequest {
     currencyId: number,
     disable: boolean,
     sort: number,
+    itemImagesList: Array<number>,
+    uploadImagesList: Array<number>,
   }
 }
 
@@ -268,6 +286,28 @@ export namespace DeleteItemRequest {
     pageSize: number,
     sort: string,
     direction: string,
+  }
+}
+
+export class ItemBindRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  getCategoryId(): string;
+  setCategoryId(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ItemBindRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ItemBindRequest): ItemBindRequest.AsObject;
+  static serializeBinaryToWriter(message: ItemBindRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ItemBindRequest;
+  static deserializeBinaryFromReader(message: ItemBindRequest, reader: jspb.BinaryReader): ItemBindRequest;
+}
+
+export namespace ItemBindRequest {
+  export type AsObject = {
+    id: number,
+    categoryId: string,
   }
 }
 

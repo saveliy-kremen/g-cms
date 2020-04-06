@@ -115,7 +115,7 @@ func (u *PropertyServiceImpl) PropertyCategories(ctx context.Context, req *v1.Pr
 			categories[i].Selected = false
 		}
 
-		if category.ID == 1 {
+		if category.Parent == "#" {
 			categories[i].Opened = true
 		} else {
 			categories[i].Opened = false
@@ -139,7 +139,8 @@ func (u *PropertyServiceImpl) PropertyBindCategory(ctx context.Context, req *v1.
 	}
 
 	item := models.PropertiesCategories{}
-	if db.DB.Where("property_id = ? AND category_id = ?", req.Id, req.CategoryId).First(&item).RecordNotFound() {
+	if db.DB.Where("user_id = ? AND property_id = ? AND category_id = ?", user_id, req.Id, req.CategoryId).First(&item).RecordNotFound() {
+		item.UserID = user_id
 		item.PropertyID = uint(req.Id)
 		item.CategoryID = category.ID
 		if db.DB.Save(&item).Error != nil {
@@ -163,7 +164,7 @@ func (u *PropertyServiceImpl) PropertyBindCategory(ctx context.Context, req *v1.
 			categories[i].Selected = false
 		}
 
-		if category.ID == 1 {
+		if category.Parent == "#" {
 			categories[i].Opened = true
 		} else {
 			categories[i].Opened = false
@@ -186,7 +187,7 @@ func (u *PropertyServiceImpl) PropertyUnbindCategory(ctx context.Context, req *v
 	}
 
 	item := models.PropertiesCategories{}
-	if db.DB.Unscoped().Where("property_id = ? AND category_id = ?", req.Id, req.CategoryId).Delete(&item).Error != nil {
+	if db.DB.Unscoped().Where("user_id = ? AND property_id = ? AND category_id = ?", user_id, req.Id, req.CategoryId).Delete(&item).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error unbind category")
 	}
 
@@ -206,7 +207,7 @@ func (u *PropertyServiceImpl) PropertyUnbindCategory(ctx context.Context, req *v
 			categories[i].Selected = false
 		}
 
-		if category.ID == 1 {
+		if category.Parent == "#" {
 			categories[i].Opened = true
 		} else {
 			categories[i].Opened = false

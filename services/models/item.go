@@ -27,6 +27,7 @@ type Item struct {
 	SeoDescription string `sql:"type:text" json:"seo_description"`
 	SeoKeywords    string `sql:"type:text" json:"seo_keywords"`
 
+	Categories []Category `gorm:"many2many:items_categories;"`
 	Properties []Property
 	Images     []ItemImage
 	Currency   Currency
@@ -49,6 +50,12 @@ type ItemProperty struct {
 	ItemID          uint32
 	PropertyID      uint32
 	PropertyValueID uint32
+}
+
+type ItemsCategories struct {
+	UserID     uint32
+	ItemID     uint
+	CategoryID uint
 }
 
 type Currency struct {
@@ -88,6 +95,8 @@ func ItemToResponse(item Item) *v1.Item {
 		SeoTitle:       item.SeoTitle,
 		SeoDescription: item.SeoDescription,
 		SeoKeywords:    item.SeoKeywords,
+
+		Images: ItemImagesToResponse(item.Images),
 	}
 }
 

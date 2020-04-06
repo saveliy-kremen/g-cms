@@ -60,17 +60,19 @@ export class ItemEditComponent implements OnInit {
       let res: any = await this.itemService.item(Number(this.activeRoute.snapshot.params["id"])).toPromise()
       this.item = res.item
       this.itemForm.patchValue(this.item)
+      this.itemImages = this.item.imagesList
+      res = await this.itemService.getUploadImages().toPromise()
+      this.uploadImages = res.imagesList
+      res = await this.itemService.itemCategories(Number(this.activeRoute.snapshot.params["id"])).toPromise()
+      this.categoriesData = res.categoriesList
       res = await this.authService.getUser()
       this.uploadUrl += `/uploads/users/${res.id}/items/`
-      res = await this.itemService.getUploadImages().toPromise()
-      this.uploadImages = res.imagesList.slice(0, 2)
-      this.itemImages = res.imagesList.slice(2, 4)
     }
     this.loaderService.hideLoader()
   }
 
   onTabChange(event) {
-    if (event.index == 2) {
+    if (event.index == 3) {
       $('#categoryTree').jstree({
         'core': {
           'data': this.categoriesData,
@@ -81,11 +83,37 @@ export class ItemEditComponent implements OnInit {
         check_callback: true,
         plugins: ["checkbox"],
       })
-      //.bind("select_node.jstree", this.bindProperty.bind(this))
-      //.bind("deselect_node.jstree", this.unbindProperty.bind(this))
+        .bind("select_node.jstree", this.bindProperty.bind(this))
+        .bind("deselect_node.jstree", this.unbindProperty.bind(this))
     } else {
       $("#categoryTree").jstree("destroy");
     }
+  }
+
+  async bindProperty(evt, data) {
+    this.loaderService.showLoader()
+    try {
+      await this.itemService.itemBindCategory(
+        Number(this.activeRoute.snapshot.params["id"]),
+        data.node.id
+      );
+    } catch (err) {
+      console.log(err)
+    }
+    this.loaderService.hideLoader()
+  }
+
+  async unbindProperty(evt, data) {
+    this.loaderService.showLoader()
+    try {
+      await this.itemService.itemUnbindCategory(
+        Number(this.activeRoute.snapshot.params["id"]),
+        data.node.id
+      );
+    } catch (err) {
+      console.log(err)
+    }
+    this.loaderService.hideLoader()
   }
 
   async submitItemForm() {
@@ -94,6 +122,8 @@ export class ItemEditComponent implements OnInit {
     if (this.itemForm.valid) {
       try {
         this.itemForm.value.id = this.editing ? Number(this.activeRoute.snapshot.params["id"]) : null
+        this.itemForm.value.itemImages = this.itemImages.map(item => item.id)
+        this.itemForm.value.uploadImages = this.uploadImages.map(item => item.id)
         await this.itemService.editItem(this.itemForm.value)
         this.itemFormSubmitted = false;
         this.itemMessage = new Message("success", "");

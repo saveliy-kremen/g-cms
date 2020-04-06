@@ -25,6 +25,8 @@ message Item {
   string seo_title = 16;
   string seo_description = 17;
   string seo_keywords = 18;
+
+  repeated ItemImage images = 19;
 }
 
 message ItemImage {
@@ -60,6 +62,8 @@ message EditItemRequest {
   uint32 currency_id = 9;
   bool disable = 10;
   uint32 sort = 11;
+  repeated uint32 item_images = 12;
+  repeated uint32 upload_images = 13;
 }
 
 message DeleteItemRequest {
@@ -68,6 +72,11 @@ message DeleteItemRequest {
   uint32 page_size = 3;
   string sort = 4;
   string direction = 5;
+}
+
+message ItemBindRequest {
+  uint32 id = 1;
+  string category_id = 2;
 }
 
 message ItemResponse {
@@ -89,4 +98,7 @@ service ItemService {
   rpc DeleteItem(DeleteItemRequest) returns (ItemsResponse);
   rpc Items(ItemsRequest) returns (ItemsResponse);
   rpc GetUploadImages(google.protobuf.Empty) returns (ItemImagesResponse);
+  rpc ItemCategories(ItemRequest) returns (CategoriesResponse);
+  rpc ItemBindCategory(ItemBindRequest) returns (CategoriesResponse);
+  rpc ItemUnbindCategory(ItemBindRequest) returns (CategoriesResponse);
 }

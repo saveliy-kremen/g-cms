@@ -47,6 +47,7 @@ type PropertyValue struct {
 }
 
 type PropertiesCategories struct {
+	UserID     uint32
 	PropertyID uint
 	CategoryID uint
 }

@@ -81,6 +81,8 @@ export class ItemGrpcService {
             request.setCurrencyId(data.currencyID)
             request.setDisable(data.disable)
             request.setSort(data.sort);
+            request.setItemImagesList(data.itemImages)
+            request.setUploadImagesList(data.uploadImages)
             this.client.editItem(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
                 if (err) {
                     return reject(err);
@@ -128,5 +130,61 @@ export class ItemGrpcService {
             });
         });
         return grpcUnary<GRPC.ItemImagesResponse.AsObject>(promise);
+    }
+
+    public itemCategories(id: number): Observable<CategoryGRPC.CategoriesResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.ItemRequest();
+            request.setId(id)
+            this.client.itemCategories(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.CategoriesResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<CategoryGRPC.CategoriesResponse.AsObject>(promise);
+    }
+
+    public itemBindCategory(id: number, categoryID: string): Observable<CategoryGRPC.CategoriesResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.ItemBindRequest();
+            request.setId(id)
+            request.setCategoryId(categoryID)
+            this.client.itemBindCategory(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.CategoriesResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<CategoryGRPC.CategoriesResponse.AsObject>(promise);
+    }
+
+    public itemUnbindCategory(id: number, categoryID: string): Observable<CategoryGRPC.CategoriesResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.ItemBindRequest();
+            request.setId(id)
+            request.setCategoryId(categoryID)
+            this.client.itemUnbindCategory(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.CategoriesResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<CategoryGRPC.CategoriesResponse.AsObject>(promise);
     }
 }

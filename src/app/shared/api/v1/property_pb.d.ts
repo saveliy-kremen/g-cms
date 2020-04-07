@@ -22,8 +22,11 @@ export class Property extends jspb.Message {
   getDisplay(): number;
   setDisplay(value: number): void;
 
-  getPlural(): boolean;
-  setPlural(value: boolean): void;
+  getRequired(): boolean;
+  setRequired(value: boolean): void;
+
+  getMultiple(): boolean;
+  setMultiple(value: boolean): void;
 
   getSort(): number;
   setSort(value: number): void;
@@ -32,6 +35,11 @@ export class Property extends jspb.Message {
   setValuesList(value: Array<PropertyValue>): void;
   clearValuesList(): void;
   addValues(value?: PropertyValue, index?: number): PropertyValue;
+
+  getItemValuesList(): Array<number>;
+  setItemValuesList(value: Array<number>): void;
+  clearItemValuesList(): void;
+  addItemValues(value: number, index?: number): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Property.AsObject;
@@ -49,9 +57,11 @@ export namespace Property {
     code: string,
     type: number,
     display: number,
-    plural: boolean,
+    required: boolean,
+    multiple: boolean,
     sort: number,
     valuesList: Array<PropertyValue.AsObject>,
+    itemValuesList: Array<number>,
   }
 }
 
@@ -197,8 +207,11 @@ export class EditPropertyRequest extends jspb.Message {
   getDisplay(): number;
   setDisplay(value: number): void;
 
-  getPlural(): boolean;
-  setPlural(value: boolean): void;
+  getRequired(): boolean;
+  setRequired(value: boolean): void;
+
+  getMultiple(): boolean;
+  setMultiple(value: boolean): void;
 
   getSort(): number;
   setSort(value: number): void;
@@ -218,7 +231,8 @@ export namespace EditPropertyRequest {
     code: string,
     type: number,
     display: number,
-    plural: boolean,
+    required: boolean,
+    multiple: boolean,
     sort: number,
   }
 }

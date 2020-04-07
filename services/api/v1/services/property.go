@@ -62,9 +62,14 @@ func (u *PropertyServiceImpl) EditProperty(ctx context.Context, req *v1.EditProp
 	if property.Code == "" {
 		property.Code = utils.Translit(strings.ToLower(property.Title))
 	}
+	existProperty := models.Property{}
+	if !db.DB.Where("user_id = ? AND code = ? AND id <> ?", user_id, property.Code, req.Id).First(&existProperty).RecordNotFound() {
+		return nil, status.Errorf(codes.Aborted, "Property code exist")
+	}
 	property.Type = models.PropertyType(req.Type)
 	property.Display = models.PropertyDisplayType(req.Display)
-	property.Plural = req.Plural
+	property.Required = req.Required
+	property.Multiple = req.Multiple
 	property.Sort = uint(req.Sort)
 	if db.DB.Save(&property).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error create property")

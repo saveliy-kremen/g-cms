@@ -2,15 +2,16 @@ package services
 
 import (
 	"context"
-	//"github.com/davecgh/go-spew/spew"
 	"fmt"
+	//"github.com/davecgh/go-spew/spew"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"os"
-	"strconv"
-	"strings"
 
 	v1 "../../../api/v1"
 	"../../../config"
@@ -78,6 +79,28 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 	if db.DB.Save(&item).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error create item")
 	}
+
+	//Properties
+	oldItemProperties := []models.ItemProperty{}
+	db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ID).Find(&oldItemProperties)
+	for _, oldItemProperty := range oldItemProperties {
+		db.DB.Unscoped().Delete(&oldItemProperty)
+	}
+	for _, propertyValue := range req.Properties {
+		property := models.Property{}
+		if !db.DB.Where("code = ?", propertyValue.Code).First(&property).RecordNotFound() {
+			for _, valueID := range propertyValue.PropertyValueIds {
+				itemProperty := models.ItemProperty{}
+				itemProperty.UserID = user_id
+				itemProperty.ItemID = uint32(item.ID)
+				itemProperty.PropertyID = uint32(property.ID)
+				itemProperty.PropertyValueID = valueID
+				db.DB.Create(&itemProperty)
+			}
+		}
+	}
+
+	//Images
 	directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/images/"
 	itemImages := []models.ItemImage{}
 	orderValues := strings.Replace(strings.Trim(fmt.Sprint(req.ItemImages), "[]"), " ", ",", -1)
@@ -265,6 +288,43 @@ func (u *ItemServiceImpl) ItemUnbindCategory(ctx context.Context, req *v1.ItemBi
 		}
 	}
 	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+}
+
+func (u *ItemServiceImpl) ItemProperties(ctx context.Context, req *v1.ItemRequest) (*v1.PropertiesResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	item := models.Item{}
+	if req.Id != 0 {
+		if db.DB.Where("user_id = ?", user_id).First(&item, req.Id).RecordNotFound() {
+			return nil, status.Errorf(codes.NotFound, "Item not found")
+		}
+	}
+
+	itemCategories := []models.ItemsCategories{}
+	db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ID).Find(&itemCategories)
+	var cats []uint
+	for _, itemCategory := range itemCategories {
+		cats = append(cats, itemCategory.CategoryID)
+	}
+
+	propertiesCategories := []models.PropertiesCategories{}
+	db.DB.Where("user_id = ? AND category_id IN (?)", user_id, cats).Find(&propertiesCategories)
+	var props []uint
+	for _, propertiesCategory := range propertiesCategories {
+		props = append(props, propertiesCategory.PropertyID)
+	}
+	properties := []models.Property{}
+	db.DB.Preload("Values").Where("user_id = ? AND id IN(?)", user_id, props).Order("sort").Find(&properties)
+	for propertyIndex, property := range properties {
+		item_values_ids := []uint32{}
+		item_property_values := []models.ItemProperty{}
+		db.DB.Where("user_id = ? AND item_id = ? AND property_id = ?", user_id, req.Id, property.ID).Find(&item_property_values)
+		for _, item_property_value := range item_property_values {
+			item_values_ids = append(item_values_ids, item_property_value.PropertyValueID)
+		}
+		properties[propertyIndex].ItemValues = item_values_ids
+	}
+	return &v1.PropertiesResponse{Properties: models.PropertiesToResponse(properties)}, nil
 }
 
 // compile-type check that our new type provides the

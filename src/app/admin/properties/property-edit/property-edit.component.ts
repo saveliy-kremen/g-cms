@@ -63,7 +63,8 @@ export class PropertyEditComponent implements OnInit {
       code: new FormControl(''),
       type: new FormControl('', Validators.required),
       display: new FormControl('', Validators.required),
-      plural: new FormControl(''),
+      required: new FormControl(''),
+      multiple: new FormControl(''),
       sort: new FormControl('', Validators.required),
     })
     this.propertyForm.patchValue({ type: 0, display: 0 })

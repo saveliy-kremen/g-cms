@@ -47,6 +47,7 @@ type ItemImage struct {
 type ItemProperty struct {
 	gorm.Model
 
+	UserID          uint32
 	ItemID          uint32
 	PropertyID      uint32
 	PropertyValueID uint32

@@ -113,14 +113,26 @@
         </mat-tab>
 
         <mat-tab label="{{'Values' | translate}}" *ngIf="editing">
-          <mat-card>
-            <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
-              <!--app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns"
-                                [dataSource]="itemValues" [length]="item.valuesList?.length"
-                                (changePageHandler)="changePage($event)" actions="actions">
-                            </app-table-->
-            </mat-card-content>
-          </mat-card>
+          <br>
+          <div class="form-group" formArrayName="properties">
+            <div *ngFor="let property of properties.controls; let i = index" [formGroup]="property" [formGroupName]="i">
+              <div *ngIf="!property.controls[itemProperties[i].code].controls">
+                <mat-form-field>
+                  <mat-select formControlName="{{itemProperties[i].code}}" placeholder="{{itemProperties[i].title}}"
+                    [errorStateMatcher]="matcher" [multiple]="itemProperties[i].multiple">
+                    <mat-option *ngIf="!itemProperties[i].multiple">{{"None" | translate}}</mat-option>
+                    <mat-option *ngFor="let value of itemProperties[i].valuesList" [value]="value.id">
+                      {{value.value}}</mat-option>
+                  </mat-select>
+                  <mat-error>
+                    <validator-message [field]="property.controls[itemProperties[i].code]"
+                      [submitted]="itemFormSubmitted" [title]="itemProperties[i].title">
+                    </validator-message>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
           <br>
         </mat-tab>
         <mat-tab label="{{'Категория'}}" *ngIf="editing">

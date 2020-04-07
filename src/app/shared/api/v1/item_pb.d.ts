@@ -2,6 +2,7 @@ import * as jspb from "google-protobuf"
 
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 import * as category_pb from './category_pb';
+import * as property_pb from './property_pb';
 
 export class Item extends jspb.Message {
   getId(): string;
@@ -137,6 +138,30 @@ export namespace ItemImage {
   }
 }
 
+export class ItemProperty extends jspb.Message {
+  getCode(): string;
+  setCode(value: string): void;
+
+  getPropertyValueIdsList(): Array<number>;
+  setPropertyValueIdsList(value: Array<number>): void;
+  clearPropertyValueIdsList(): void;
+  addPropertyValueIds(value: number, index?: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ItemProperty.AsObject;
+  static toObject(includeInstance: boolean, msg: ItemProperty): ItemProperty.AsObject;
+  static serializeBinaryToWriter(message: ItemProperty, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ItemProperty;
+  static deserializeBinaryFromReader(message: ItemProperty, reader: jspb.BinaryReader): ItemProperty;
+}
+
+export namespace ItemProperty {
+  export type AsObject = {
+    code: string,
+    propertyValueIdsList: Array<number>,
+  }
+}
+
 export class ItemRequest extends jspb.Message {
   getId(): number;
   setId(value: number): void;
@@ -229,6 +254,11 @@ export class EditItemRequest extends jspb.Message {
   clearUploadImagesList(): void;
   addUploadImages(value: number, index?: number): void;
 
+  getPropertiesList(): Array<ItemProperty>;
+  setPropertiesList(value: Array<ItemProperty>): void;
+  clearPropertiesList(): void;
+  addProperties(value?: ItemProperty, index?: number): ItemProperty;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): EditItemRequest.AsObject;
   static toObject(includeInstance: boolean, msg: EditItemRequest): EditItemRequest.AsObject;
@@ -252,6 +282,7 @@ export namespace EditItemRequest {
     sort: number,
     itemImagesList: Array<number>,
     uploadImagesList: Array<number>,
+    propertiesList: Array<ItemProperty.AsObject>,
   }
 }
 

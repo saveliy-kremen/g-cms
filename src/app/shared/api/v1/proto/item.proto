@@ -4,6 +4,7 @@ package v1;
 
 import "google/protobuf/empty.proto";
 import "category.proto";
+import "property.proto";
 //import "google/protobuf/wrappers.proto";
 
 message Item {
@@ -39,6 +40,11 @@ message ItemImage {
   bool main = 7;
 }
 
+message ItemProperty {
+  string code = 1;
+  repeated uint32 property_value_ids = 2;
+}
+
 message ItemRequest {
   uint32 id = 1;
 }
@@ -64,6 +70,7 @@ message EditItemRequest {
   uint32 sort = 11;
   repeated uint32 item_images = 12;
   repeated uint32 upload_images = 13;
+  repeated ItemProperty properties = 14;
 }
 
 message DeleteItemRequest {
@@ -101,4 +108,5 @@ service ItemService {
   rpc ItemCategories(ItemRequest) returns (CategoriesResponse);
   rpc ItemBindCategory(ItemBindRequest) returns (CategoriesResponse);
   rpc ItemUnbindCategory(ItemBindRequest) returns (CategoriesResponse);
+  rpc ItemProperties(ItemRequest) returns (PropertiesResponse);
 }

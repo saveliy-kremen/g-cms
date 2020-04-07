@@ -24,15 +24,17 @@ const (
 type Property struct {
 	gorm.Model
 
-	UserID  uint32
-	Title   string
-	Code    string
-	Type    PropertyType
-	Display PropertyDisplayType
-	Plural  bool
-	Sort    uint
+	UserID   uint32
+	Title    string
+	Code     string
+	Type     PropertyType
+	Display  PropertyDisplayType
+	Required bool
+	Multiple bool
+	Sort     uint
 
 	Values     []PropertyValue
+	ItemValues []uint32   `sql:"-"`
 	Categories []Category `gorm:"many2many:properties_categories;"`
 }
 
@@ -73,15 +75,17 @@ func PropertyValuesToResponse(propertyValues []PropertyValue) []*v1.PropertyValu
 
 func PropertyToResponse(property Property) *v1.Property {
 	return &v1.Property{
-		Id:      strconv.Itoa(int(property.ID)),
-		UserId:  uint32(property.UserID),
-		Title:   property.Title,
-		Code:    property.Code,
-		Type:    uint32(property.Type),
-		Display: uint32(property.Display),
-		Plural:  property.Plural,
-		Sort:    uint32(property.Sort),
-		Values:  PropertyValuesToResponse(property.Values),
+		Id:         strconv.Itoa(int(property.ID)),
+		UserId:     uint32(property.UserID),
+		Title:      property.Title,
+		Code:       property.Code,
+		Type:       uint32(property.Type),
+		Display:    uint32(property.Display),
+		Required:   property.Required,
+		Multiple:   property.Multiple,
+		Sort:       uint32(property.Sort),
+		Values:     PropertyValuesToResponse(property.Values),
+		ItemValues: property.ItemValues,
 	}
 }
 

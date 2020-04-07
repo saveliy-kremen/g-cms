@@ -13,9 +13,11 @@ message Property{
   string code = 4;
   uint32 type = 5;
   uint32 display = 6;
-  bool plural = 7;
-  uint32 sort = 8;
-  repeated PropertyValue values = 9;
+  bool required = 7;
+  bool multiple = 8;
+  uint32 sort = 9;
+  repeated PropertyValue values = 10;
+  repeated uint32 item_values = 11;
 }
 
 message PropertyValue{
@@ -53,8 +55,9 @@ message EditPropertyRequest {
   string code = 3;
   uint32 type = 4;
   uint32 display = 5;
-  bool plural = 6;
-  uint32 sort = 7;
+  bool required = 6;
+  bool multiple = 7;
+  uint32 sort = 8;
 }
 
 message DeletePropertyRequest {

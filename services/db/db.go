@@ -27,6 +27,7 @@ func init() {
 	}
 	DB.DB().SetMaxIdleConns(0)
 	DB.AutoMigrate(&models.User{}, &models.Category{}, &models.Property{}, &models.PropertyValue{},
-		&models.PropertiesCategories{}, &models.Item{}, &models.ItemImage{}, &models.ItemsCategories{})
+		&models.PropertiesCategories{}, &models.Item{}, &models.ItemImage{}, &models.ItemsCategories{},
+		&models.ItemProperty{})
 	//DB.LogMode(true)
 }

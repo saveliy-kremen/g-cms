@@ -11,6 +11,7 @@ import * as grpcWeb from 'grpc-web';
 
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 import * as category_pb from './category_pb';
+import * as property_pb from './property_pb';
 
 import {
   DeleteItemRequest,
@@ -214,6 +215,28 @@ export class ItemServiceClient {
       request,
       metadata || {},
       this.methodInfoItemUnbindCategory,
+      callback);
+  }
+
+  methodInfoItemProperties = new grpcWeb.AbstractClientBase.MethodInfo(
+    property_pb.PropertiesResponse,
+    (request: ItemRequest) => {
+      return request.serializeBinary();
+    },
+    property_pb.PropertiesResponse.deserializeBinary
+  );
+
+  itemProperties(
+    request: ItemRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: property_pb.PropertiesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.ItemService/ItemProperties',
+      request,
+      metadata || {},
+      this.methodInfoItemProperties,
       callback);
   }
 

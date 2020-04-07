@@ -286,7 +286,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.v1.Property.repeatedFields_ = [9];
+proto.v1.Property.repeatedFields_ = [10,11];
 
 
 
@@ -325,10 +325,12 @@ proto.v1.Property.toObject = function(includeInstance, msg) {
     code: jspb.Message.getFieldWithDefault(msg, 4, ""),
     type: jspb.Message.getFieldWithDefault(msg, 5, 0),
     display: jspb.Message.getFieldWithDefault(msg, 6, 0),
-    plural: jspb.Message.getBooleanFieldWithDefault(msg, 7, false),
-    sort: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    required: jspb.Message.getBooleanFieldWithDefault(msg, 7, false),
+    multiple: jspb.Message.getBooleanFieldWithDefault(msg, 8, false),
+    sort: jspb.Message.getFieldWithDefault(msg, 9, 0),
     valuesList: jspb.Message.toObjectList(msg.getValuesList(),
-    proto.v1.PropertyValue.toObject, includeInstance)
+    proto.v1.PropertyValue.toObject, includeInstance),
+    itemValuesList: (f = jspb.Message.getRepeatedField(msg, 11)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -391,16 +393,24 @@ proto.v1.Property.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 7:
       var value = /** @type {boolean} */ (reader.readBool());
-      msg.setPlural(value);
+      msg.setRequired(value);
       break;
     case 8:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setMultiple(value);
+      break;
+    case 9:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSort(value);
       break;
-    case 9:
+    case 10:
       var value = new proto.v1.PropertyValue;
       reader.readMessage(value,proto.v1.PropertyValue.deserializeBinaryFromReader);
       msg.addValues(value);
+      break;
+    case 11:
+      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
+      msg.setItemValuesList(value);
       break;
     default:
       reader.skipField();
@@ -473,26 +483,40 @@ proto.v1.Property.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getPlural();
+  f = message.getRequired();
   if (f) {
     writer.writeBool(
       7,
       f
     );
   }
+  f = message.getMultiple();
+  if (f) {
+    writer.writeBool(
+      8,
+      f
+    );
+  }
   f = message.getSort();
   if (f !== 0) {
     writer.writeUint32(
-      8,
+      9,
       f
     );
   }
   f = message.getValuesList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      9,
+      10,
       f,
       proto.v1.PropertyValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getItemValuesList();
+  if (f.length > 0) {
+    writer.writePackedUint32(
+      11,
+      f
     );
   }
 };
@@ -607,10 +631,10 @@ proto.v1.Property.prototype.setDisplay = function(value) {
 
 
 /**
- * optional bool plural = 7;
+ * optional bool required = 7;
  * @return {boolean}
  */
-proto.v1.Property.prototype.getPlural = function() {
+proto.v1.Property.prototype.getRequired = function() {
   return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 7, false));
 };
 
@@ -619,17 +643,35 @@ proto.v1.Property.prototype.getPlural = function() {
  * @param {boolean} value
  * @return {!proto.v1.Property} returns this
  */
-proto.v1.Property.prototype.setPlural = function(value) {
+proto.v1.Property.prototype.setRequired = function(value) {
   return jspb.Message.setProto3BooleanField(this, 7, value);
 };
 
 
 /**
- * optional uint32 sort = 8;
+ * optional bool multiple = 8;
+ * @return {boolean}
+ */
+proto.v1.Property.prototype.getMultiple = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 8, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.v1.Property} returns this
+ */
+proto.v1.Property.prototype.setMultiple = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 8, value);
+};
+
+
+/**
+ * optional uint32 sort = 9;
  * @return {number}
  */
 proto.v1.Property.prototype.getSort = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
 };
 
 
@@ -638,17 +680,17 @@ proto.v1.Property.prototype.getSort = function() {
  * @return {!proto.v1.Property} returns this
  */
 proto.v1.Property.prototype.setSort = function(value) {
-  return jspb.Message.setProto3IntField(this, 8, value);
+  return jspb.Message.setProto3IntField(this, 9, value);
 };
 
 
 /**
- * repeated PropertyValue values = 9;
+ * repeated PropertyValue values = 10;
  * @return {!Array<!proto.v1.PropertyValue>}
  */
 proto.v1.Property.prototype.getValuesList = function() {
   return /** @type{!Array<!proto.v1.PropertyValue>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.v1.PropertyValue, 9));
+    jspb.Message.getRepeatedWrapperField(this, proto.v1.PropertyValue, 10));
 };
 
 
@@ -657,7 +699,7 @@ proto.v1.Property.prototype.getValuesList = function() {
  * @return {!proto.v1.Property} returns this
 */
 proto.v1.Property.prototype.setValuesList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 9, value);
+  return jspb.Message.setRepeatedWrapperField(this, 10, value);
 };
 
 
@@ -667,7 +709,7 @@ proto.v1.Property.prototype.setValuesList = function(value) {
  * @return {!proto.v1.PropertyValue}
  */
 proto.v1.Property.prototype.addValues = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 9, opt_value, proto.v1.PropertyValue, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 10, opt_value, proto.v1.PropertyValue, opt_index);
 };
 
 
@@ -677,6 +719,43 @@ proto.v1.Property.prototype.addValues = function(opt_value, opt_index) {
  */
 proto.v1.Property.prototype.clearValuesList = function() {
   return this.setValuesList([]);
+};
+
+
+/**
+ * repeated uint32 item_values = 11;
+ * @return {!Array<number>}
+ */
+proto.v1.Property.prototype.getItemValuesList = function() {
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 11));
+};
+
+
+/**
+ * @param {!Array<number>} value
+ * @return {!proto.v1.Property} returns this
+ */
+proto.v1.Property.prototype.setItemValuesList = function(value) {
+  return jspb.Message.setField(this, 11, value || []);
+};
+
+
+/**
+ * @param {number} value
+ * @param {number=} opt_index
+ * @return {!proto.v1.Property} returns this
+ */
+proto.v1.Property.prototype.addItemValues = function(value, opt_index) {
+  return jspb.Message.addToRepeatedField(this, 11, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.v1.Property} returns this
+ */
+proto.v1.Property.prototype.clearItemValuesList = function() {
+  return this.setItemValuesList([]);
 };
 
 
@@ -1637,8 +1716,9 @@ proto.v1.EditPropertyRequest.toObject = function(includeInstance, msg) {
     code: jspb.Message.getFieldWithDefault(msg, 3, ""),
     type: jspb.Message.getFieldWithDefault(msg, 4, 0),
     display: jspb.Message.getFieldWithDefault(msg, 5, 0),
-    plural: jspb.Message.getBooleanFieldWithDefault(msg, 6, false),
-    sort: jspb.Message.getFieldWithDefault(msg, 7, 0)
+    required: jspb.Message.getBooleanFieldWithDefault(msg, 6, false),
+    multiple: jspb.Message.getBooleanFieldWithDefault(msg, 7, false),
+    sort: jspb.Message.getFieldWithDefault(msg, 8, 0)
   };
 
   if (includeInstance) {
@@ -1697,9 +1777,13 @@ proto.v1.EditPropertyRequest.deserializeBinaryFromReader = function(msg, reader)
       break;
     case 6:
       var value = /** @type {boolean} */ (reader.readBool());
-      msg.setPlural(value);
+      msg.setRequired(value);
       break;
     case 7:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setMultiple(value);
+      break;
+    case 8:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSort(value);
       break;
@@ -1767,17 +1851,24 @@ proto.v1.EditPropertyRequest.serializeBinaryToWriter = function(message, writer)
       f
     );
   }
-  f = message.getPlural();
+  f = message.getRequired();
   if (f) {
     writer.writeBool(
       6,
       f
     );
   }
+  f = message.getMultiple();
+  if (f) {
+    writer.writeBool(
+      7,
+      f
+    );
+  }
   f = message.getSort();
   if (f !== 0) {
     writer.writeUint32(
-      7,
+      8,
       f
     );
   }
@@ -1875,10 +1966,10 @@ proto.v1.EditPropertyRequest.prototype.setDisplay = function(value) {
 
 
 /**
- * optional bool plural = 6;
+ * optional bool required = 6;
  * @return {boolean}
  */
-proto.v1.EditPropertyRequest.prototype.getPlural = function() {
+proto.v1.EditPropertyRequest.prototype.getRequired = function() {
   return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 6, false));
 };
 
@@ -1887,17 +1978,35 @@ proto.v1.EditPropertyRequest.prototype.getPlural = function() {
  * @param {boolean} value
  * @return {!proto.v1.EditPropertyRequest} returns this
  */
-proto.v1.EditPropertyRequest.prototype.setPlural = function(value) {
+proto.v1.EditPropertyRequest.prototype.setRequired = function(value) {
   return jspb.Message.setProto3BooleanField(this, 6, value);
 };
 
 
 /**
- * optional uint32 sort = 7;
+ * optional bool multiple = 7;
+ * @return {boolean}
+ */
+proto.v1.EditPropertyRequest.prototype.getMultiple = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 7, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.v1.EditPropertyRequest} returns this
+ */
+proto.v1.EditPropertyRequest.prototype.setMultiple = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 7, value);
+};
+
+
+/**
+ * optional uint32 sort = 8;
  * @return {number}
  */
 proto.v1.EditPropertyRequest.prototype.getSort = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
 };
 
 
@@ -1906,7 +2015,7 @@ proto.v1.EditPropertyRequest.prototype.getSort = function() {
  * @return {!proto.v1.EditPropertyRequest} returns this
  */
 proto.v1.EditPropertyRequest.prototype.setSort = function(value) {
-  return jspb.Message.setProto3IntField(this, 7, value);
+  return jspb.Message.setProto3IntField(this, 8, value);
 };
 
 

@@ -43,8 +43,10 @@
             </mat-select>
           </mat-form-field>
           <br>
-          <mat-checkbox labelPosition="before" formControlName="plural">Множественное</mat-checkbox>
-          <br>
+          <mat-checkbox labelPosition="before" formControlName="required">{{"Required" | translate}}</mat-checkbox>
+          <br><br>
+          <mat-checkbox labelPosition="before" formControlName="multiple">{{"Multiple" | translate}}</mat-checkbox>
+          <br><br>
           <mat-form-field>
             <input matInput formControlName="sort" placeholder="Сортировка">
             <mat-error>

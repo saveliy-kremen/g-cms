@@ -7,6 +7,7 @@ import { grpcUnary } from './helpers/grpc-unary';
 
 import * as GRPC from 'src/app/shared/api/v1/item_pb';
 import * as CategoryGRPC from 'src/app/shared/api/v1/category_pb';
+import * as PropertyGRPC from 'src/app/shared/api/v1/property_pb';
 import { Empty } from 'src/app/shared/api/v1/google/protobuf/empty_pb';
 import { ItemServiceClient } from 'src/app/shared/api/v1/ItemServiceClientPb';
 import { environment } from 'src/environments/environment';
@@ -83,6 +84,21 @@ export class ItemGrpcService {
             request.setSort(data.sort);
             request.setItemImagesList(data.itemImages)
             request.setUploadImagesList(data.uploadImages)
+            request.setPropertiesList(data.properties.map(item => {
+                const wrapper = new GRPC.ItemProperty
+                const code = Object.keys(item)[0]
+                if (item[code]) {
+                    wrapper.setCode(code)
+                    if (Array.isArray(item[code])) {
+                        for (const value of item[code]) {
+                            wrapper.addPropertyValueIds(value)
+                        }
+                    } else {
+                        wrapper.addPropertyValueIds(item[code])
+                    }
+                }
+                return wrapper
+            }))
             this.client.editItem(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
                 if (err) {
                     return reject(err);
@@ -186,5 +202,23 @@ export class ItemGrpcService {
             });
         });
         return grpcUnary<CategoryGRPC.CategoriesResponse.AsObject>(promise);
+    }
+
+    public itemProperties(id: number): Observable<PropertyGRPC.PropertiesResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.ItemRequest();
+            request.setId(id)
+            this.client.itemProperties(request, meta, (err: grpcWeb.Error, response: PropertyGRPC.PropertiesResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<PropertyGRPC.PropertiesResponse.AsObject>(promise);
     }
 }

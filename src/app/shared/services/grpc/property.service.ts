@@ -75,7 +75,8 @@ export class PropertyGrpcService {
             request.setCode(data.code);
             request.setType(data.type);
             request.setDisplay(data.display);
-            request.setPlural(data.plural);
+            request.setRequired(data.required);
+            request.setMultiple(data.multiple);
             request.setSort(data.sort);
             this.client.editProperty(request, meta, (err: grpcWeb.Error, response: GRPC.PropertyResponse) => {
                 if (err) {

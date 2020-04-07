@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormArray, NgForm, FormGroupDirective } from '@angular/forms';
 
 import { Message } from 'src/app/shared/models/message.model';
 import { LoaderService } from 'src/app/shared/services/loader.service';
@@ -8,8 +8,22 @@ import { environment } from 'src/environments/environment';
 import { ItemGrpcService } from 'src/app/shared/services/grpc/item.service';
 import { UploadService } from 'src/app/shared/services/upload.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { ErrorStateMatcher } from '@angular/material/core';
 
 declare var $: any
+
+/** Error when invalid control is dirty, touched, or submitted. */
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  private formSubmitted: boolean
+
+  changeFormState(value: boolean) {
+    this.formSubmitted = value
+  }
+
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    return !!(control && control.invalid && (control.dirty || control.touched || this.formSubmitted));
+  }
+}
 
 @Component({
   selector: 'app-item-edit',
@@ -22,6 +36,8 @@ export class ItemEditComponent implements OnInit {
   itemMessage: Message = new Message("success", "")
   item: any = {}
   categoriesData: any
+  itemProperties: any = []
+  matcher = new MyErrorStateMatcher()
   uploadUrl: string = environment.siteUrl
 
   editing: boolean
@@ -52,6 +68,7 @@ export class ItemEditComponent implements OnInit {
       count: new FormControl(''),
       disable: new FormControl(''),
       sort: new FormControl('', Validators.required),
+      properties: new FormArray([])
     })
 
     this.loaderService.showLoader()
@@ -65,10 +82,37 @@ export class ItemEditComponent implements OnInit {
       this.uploadImages = res.imagesList
       res = await this.itemService.itemCategories(Number(this.activeRoute.snapshot.params["id"])).toPromise()
       this.categoriesData = res.categoriesList
+      await this.updateProperties();
       res = await this.authService.getUser()
       this.uploadUrl += `/uploads/users/${res.id}/items/`
     }
     this.loaderService.hideLoader()
+  }
+
+  get properties(): FormArray {
+    return this.itemForm.get('properties') as FormArray;
+  }
+
+  async updateProperties() {
+    try {
+      const res: any = await this.itemService.itemProperties(this.item.id).toPromise();
+      let formArray = <FormArray>this.itemForm.get("properties");
+      while (formArray.length !== 0) {
+        formArray.removeAt(0)
+      }
+      this.itemProperties = res.propertiesList
+      for (let property of res.propertiesList) {
+        let formItem = {};
+        if (property.multiple) {
+          formItem[property.code] = new FormControl(property.itemValuesList, property.required ? Validators.required : null);
+        } else {
+          formItem[property.code] = new FormControl(property.itemValuesList[0], property.required ? Validators.required : null);
+        }
+        formArray.push(new FormGroup(formItem))
+      }
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   onTabChange(event) {
@@ -119,6 +163,7 @@ export class ItemEditComponent implements OnInit {
   async submitItemForm() {
     this.loaderService.showLoader()
     this.itemFormSubmitted = true;
+    this.matcher.changeFormState(this.itemFormSubmitted)
     if (this.itemForm.valid) {
       try {
         this.itemForm.value.id = this.editing ? Number(this.activeRoute.snapshot.params["id"]) : null
@@ -126,6 +171,7 @@ export class ItemEditComponent implements OnInit {
         this.itemForm.value.uploadImages = this.uploadImages.map(item => item.id)
         await this.itemService.editItem(this.itemForm.value)
         this.itemFormSubmitted = false;
+        this.matcher.changeFormState(this.itemFormSubmitted)
         this.itemMessage = new Message("success", "");
         this.itemForm.reset();
         this.router.navigateByUrl("/admin/items");

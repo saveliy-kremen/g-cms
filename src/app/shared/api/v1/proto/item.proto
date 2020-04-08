@@ -101,6 +101,7 @@ message ItemImagesResponse {
 
 service ItemService {
   rpc Item(ItemRequest) returns (ItemResponse);
+  rpc CreateDraftItem(google.protobuf.Empty) returns (ItemResponse);
   rpc EditItem(EditItemRequest) returns (ItemResponse);
   rpc DeleteItem(DeleteItemRequest) returns (ItemsResponse);
   rpc Items(ItemsRequest) returns (ItemsResponse);

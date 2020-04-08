@@ -45,11 +45,24 @@ func (u *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.
 	if req.Sort != "" {
 		order = req.Sort + " " + req.Direction
 	}
-	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&items).Count(&total)
+	db.DB.Where("user_id = ? AND draft <> ?", user_id, true).Order("sort").Find(&items).Count(&total)
 	db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
 		return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
-	}).Where("user_id = ?", user_id).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&items)
+	}).Where("user_id = ? AND draft <> ?", user_id, true).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&items)
 	return &v1.ItemsResponse{Items: models.ItemsToResponse(items), Total: total}, nil
+}
+
+func (u *ItemServiceImpl) CreateDraftItem(ctx context.Context, req *empty.Empty) (*v1.ItemResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	draft := models.Item{}
+	if db.DB.Where("user_id = ? AND draft = ?", user_id, true).First(&draft).RecordNotFound() {
+		draft.UserID = user_id
+		draft.Draft = true
+		db.DB.Create(&draft)
+	}
+	db.DB.Where("user_id = ? AND draft = ? AND id <> ?", user_id, true, draft.ID).Delete(models.Item{})
+	return &v1.ItemResponse{Item: models.ItemToResponse(draft)}, nil
 }
 
 func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest) (*v1.ItemResponse, error) {

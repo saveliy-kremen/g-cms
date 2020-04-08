@@ -158,7 +158,7 @@ export class PropertyEditComponent implements OnInit {
     if (this.propertyForm.valid) {
       try {
         this.propertyForm.value.id = this.editing ? Number(this.activeRoute.snapshot.params["id"]) : null
-        await this.propertyService.editProperty(this.propertyForm.value)
+        await this.propertyService.editProperty(this.propertyForm.value).toPromise()
         this.propertyFormSubmitted = false;
         this.propertyMessage = new Message("success", "");
         this.propertyForm.reset();

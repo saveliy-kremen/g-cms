@@ -64,6 +64,28 @@ export class ItemServiceClient {
       callback);
   }
 
+  methodInfoCreateDraftItem = new grpcWeb.AbstractClientBase.MethodInfo(
+    ItemResponse,
+    (request: google_protobuf_empty_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    ItemResponse.deserializeBinary
+  );
+
+  createDraftItem(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: ItemResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.ItemService/CreateDraftItem',
+      request,
+      metadata || {},
+      this.methodInfoCreateDraftItem,
+      callback);
+  }
+
   methodInfoEditItem = new grpcWeb.AbstractClientBase.MethodInfo(
     ItemResponse,
     (request: EditItemRequest) => {

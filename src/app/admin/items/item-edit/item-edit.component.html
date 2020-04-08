@@ -1,6 +1,6 @@
 <mat-card>
   <mat-card-title>{{"Items" | translate}}</mat-card-title>
-  <mat-card-subtitle>{{editing ? ("Edit" | translate) : ("Add" | translate)}} {{'item' | translate}}</mat-card-subtitle>
+  <mat-card-subtitle>{{mode == "edit" ? ("Edit" | translate) : ("Add" | translate)}} {{'item' | translate}}</mat-card-subtitle>
 
   <mat-card-content>
     <form novalidate #form="ngForm" [formGroup]="itemForm" (ngSubmit)="submitItemForm()">
@@ -85,7 +85,7 @@
           <br><br><br>
         </mat-tab>
 
-        <mat-tab label="{{'Images' | translate}}" *ngIf="editing">
+        <mat-tab label="{{'Images' | translate}}" *ngIf="mode == 'edit' || mode == 'draft'">
           <br>
           <div class="sort-grid" droppable [dropScope]="'item'" (onDrop)="onItemDrop($event, 'item')">
             <img *ngFor="let image of itemImages" class="upload-images" src="{{uploadUrl + '0/' + image?.filename}}"
@@ -112,7 +112,7 @@
           <br>
         </mat-tab>
 
-        <mat-tab label="{{'Values' | translate}}" *ngIf="editing">
+        <mat-tab label="{{'Values' | translate}}" *ngIf="mode == 'edit' || mode == 'draft'">
           <br>
           <div class="form-group" formArrayName="properties">
             <div *ngFor="let property of properties.controls; let i = index" [formGroup]="property" [formGroupName]="i">
@@ -135,14 +135,14 @@
           </div>
           <br>
         </mat-tab>
-        <mat-tab label="{{'Категория'}}" *ngIf="editing">
+        <mat-tab label="{{'Категория'}}" *ngIf="mode == 'edit' || mode == 'draft'">
           <br>
           <div id="categoryTree"></div>
           <br>
         </mat-tab>
       </mat-tab-group>
       <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;">
-        {{editing ? ("Save" | translate) : ("Add" | translate)}}
+        {{mode == "edit" ? ("Save" | translate) : ("Add" | translate)}}
       </button>
       <button mat-raised-button type="reset" class="btn btn-secondary" routerLink="/admin/items">
         {{"Cancel" | translate}}

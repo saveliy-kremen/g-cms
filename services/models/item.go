@@ -13,6 +13,7 @@ type Item struct {
 	VendorID       uint32
 	ParentID       uint32
 	CategoryID     uint32
+	Draft          bool
 	Title          string `sql:"type:text"`
 	Article        string
 	Alias          string

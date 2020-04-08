@@ -40,7 +40,7 @@ export class ItemEditComponent implements OnInit {
   matcher = new MyErrorStateMatcher()
   uploadUrl: string = environment.siteUrl
 
-  editing: boolean
+  mode: string
 
   itemImages: any = []
   uploadImages: any = []
@@ -72,19 +72,27 @@ export class ItemEditComponent implements OnInit {
     })
 
     this.loaderService.showLoader()
-    this.editing = this.activeRoute.snapshot.params["mode"] == "edit"
-    if (this.editing) {
-      let res: any = await this.itemService.item(Number(this.activeRoute.snapshot.params["id"])).toPromise()
-      this.item = res.item
+    this.mode = this.activeRoute.snapshot.params["mode"]
+    try {
+      if (this.mode == "edit") {
+        const res: any = await this.itemService.item(Number(this.activeRoute.snapshot.params["id"])).toPromise()
+        this.item = res.item
+      } else {
+        const res: any = await this.itemService.createDraftItem().toPromise()
+        this.item = res.item
+        this.mode = "draft"
+      }
       this.itemForm.patchValue(this.item)
       this.itemImages = this.item.imagesList
-      res = await this.itemService.getUploadImages().toPromise()
+      let res: any = await this.itemService.getUploadImages().toPromise()
       this.uploadImages = res.imagesList
-      res = await this.itemService.itemCategories(Number(this.activeRoute.snapshot.params["id"])).toPromise()
+      res = await this.itemService.itemCategories(this.item.id).toPromise()
       this.categoriesData = res.categoriesList
       await this.updateProperties();
       res = await this.authService.getUser()
       this.uploadUrl += `/uploads/users/${res.id}/items/`
+    } catch (err) {
+      this.itemMessage = new Message("danger", err.message);
     }
     this.loaderService.hideLoader()
   }
@@ -138,7 +146,7 @@ export class ItemEditComponent implements OnInit {
     this.loaderService.showLoader()
     try {
       await this.itemService.itemBindCategory(
-        Number(this.activeRoute.snapshot.params["id"]),
+        this.item.id,
         data.node.id
       );
     } catch (err) {
@@ -151,7 +159,7 @@ export class ItemEditComponent implements OnInit {
     this.loaderService.showLoader()
     try {
       await this.itemService.itemUnbindCategory(
-        Number(this.activeRoute.snapshot.params["id"]),
+        this.item.id,
         data.node.id
       );
     } catch (err) {
@@ -166,7 +174,7 @@ export class ItemEditComponent implements OnInit {
     this.matcher.changeFormState(this.itemFormSubmitted)
     if (this.itemForm.valid) {
       try {
-        this.itemForm.value.id = this.editing ? Number(this.activeRoute.snapshot.params["id"]) : null
+        this.itemForm.value.id = (this.mode == "edit" || this.mode == "draft") ? Number(this.item.id) : null
         this.itemForm.value.itemImages = this.itemImages.map(item => item.id)
         this.itemForm.value.uploadImages = this.uploadImages.map(item => item.id)
         await this.itemService.editItem(this.itemForm.value)

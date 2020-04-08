@@ -64,6 +64,23 @@ export class ItemGrpcService {
         return grpcUnary<GRPC.ItemResponse.AsObject>(promise);
     }
 
+    public createDraftItem(): Observable<GRPC.ItemResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new Empty();
+            this.client.createDraftItem(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
+                if (err) {
+                    return reject(err)
+                }
+                resolve(response)
+            });
+        });
+        return grpcUnary<GRPC.ItemResponse.AsObject>(promise);
+    }
+
     public editItem(data): Observable<GRPC.ItemResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()

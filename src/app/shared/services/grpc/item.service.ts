@@ -64,13 +64,14 @@ export class ItemGrpcService {
         return grpcUnary<GRPC.ItemResponse.AsObject>(promise);
     }
 
-    public createDraftItem(): Observable<GRPC.ItemResponse.AsObject> {
+    public createDraftItem(parentID: number): Observable<GRPC.ItemResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new Empty();
+            var request = new GRPC.DraftRequest();
+            request.setParentId(parentID)
             this.client.createDraftItem(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
                 if (err) {
                     return reject(err)

@@ -1,14 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormArray, NgForm, FormGroupDirective } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Message } from 'src/app/shared/models/message.model';
 import { LoaderService } from 'src/app/shared/services/loader.service';
-import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { ItemGrpcService } from 'src/app/shared/services/grpc/item.service';
 import { UploadService } from 'src/app/shared/services/upload.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { ErrorStateMatcher } from '@angular/material/core';
+import { ModalService } from 'src/app/shared/modal/modal.service';
+import { TranslateService } from '@ngx-translate/core';
 
 declare var $: any
 
@@ -38,14 +40,37 @@ export class ItemEditComponent implements OnInit {
   categoriesData: any
   itemProperties: any = []
   matcher = new MyErrorStateMatcher()
-  uploadUrl: string = environment.siteUrl
+  uploadUrl: string
 
   mode: string
+  itemTabIndex: number;
 
+  //Parent
+  parent: any
+  parentID: number
+
+  //Images
   itemImages: any = []
   uploadImages: any = []
   requestItemImages: any
   requestUploadImages: any
+
+  //Offers
+  displayedColumns: string[] = ['position', 'title', 'article', 'price', 'sort', 'actions']
+  columnDefs = [
+    { column: "title", title: "Title", translate: true, sort: true },
+    { column: "article", title: "Article", translate: true, sort: true },
+    { column: "price", title: "Price", translate: true, sort: true },
+    { column: "sort", title: "Sort", translate: true, sort: true },
+  ]
+  actions = []
+  offersData: any
+  offersPage: number = 0
+  offersPageSize: number
+  offersSort: string
+  offersDirection: string
+  offerID: number
+  total: number
 
   constructor(
     private router: Router,
@@ -54,6 +79,8 @@ export class ItemEditComponent implements OnInit {
     private activeRoute: ActivatedRoute,
     private authService: AuthService,
     private uploadService: UploadService,
+    private modalService: ModalService,
+    private translateService: TranslateService,
   ) { }
 
   async ngOnInit() {
@@ -70,27 +97,30 @@ export class ItemEditComponent implements OnInit {
       sort: new FormControl('', Validators.required),
       properties: new FormArray([])
     })
-
     this.loaderService.showLoader()
     this.mode = this.activeRoute.snapshot.params["mode"]
+    this.parentID = Number(this.activeRoute.snapshot.queryParamMap.get("parent"))
     try {
       if (this.mode == "edit") {
         const res: any = await this.itemService.item(Number(this.activeRoute.snapshot.params["id"])).toPromise()
         this.item = res.item
       } else {
-        const res: any = await this.itemService.createDraftItem().toPromise()
+        const res: any = await this.itemService.createDraftItem(this.parentID).toPromise()
         this.item = res.item
         this.mode = "draft"
       }
       this.itemForm.patchValue(this.item)
+      if (this.parentID != 0) {
+        this.itemForm.controls['alias'].disable()
+      }
       this.itemImages = this.item.imagesList
-      let res: any = await this.itemService.getUploadImages().toPromise()
+      let res: any = await this.authService.getUser()
+      this.uploadUrl = `${environment.siteUrl}/uploads/users/${res.id}/items/`
+      res = await this.itemService.getUploadImages().toPromise()
       this.uploadImages = res.imagesList
       res = await this.itemService.itemCategories(this.item.id).toPromise()
       this.categoriesData = res.categoriesList
       await this.updateProperties();
-      res = await this.authService.getUser()
-      this.uploadUrl += `/uploads/users/${res.id}/items/`
     } catch (err) {
       this.itemMessage = new Message("danger", err.message);
     }
@@ -164,6 +194,56 @@ export class ItemEditComponent implements OnInit {
       );
     } catch (err) {
       console.log(err)
+    }
+    this.loaderService.hideLoader()
+  }
+
+  async changePage(event) {
+    this.offersPage = event.pageIndex
+    this.offersPageSize = event.pageSize
+    this.offersSort = event.sort
+    this.offersDirection = event.direction
+    let res = await this.itemService.items(this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
+    this.updateOffersData(res)
+  }
+
+  editOfferAction(id) {
+    this.router.navigate(["/admin/offers/edit", id])
+  }
+
+  updateOffersData(data) {
+    this.offersData = data.itemsList.map((item, index) => {
+      return {
+        ...item,
+        actions: [
+          { icon: "edit", class: "button-edit", handler: this.editOfferAction.bind(this), id: item.id },
+          { icon: "delete", class: "button-delete", handler: this.deleteOfferConfirm.bind(this), id: item.id }
+        ],
+      }
+    })
+    this.total = data.total
+  }
+
+  async deleteOfferConfirm(id) {
+    this.offerID = id;
+    const property = this.offersData.filter(item => item.id == id)[0];
+    const modalData = {
+      title: await this.translateService.get("Delete trading offer").toPromise(),
+      text: await this.translateService.get("Delete trading offer").toPromise() + ` "${property.title}"?`,
+      callBackFunction: this.deleteOffer.bind(this)
+    };
+    this.modalService.showModal(modalData);
+  }
+
+  async deleteOffer(confirm) {
+    this.loaderService.showLoader()
+    try {
+      if (confirm) {
+        const res = await this.itemService.deleteItem(this.offerID, this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
+        this.updateOffersData(res)
+      }
+    } catch (err) {
+      this.itemMessage = new Message("danger", err.message);
     }
     this.loaderService.hideLoader()
   }

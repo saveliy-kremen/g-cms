@@ -30,6 +30,18 @@ type CategoryListItem struct {
 	Options []CategoryListItem
 }
 
+func childCategoriesIDs(user_id uint32, categoryID uint) []uint {
+	categoriesIDs := []uint{}
+	categories := []models.Category{}
+	db.DB.Where("user_id = ? AND parent = ?", user_id, categoryID).Find(&categories)
+	for _, category := range categories {
+		categoriesIDs = append(categoriesIDs, category.ID)
+		childCategoriesIDs := childCategoriesIDs(user_id, category.ID)
+		categoriesIDs = append(categoriesIDs, childCategoriesIDs...)
+	}
+	return categoriesIDs
+}
+
 /*
 func addCategoryChildrenList(category models.Category, list CategoryListItem) []CategoryListItem {
 	level := list.Level

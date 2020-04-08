@@ -28,6 +28,7 @@ message Item {
   string seo_keywords = 18;
 
   repeated ItemImage images = 19;
+  repeated Item offers = 20;
 }
 
 message ItemImage {
@@ -49,6 +50,10 @@ message ItemRequest {
   uint32 id = 1;
 }
 
+message DraftRequest {
+  uint32 parent_id = 1;
+}
+
 message ItemsRequest {
   uint32 page = 1;
   uint32 page_size = 2;
@@ -58,19 +63,20 @@ message ItemsRequest {
 
 message EditItemRequest {
   uint32 id = 1;
-  string title = 2;
-  string article = 3;
-  string alias = 4;
-  int32 count = 5;
-  string description = 6;
-  float price = 7;
-  float old_price = 8;
-  uint32 currency_id = 9;
-  bool disable = 10;
-  uint32 sort = 11;
-  repeated uint32 item_images = 12;
-  repeated uint32 upload_images = 13;
-  repeated ItemProperty properties = 14;
+  uint32 parent_id = 2;
+  string title = 3;
+  string article = 4;
+  string alias = 5;
+  int32 count = 6;
+  string description = 7;
+  float price = 8;
+  float old_price = 9;
+  uint32 currency_id = 10;
+  bool disable = 11;
+  uint32 sort = 12;
+  repeated uint32 item_images = 13;
+  repeated uint32 upload_images = 14;
+  repeated ItemProperty properties = 15;
 }
 
 message DeleteItemRequest {
@@ -101,7 +107,7 @@ message ItemImagesResponse {
 
 service ItemService {
   rpc Item(ItemRequest) returns (ItemResponse);
-  rpc CreateDraftItem(google.protobuf.Empty) returns (ItemResponse);
+  rpc CreateDraftItem(DraftRequest) returns (ItemResponse);
   rpc EditItem(EditItemRequest) returns (ItemResponse);
   rpc DeleteItem(DeleteItemRequest) returns (ItemsResponse);
   rpc Items(ItemsRequest) returns (ItemsResponse);

@@ -1,6 +1,8 @@
 <mat-card>
-  <mat-card-title>{{"Items" | translate}}</mat-card-title>
-  <mat-card-subtitle>{{mode == "edit" ? ("Edit" | translate) : ("Add" | translate)}} {{'item' | translate}}</mat-card-subtitle>
+  <mat-card-title>{{(parentID == 0 ? "Items" : "Trading offers") | translate}}</mat-card-title>
+  <mat-card-subtitle>{{mode == "edit" ? ("Edit" | translate) : ("Add" | translate)}}
+    {{(parentID == 0 ? "item" : "trading offer") | translate}}
+  </mat-card-subtitle>
 
   <mat-card-content>
     <form novalidate #form="ngForm" [formGroup]="itemForm" (ngSubmit)="submitItemForm()">
@@ -8,7 +10,7 @@
         {{itemMessage.text}}
       </div>
 
-      <mat-tab-group (selectedTabChange)="onTabChange($event)">
+      <mat-tab-group [(selectedIndex)]="itemTabIndex" (selectedTabChange)="onTabChange($event)">
         <mat-tab label="{{'Основные характеристики'}}">
           <br>
           <mat-form-field class="half-width">
@@ -112,7 +114,7 @@
           <br>
         </mat-tab>
 
-        <mat-tab label="{{'Values' | translate}}" *ngIf="mode == 'edit' || mode == 'draft'">
+        <mat-tab label="{{'Properties' | translate}}" *ngIf="mode == 'edit' || mode == 'draft'">
           <br>
           <div class="form-group" formArrayName="properties">
             <div *ngFor="let property of properties.controls; let i = index" [formGroup]="property" [formGroupName]="i">
@@ -135,10 +137,24 @@
           </div>
           <br>
         </mat-tab>
-        <mat-tab label="{{'Категория'}}" *ngIf="mode == 'edit' || mode == 'draft'">
+        <mat-tab label="{{'Category' | translate}}" *ngIf="parentID == 0 && (mode == 'edit' || mode == 'draft')">
           <br>
           <div id="categoryTree"></div>
           <br>
+        </mat-tab>
+        <mat-tab label="{{'Trading offers' | translate}}" *ngIf="parentID == 0 && (mode == 'edit' || mode == 'draft')">
+          <mat-card>
+            <button mat-mini-fab color="accent" style="margin: 20px;" routerLink="/admin/offers/create"
+              [queryParams]="{ parent: item.id}">
+              <mat-icon>add</mat-icon>
+            </button>
+
+            <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
+              <app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns" [dataSource]="offersData"
+                [length]="total" (changePageHandler)="changePage($event)" actions="actions">
+              </app-table>
+            </mat-card-content>
+          </mat-card>
         </mat-tab>
       </mat-tab-group>
       <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;">

@@ -31,6 +31,7 @@ type Item struct {
 	Categories []Category `gorm:"many2many:items_categories;"`
 	Properties []Property
 	Images     []ItemImage
+	Offers     []Item
 	Currency   Currency
 }
 
@@ -99,6 +100,7 @@ func ItemToResponse(item Item) *v1.Item {
 		SeoKeywords:    item.SeoKeywords,
 
 		Images: ItemImagesToResponse(item.Images),
+		Offers: ItemsToResponse(item.Offers),
 	}
 }
 

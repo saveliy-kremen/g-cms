@@ -64,6 +64,11 @@ export class Item extends jspb.Message {
   clearImagesList(): void;
   addImages(value?: ItemImage, index?: number): ItemImage;
 
+  getOffersList(): Array<Item>;
+  setOffersList(value: Array<Item>): void;
+  clearOffersList(): void;
+  addOffers(value?: Item, index?: number): Item;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Item.AsObject;
   static toObject(includeInstance: boolean, msg: Item): Item.AsObject;
@@ -93,6 +98,7 @@ export namespace Item {
     seoDescription: string,
     seoKeywords: string,
     imagesList: Array<ItemImage.AsObject>,
+    offersList: Array<Item.AsObject>,
   }
 }
 
@@ -180,6 +186,24 @@ export namespace ItemRequest {
   }
 }
 
+export class DraftRequest extends jspb.Message {
+  getParentId(): number;
+  setParentId(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DraftRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DraftRequest): DraftRequest.AsObject;
+  static serializeBinaryToWriter(message: DraftRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DraftRequest;
+  static deserializeBinaryFromReader(message: DraftRequest, reader: jspb.BinaryReader): DraftRequest;
+}
+
+export namespace DraftRequest {
+  export type AsObject = {
+    parentId: number,
+  }
+}
+
 export class ItemsRequest extends jspb.Message {
   getPage(): number;
   setPage(value: number): void;
@@ -213,6 +237,9 @@ export namespace ItemsRequest {
 export class EditItemRequest extends jspb.Message {
   getId(): number;
   setId(value: number): void;
+
+  getParentId(): number;
+  setParentId(value: number): void;
 
   getTitle(): string;
   setTitle(value: string): void;
@@ -270,6 +297,7 @@ export class EditItemRequest extends jspb.Message {
 export namespace EditItemRequest {
   export type AsObject = {
     id: number,
+    parentId: number,
     title: string,
     article: string,
     alias: string,

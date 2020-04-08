@@ -52,7 +52,7 @@ func (u *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.
 	return &v1.ItemsResponse{Items: models.ItemsToResponse(items), Total: total}, nil
 }
 
-func (u *ItemServiceImpl) CreateDraftItem(ctx context.Context, req *empty.Empty) (*v1.ItemResponse, error) {
+func (u *ItemServiceImpl) CreateDraftItem(ctx context.Context, req *v1.DraftRequest) (*v1.ItemResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	draft := models.Item{}
@@ -62,6 +62,24 @@ func (u *ItemServiceImpl) CreateDraftItem(ctx context.Context, req *empty.Empty)
 		db.DB.Create(&draft)
 	}
 	db.DB.Where("user_id = ? AND draft = ? AND id <> ?", user_id, true, draft.ID).Delete(models.Item{})
+	if req.ParentId == 0 {
+		//Item
+		draft.ParentID = 0
+		draft.Title = ""
+		draft.Alias = ""
+		draft.Article = ""
+	} else {
+		//Offer
+		parent := models.Item{}
+		if db.DB.Where("user_id = ?", user_id).First(&parent, req.ParentId).RecordNotFound() {
+			return nil, status.Errorf(codes.NotFound, "Parent item not found")
+		}
+		draft.ParentID = req.ParentId
+		draft.Title = parent.Title
+		draft.Alias = parent.Alias
+		draft.Article = parent.Article
+	}
+	db.DB.Save(&draft)
 	return &v1.ItemResponse{Item: models.ItemToResponse(draft)}, nil
 }
 
@@ -89,6 +107,7 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 	item.CurrencyID = req.CurrencyId
 	item.Disable = req.Disable
 	item.Sort = req.Sort
+	item.Draft = false
 	if db.DB.Save(&item).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error create item")
 	}
@@ -314,10 +333,16 @@ func (u *ItemServiceImpl) ItemProperties(ctx context.Context, req *v1.ItemReques
 	}
 
 	itemCategories := []models.ItemsCategories{}
-	db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ID).Find(&itemCategories)
+	if item.ParentID == 0 {
+		db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ID).Find(&itemCategories)
+	} else {
+		db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ParentID).Find(&itemCategories)
+	}
 	var cats []uint
 	for _, itemCategory := range itemCategories {
 		cats = append(cats, itemCategory.CategoryID)
+		childCategoriesIDs := childCategoriesIDs(user_id, itemCategory.CategoryID)
+		cats = append(cats, childCategoriesIDs...)
 	}
 
 	propertiesCategories := []models.PropertiesCategories{}

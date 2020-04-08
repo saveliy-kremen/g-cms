@@ -15,6 +15,7 @@ import * as property_pb from './property_pb';
 
 import {
   DeleteItemRequest,
+  DraftRequest,
   EditItemRequest,
   ItemBindRequest,
   ItemImagesResponse,
@@ -66,14 +67,14 @@ export class ItemServiceClient {
 
   methodInfoCreateDraftItem = new grpcWeb.AbstractClientBase.MethodInfo(
     ItemResponse,
-    (request: google_protobuf_empty_pb.Empty) => {
+    (request: DraftRequest) => {
       return request.serializeBinary();
     },
     ItemResponse.deserializeBinary
   );
 
   createDraftItem(
-    request: google_protobuf_empty_pb.Empty,
+    request: DraftRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
                response: ItemResponse) => void) {

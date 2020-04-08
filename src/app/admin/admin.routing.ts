@@ -21,6 +21,8 @@ export const AdminRoutes: Routes = [
       { path: 'items', component: ItemsComponent },
       { path: 'items/:mode', component: ItemEditComponent },
       { path: 'items/:mode/:id', component: ItemEditComponent },
+      { path: 'offers/:mode', component: ItemEditComponent },
+      { path: 'offers/:mode/:id', component: ItemEditComponent },
       { path: 'db', component: IndexComponent },
       { path: '**', redirectTo: '' }
     ]

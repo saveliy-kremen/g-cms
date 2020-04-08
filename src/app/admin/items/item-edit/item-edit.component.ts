@@ -257,6 +257,7 @@ export class ItemEditComponent implements OnInit {
         this.itemForm.value.id = (this.mode == "edit" || this.mode == "draft") ? Number(this.item.id) : null
         this.itemForm.value.itemImages = this.itemImages.map(item => item.id)
         this.itemForm.value.uploadImages = this.uploadImages.map(item => item.id)
+        this.itemForm.value.parentID = this.parentID
         await this.itemService.editItem(this.itemForm.value)
         this.itemFormSubmitted = false;
         this.matcher.changeFormState(this.itemFormSubmitted)

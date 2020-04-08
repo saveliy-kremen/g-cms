@@ -91,6 +91,7 @@ export class ItemGrpcService {
             var request = new GRPC.EditItemRequest()
             request.setId(data.id)
             request.setTitle(data.title)
+            request.setParentId(data.parentID)
             request.setArticle(data.article)
             request.setAlias(data.alias)
             request.setCount(data.count)

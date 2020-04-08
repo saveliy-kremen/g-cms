@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+
 	//"github.com/davecgh/go-spew/spew"
 	"os"
 	"strconv"
@@ -45,10 +46,10 @@ func (u *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.
 	if req.Sort != "" {
 		order = req.Sort + " " + req.Direction
 	}
-	db.DB.Where("user_id = ? AND draft <> ?", user_id, true).Order("sort").Find(&items).Count(&total)
+	db.DB.Where("user_id = ? AND draft <> ? AND parent_id = ?", user_id, true, 0).Order("sort").Find(&items).Count(&total)
 	db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
 		return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
-	}).Where("user_id = ? AND draft <> ?", user_id, true).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&items)
+	}).Where("user_id = ? AND draft <> ? AND parent_id = ?", user_id, true, 0).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&items)
 	return &v1.ItemsResponse{Items: models.ItemsToResponse(items), Total: total}, nil
 }
 
@@ -95,6 +96,7 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 
 	item.UserID = user_id
 	item.Title = req.Title
+	item.ParentID = req.ParentId
 	item.Article = req.Article
 	if item.Article == "" {
 		item.Article = utils.Translit(strings.ToLower(item.Title))
@@ -157,7 +159,7 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 		db.DB.Save(&uploadImage)
 	}
 	deleteImages := []models.ItemImage{}
-	db.DB.Where("user_id = ? AND id NOT IN(?) AND id NOT IN(?)", user_id, req.ItemImages, req.UploadImages).Find(&deleteImages)
+	db.DB.Where("user_id = ? AND item_id = ? AND id NOT IN(?) AND id NOT IN(?)", user_id, 0, req.ItemImages, req.UploadImages).Find(&deleteImages)
 	for _, deleteImage := range deleteImages {
 		if deleteImage.ItemID == 0 {
 			os.Remove(directory + "0/" + deleteImage.Filename)

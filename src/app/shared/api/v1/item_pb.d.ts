@@ -234,6 +234,40 @@ export namespace ItemsRequest {
   }
 }
 
+export class OffersRequest extends jspb.Message {
+  getItemId(): number;
+  setItemId(value: number): void;
+
+  getPage(): number;
+  setPage(value: number): void;
+
+  getPageSize(): number;
+  setPageSize(value: number): void;
+
+  getSort(): string;
+  setSort(value: string): void;
+
+  getDirection(): string;
+  setDirection(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OffersRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: OffersRequest): OffersRequest.AsObject;
+  static serializeBinaryToWriter(message: OffersRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OffersRequest;
+  static deserializeBinaryFromReader(message: OffersRequest, reader: jspb.BinaryReader): OffersRequest;
+}
+
+export namespace OffersRequest {
+  export type AsObject = {
+    itemId: number,
+    page: number,
+    pageSize: number,
+    sort: string,
+    direction: string,
+  }
+}
+
 export class EditItemRequest extends jspb.Message {
   getId(): number;
   setId(value: number): void;
@@ -348,6 +382,44 @@ export namespace DeleteItemRequest {
   }
 }
 
+export class DeleteOfferRequest extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  getParentId(): number;
+  setParentId(value: number): void;
+
+  getPage(): number;
+  setPage(value: number): void;
+
+  getPageSize(): number;
+  setPageSize(value: number): void;
+
+  getSort(): string;
+  setSort(value: string): void;
+
+  getDirection(): string;
+  setDirection(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteOfferRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteOfferRequest): DeleteOfferRequest.AsObject;
+  static serializeBinaryToWriter(message: DeleteOfferRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteOfferRequest;
+  static deserializeBinaryFromReader(message: DeleteOfferRequest, reader: jspb.BinaryReader): DeleteOfferRequest;
+}
+
+export namespace DeleteOfferRequest {
+  export type AsObject = {
+    id: number,
+    parentId: number,
+    page: number,
+    pageSize: number,
+    sort: string,
+    direction: string,
+  }
+}
+
 export class ItemBindRequest extends jspb.Message {
   getId(): number;
   setId(value: number): void;
@@ -410,6 +482,30 @@ export class ItemsResponse extends jspb.Message {
 export namespace ItemsResponse {
   export type AsObject = {
     itemsList: Array<Item.AsObject>,
+    total: number,
+  }
+}
+
+export class OffersResponse extends jspb.Message {
+  getOffersList(): Array<Item>;
+  setOffersList(value: Array<Item>): void;
+  clearOffersList(): void;
+  addOffers(value?: Item, index?: number): Item;
+
+  getTotal(): number;
+  setTotal(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OffersResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: OffersResponse): OffersResponse.AsObject;
+  static serializeBinaryToWriter(message: OffersResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OffersResponse;
+  static deserializeBinaryFromReader(message: OffersResponse, reader: jspb.BinaryReader): OffersResponse;
+}
+
+export namespace OffersResponse {
+  export type AsObject = {
+    offersList: Array<Item.AsObject>,
     total: number,
   }
 }

@@ -33,17 +33,19 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styleUrls: ['./item-edit.component.scss']
 })
 export class ItemEditComponent implements OnInit {
+  matcher = new MyErrorStateMatcher()
+  uploadUrl: string
+  mode: string
+  itemTabIndex: number;
+
+  //Item
   itemForm: FormGroup
   itemFormSubmitted: boolean
   itemMessage: Message = new Message("success", "")
+  itemID: number
   item: any = {}
   categoriesData: any
   itemProperties: any = []
-  matcher = new MyErrorStateMatcher()
-  uploadUrl: string
-
-  mode: string
-  itemTabIndex: number;
 
   //Parent
   parent: any
@@ -98,19 +100,29 @@ export class ItemEditComponent implements OnInit {
       properties: new FormArray([])
     })
     this.loaderService.showLoader()
-    this.mode = this.activeRoute.snapshot.params["mode"]
-    this.parentID = Number(this.activeRoute.snapshot.queryParamMap.get("parent"))
+    if (this.activeRoute.snapshot.queryParamMap.get("tab")) {
+      this.itemTabIndex = Number(this.activeRoute.snapshot.queryParamMap.get("tab"))
+    }
+    if (this.activeRoute.snapshot.params["offerMode"]) {
+      this.mode = this.activeRoute.snapshot.params["offerMode"]
+      this.parentID = Number(this.activeRoute.snapshot.params["id"])
+      this.itemID = Number(this.activeRoute.snapshot.params["offerID"])
+    } else {
+      this.mode = this.activeRoute.snapshot.params["mode"]
+      this.itemID = Number(this.activeRoute.snapshot.params["id"])
+    }
     try {
       if (this.mode == "edit") {
-        const res: any = await this.itemService.item(Number(this.activeRoute.snapshot.params["id"])).toPromise()
+        const res: any = await this.itemService.item(Number(this.itemID)).toPromise()
         this.item = res.item
+        this.updateOffersData(res.item)
       } else {
         const res: any = await this.itemService.createDraftItem(this.parentID).toPromise()
         this.item = res.item
         this.mode = "draft"
       }
       this.itemForm.patchValue(this.item)
-      if (this.parentID != 0) {
+      if (this.parentID) {
         this.itemForm.controls['alias'].disable()
       }
       this.itemImages = this.item.imagesList
@@ -203,16 +215,16 @@ export class ItemEditComponent implements OnInit {
     this.offersPageSize = event.pageSize
     this.offersSort = event.sort
     this.offersDirection = event.direction
-    let res = await this.itemService.items(this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
+    let res = await this.itemService.itemOffers(this.itemID, this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
     this.updateOffersData(res)
   }
 
   editOfferAction(id) {
-    this.router.navigate(["/admin/offers/edit", id])
+    this.router.navigate(["/admin/items/edit/" + this.itemID + "/offers/edit/", id])
   }
 
   updateOffersData(data) {
-    this.offersData = data.itemsList.map((item, index) => {
+    this.offersData = data.offersList.map((item, index) => {
       return {
         ...item,
         actions: [
@@ -228,7 +240,7 @@ export class ItemEditComponent implements OnInit {
     this.offerID = id;
     const property = this.offersData.filter(item => item.id == id)[0];
     const modalData = {
-      title: await this.translateService.get("Delete trading offer").toPromise(),
+      title: await this.translateService.get("Delete Trading Offer").toPromise(),
       text: await this.translateService.get("Delete trading offer").toPromise() + ` "${property.title}"?`,
       callBackFunction: this.deleteOffer.bind(this)
     };
@@ -239,7 +251,7 @@ export class ItemEditComponent implements OnInit {
     this.loaderService.showLoader()
     try {
       if (confirm) {
-        const res = await this.itemService.deleteItem(this.offerID, this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
+        const res = await this.itemService.deleteOffer(this.offerID, this.itemID, this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
         this.updateOffersData(res)
       }
     } catch (err) {
@@ -263,10 +275,13 @@ export class ItemEditComponent implements OnInit {
         this.matcher.changeFormState(this.itemFormSubmitted)
         this.itemMessage = new Message("success", "");
         this.itemForm.reset();
-        this.router.navigateByUrl("/admin/items");
+        if (this.activeRoute.snapshot.params["offerMode"]) {
+          this.router.navigate(["/admin/items/edit", this.parentID], { queryParams: { tab: 4 } })
+        } else {
+          this.router.navigateByUrl("/admin/items");
+        }
       } catch (err) {
         this.itemMessage = new Message("danger", err.message);
-        console.log(this.itemMessage);
       }
     }
     this.loaderService.hideLoader()

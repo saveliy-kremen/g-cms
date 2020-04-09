@@ -61,6 +61,14 @@ message ItemsRequest {
   string direction = 4;
 }
 
+message OffersRequest {
+  uint32 item_id = 1;
+  uint32 page = 2;
+  uint32 page_size = 3;
+  string sort = 4;
+  string direction = 5;
+}
+
 message EditItemRequest {
   uint32 id = 1;
   uint32 parent_id = 2;
@@ -87,6 +95,15 @@ message DeleteItemRequest {
   string direction = 5;
 }
 
+message DeleteOfferRequest {
+  uint32 id = 1;
+  uint32 parent_id = 2;
+  uint32 page = 3;
+  uint32 page_size = 4;
+  string sort = 5;
+  string direction = 6;
+}
+
 message ItemBindRequest {
   uint32 id = 1;
   string category_id = 2;
@@ -101,6 +118,11 @@ message ItemsResponse {
   uint32 total = 2;
 }
 
+message OffersResponse {
+  repeated Item offers = 1;
+  uint32 total = 2;
+}
+
 message ItemImagesResponse {
   repeated ItemImage images = 1;
 }
@@ -110,10 +132,12 @@ service ItemService {
   rpc CreateDraftItem(DraftRequest) returns (ItemResponse);
   rpc EditItem(EditItemRequest) returns (ItemResponse);
   rpc DeleteItem(DeleteItemRequest) returns (ItemsResponse);
+  rpc DeleteOffer(DeleteOfferRequest) returns (OffersResponse);
   rpc Items(ItemsRequest) returns (ItemsResponse);
   rpc GetUploadImages(google.protobuf.Empty) returns (ItemImagesResponse);
   rpc ItemCategories(ItemRequest) returns (CategoriesResponse);
   rpc ItemBindCategory(ItemBindRequest) returns (CategoriesResponse);
   rpc ItemUnbindCategory(ItemBindRequest) returns (CategoriesResponse);
   rpc ItemProperties(ItemRequest) returns (PropertiesResponse);
+  rpc ItemOffers(OffersRequest) returns (OffersResponse);
 }

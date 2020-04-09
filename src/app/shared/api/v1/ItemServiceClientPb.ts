@@ -15,6 +15,7 @@ import * as property_pb from './property_pb';
 
 import {
   DeleteItemRequest,
+  DeleteOfferRequest,
   DraftRequest,
   EditItemRequest,
   ItemBindRequest,
@@ -22,7 +23,9 @@ import {
   ItemRequest,
   ItemResponse,
   ItemsRequest,
-  ItemsResponse} from './item_pb';
+  ItemsResponse,
+  OffersRequest,
+  OffersResponse} from './item_pb';
 
 export class ItemServiceClient {
   client_: grpcWeb.AbstractClientBase;
@@ -128,6 +131,28 @@ export class ItemServiceClient {
       request,
       metadata || {},
       this.methodInfoDeleteItem,
+      callback);
+  }
+
+  methodInfoDeleteOffer = new grpcWeb.AbstractClientBase.MethodInfo(
+    OffersResponse,
+    (request: DeleteOfferRequest) => {
+      return request.serializeBinary();
+    },
+    OffersResponse.deserializeBinary
+  );
+
+  deleteOffer(
+    request: DeleteOfferRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: OffersResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.ItemService/DeleteOffer',
+      request,
+      metadata || {},
+      this.methodInfoDeleteOffer,
       callback);
   }
 
@@ -260,6 +285,28 @@ export class ItemServiceClient {
       request,
       metadata || {},
       this.methodInfoItemProperties,
+      callback);
+  }
+
+  methodInfoItemOffers = new grpcWeb.AbstractClientBase.MethodInfo(
+    OffersResponse,
+    (request: OffersRequest) => {
+      return request.serializeBinary();
+    },
+    OffersResponse.deserializeBinary
+  );
+
+  itemOffers(
+    request: OffersRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: OffersResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.ItemService/ItemOffers',
+      request,
+      metadata || {},
+      this.methodInfoItemOffers,
       callback);
   }
 

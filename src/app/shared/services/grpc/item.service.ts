@@ -240,4 +240,49 @@ export class ItemGrpcService {
         });
         return grpcUnary<PropertyGRPC.PropertiesResponse.AsObject>(promise);
     }
+
+    public itemOffers(item_id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.OffersResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.OffersRequest();
+            request.setItemId(item_id)
+            request.setPage(page)
+            request.setPageSize(pageSize)
+            request.setSort(sort)
+            request.setDirection(direction)
+            this.client.itemOffers(request, meta, (err: grpcWeb.Error, response: GRPC.OffersResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<GRPC.OffersResponse.AsObject>(promise);
+    }
+
+    public deleteOffer(id: number, parent_id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.OffersResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.DeleteOfferRequest();
+            request.setId(id)
+            request.setParentId(parent_id)
+            request.setPage(page)
+            request.setPageSize(pageSize)
+            request.setSort(sort)
+            request.setDirection(direction)
+            this.client.deleteOffer(request, meta, (err: grpcWeb.Error, response: GRPC.OffersResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<GRPC.OffersResponse.AsObject>(promise);
+    }
 }

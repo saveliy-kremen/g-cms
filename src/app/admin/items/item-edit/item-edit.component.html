@@ -1,7 +1,7 @@
 <mat-card>
-  <mat-card-title>{{(parentID == 0 ? "Items" : "Trading offers") | translate}}</mat-card-title>
+  <mat-card-title>{{(parentID ? "Trading offers" : "Items") | translate}}</mat-card-title>
   <mat-card-subtitle>{{mode == "edit" ? ("Edit" | translate) : ("Add" | translate)}}
-    {{(parentID == 0 ? "item" : "trading offer") | translate}}
+    {{(parentID ? "trading offer" : "item") | translate}}
   </mat-card-subtitle>
 
   <mat-card-content>
@@ -137,15 +137,15 @@
           </div>
           <br>
         </mat-tab>
-        <mat-tab label="{{'Category' | translate}}" *ngIf="parentID == 0 && (mode == 'edit' || mode == 'draft')">
+        <mat-tab label="{{'Category' | translate}}" *ngIf="!parentID && (mode == 'edit' || mode == 'draft')">
           <br>
           <div id="categoryTree"></div>
           <br>
         </mat-tab>
-        <mat-tab label="{{'Trading offers' | translate}}" *ngIf="parentID == 0 && (mode == 'edit' || mode == 'draft')">
+        <mat-tab label="{{'Trading offers' | translate}}" *ngIf="!parentID && (mode == 'edit' || mode == 'draft')">
           <mat-card>
-            <button mat-mini-fab color="accent" style="margin: 20px;" routerLink="/admin/offers/create"
-              [queryParams]="{ parent: item.id}">
+            <button mat-mini-fab color="accent" style="margin: 20px;"
+              routerLink="/admin/items/edit/{{item.id}}/offers/create">
               <mat-icon>add</mat-icon>
             </button>
 

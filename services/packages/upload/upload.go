@@ -74,16 +74,22 @@ func UploadFileHandler() http.HandlerFunc {
 		image.UserID = userID
 		image.Filename = handler.Filename
 		db.DB.Save(&image)
+		thumb := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.ItemThumbSize, directory, strconv.Itoa(int(image.ID)))
+		image.Filename = thumb
+		db.DB.Save(&image)
+		if handler.Filename != thumb {
+			os.Remove(directory + handler.Filename)
+		}
 
 		// return that we have successfully uploaded our file!
 		resp := Response{
-			Url: "/users/" + strconv.Itoa(int(userID)) + "/items/0/" + handler.Filename,
+			Url: directory + thumb,
 		}
 		json.NewEncoder(w).Encode(resp)
 	})
 }
 
-func UploadImage(data string, directory string, file string) (string, error) {
+func UploadImage(data string, directory string, file string, size string) (string, error) {
 	os.RemoveAll(directory)
 	os.MkdirAll(directory, 0775)
 	secs := time.Now().Unix()
@@ -101,7 +107,7 @@ func UploadImage(data string, directory string, file string) (string, error) {
 		return "", err
 	}
 	jpeg.Encode(img, src, nil)
-	thumb := thumbs.CreateThumb(directory+file, config.AppConfig.CategoryThumbSize, directory, file)
+	thumb := thumbs.CreateThumb(directory+file, size, directory, file)
 	os.Remove(directory + file)
 	return thumb + "?" + strconv.Itoa(int(secs)), nil
 }

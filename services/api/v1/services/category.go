@@ -3,11 +3,12 @@ package services
 import (
 	"context"
 	//"github.com/davecgh/go-spew/spew"
+	"strconv"
+	"strings"
+
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"strconv"
-	"strings"
 
 	v1 "../../../api/v1"
 	"../../../config"
@@ -90,7 +91,7 @@ func (u *CategoryServiceImpl) EditCategory(ctx context.Context, req *v1.EditCate
 
 	if req.Image != "" {
 		directory := config.AppConfig.UploadPath + "/categories/" + strconv.Itoa(int(category.ID)) + "/"
-		file, err := upload.UploadImage(req.Image, directory, "category")
+		file, err := upload.UploadImage(req.Image, directory, "category", config.AppConfig.CategoryThumbSize)
 		if err == nil {
 			category.Image = file
 			db.DB.Save(&category)

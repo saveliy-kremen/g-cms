@@ -139,6 +139,10 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 
 	//Images
 	directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/images/"
+	if _, err := os.Stat(directory + strconv.Itoa(int(item.ID))); err != nil {
+		os.MkdirAll(directory+strconv.Itoa(int(item.ID)), 0775)
+	}
+
 	if req.ItemImages != nil {
 		itemImages := []models.ItemImage{}
 		orderValues := strings.Replace(strings.Trim(fmt.Sprint(req.ItemImages), "[]"), " ", ",", -1)

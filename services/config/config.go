@@ -19,7 +19,10 @@ type Configuration struct {
 	Password          string
 	Dbname            string
 	UploadPath        string
+	ItemThumbSize     string
 	CategoryThumbSize string
+	PropertyThumbSize string
+	CatalogThumbs     string
 	JWTKey            string
 	JWTExpire         int
 }

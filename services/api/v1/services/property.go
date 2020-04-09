@@ -4,11 +4,12 @@ import (
 	"context"
 	//"github.com/davecgh/go-spew/spew"
 	//"github.com/golang/protobuf/ptypes/empty"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"os"
 	"strconv"
 	"strings"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	v1 "../../../api/v1"
 	"../../../config"
@@ -241,7 +242,7 @@ func (u *PropertyServiceImpl) EditPropertyValue(ctx context.Context, req *v1.Edi
 
 	if req.Image != "" {
 		directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(propertyValue.PropertyID)) + "/"
-		file, err := upload.UploadImage(req.Image, directory, "thumb-"+strconv.Itoa(int(propertyValue.ID)))
+		file, err := upload.UploadImage(req.Image, directory, "thumb-"+strconv.Itoa(int(propertyValue.ID)), config.AppConfig.PropertyThumbSize)
 		if err == nil {
 			propertyValue.Image = file
 			db.DB.Save(&propertyValue)

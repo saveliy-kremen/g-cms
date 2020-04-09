@@ -15,9 +15,24 @@
 
 .upload-images {
     width: 100px;
+    height: 133px;
+    background-size: cover;
+    display: inline-block;
+    position: relative;
     margin-top: 10px;
     margin-left: 10px;
 }
+
+.right-top-icon{
+    position: absolute;
+    z-index: 10;
+    color: grey;
+    float: right;
+    right: 2px;
+    top: 2px;
+    display: block;
+    cursor: pointer;
+  }
 
 .sort-grid {
     display: flex;

@@ -260,6 +260,15 @@ export class ItemEditComponent implements OnInit {
     this.loaderService.hideLoader()
   }
 
+  itemImageDelete(id) {
+    console.log(id)
+  }
+
+  uploadImageDelete($event, id) {
+    $event.stopPropagation();
+    console.log(id)
+  }
+
   async submitItemForm() {
     this.loaderService.showLoader()
     this.itemFormSubmitted = true;

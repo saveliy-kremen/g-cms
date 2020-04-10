@@ -58,9 +58,10 @@ export class ItemEditComponent implements OnInit {
   requestUploadImages: any
 
   //Offers
-  displayedColumns: string[] = ['position', 'title', 'article', 'price', 'sort', 'actions']
+  displayedColumns: string[] = ['position', 'title', 'image', 'article', 'price', 'sort', 'actions']
   columnDefs = [
     { column: "title", title: "Title", translate: true, sort: true },
+    { column: "image", title: "Image", translate: true, sort: false },
     { column: "article", title: "Article", translate: true, sort: true },
     { column: "price", title: "Price", translate: true, sort: true },
     { column: "sort", title: "Sort", translate: true, sort: true },
@@ -113,7 +114,9 @@ export class ItemEditComponent implements OnInit {
     }
     try {
       if (this.mode == "edit") {
-        const res: any = await this.itemService.item(Number(this.itemID)).toPromise()
+        let res: any = await this.authService.getUser()
+        this.uploadUrl = `${environment.siteUrl}/uploads/users/${res.id}/items/`
+        res = await this.itemService.item(Number(this.itemID)).toPromise()
         this.item = res.item
         this.updateOffersData(res.item)
       } else {
@@ -126,9 +129,7 @@ export class ItemEditComponent implements OnInit {
         this.itemForm.controls['alias'].disable()
       }
       this.itemImages = this.item.imagesList
-      let res: any = await this.authService.getUser()
-      this.uploadUrl = `${environment.siteUrl}/uploads/users/${res.id}/items/`
-      res = await this.itemService.getUploadImages().toPromise()
+      let res: any = await this.itemService.getUploadImages().toPromise()
       this.uploadImages = res.imagesList
       res = await this.itemService.itemCategories(this.item.id).toPromise()
       this.categoriesData = res.categoriesList
@@ -227,6 +228,7 @@ export class ItemEditComponent implements OnInit {
     this.offersData = data.offersList.map((item, index) => {
       return {
         ...item,
+        image: item.imagesList && item.imagesList.length > 0 ? `<img src="${this.uploadUrl + item.id}/${item.imagesList[0].filename}" alt="${item.title}" width="100" height="120">` : `<img src="" alt="${item.title}" width="100" height="120">`,
         actions: [
           { icon: "edit", class: "button-edit", handler: this.editOfferAction.bind(this), id: item.id },
           { icon: "delete", class: "button-delete", handler: this.deleteOfferConfirm.bind(this), id: item.id }

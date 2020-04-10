@@ -176,9 +176,9 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 	existImagesIDs = append(existImagesIDs, req.ItemImages...)
 	existImagesIDs = append(existImagesIDs, req.UploadImages...)
 	if len(existImagesIDs) > 0 {
-		db.DB.Where("user_id = ? AND id NOT IN(?)", user_id, existImagesIDs).Find(&deleteImages)
+		db.DB.Where("user_id = ? AND (item_id == ? OR item_id = ?) AND id NOT IN(?)", user_id, 0, item.ID, existImagesIDs).Find(&deleteImages)
 	} else {
-		db.DB.Where("user_id = ?", user_id).Find(&deleteImages)
+		db.DB.Where("user_id = ? AND (item_id == ? OR item_id = ?)", user_id, 0, item.ID).Find(&deleteImages)
 	}
 	for _, deleteImage := range deleteImages {
 		if deleteImage.ItemID == 0 {

@@ -7,6 +7,7 @@ import { Message } from 'src/app/shared/models/message.model';
 import { environment } from 'src/environments/environment';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-items',
@@ -14,9 +15,10 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./items.component.scss']
 })
 export class ItemsComponent implements OnInit {
-  displayedColumns: string[] = ['position', 'title', 'article', 'price', 'sort', 'actions']
+  displayedColumns: string[] = ['position', 'title', 'image', 'article', 'price', 'sort', 'actions']
   columnDefs = [
     { column: "title", title: "Title", translate: true, sort: true },
+    { column: "image", title: "Image", translate: true, sort: false },
     { column: "article", title: "Article", translate: true, sort: true },
     { column: "price", title: "Price", translate: true, sort: true },
     { column: "sort", title: "Sort", translate: true, sort: true },
@@ -30,6 +32,7 @@ export class ItemsComponent implements OnInit {
   itemsDirection: string
   itemID: number
   total: number
+  uploadUrl: string
 
   constructor(
     private router: Router,
@@ -37,14 +40,16 @@ export class ItemsComponent implements OnInit {
     private itemService: ItemGrpcService,
     private modalService: ModalService,
     private translateService: TranslateService,
-    private activeRoute: ActivatedRoute
+    private authService: AuthService
   ) { }
 
   async ngOnInit() {
     this.loaderService.showLoader()
     this.itemsPage = 0
     this.itemsPageSize = environment.pageSizeOptions[0]
-    let res = await this.itemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
+    let res: any = await this.authService.getUser()
+    this.uploadUrl = `${environment.siteUrl}/uploads/users/${res.id}/items/`
+    res = await this.itemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
     this.updateItemsData(res)
     this.loaderService.hideLoader()
   }
@@ -66,6 +71,7 @@ export class ItemsComponent implements OnInit {
     this.itemsData = data.itemsList.map((item, index) => {
       return {
         ...item,
+        image: item.imagesList && item.imagesList.length > 0 ? `<img src="${this.uploadUrl + item.id}/${item.imagesList[0].filename}" alt="${item.title}" width="100" height="120">` : `<img src="" alt="${item.title}" width="100" height="120">`,
         actions: [
           { icon: "edit", class: "button-edit", handler: this.editAction.bind(this), id: item.id },
           { icon: "delete", class: "button-delete", handler: this.deleteItemConfirm.bind(this), id: item.id }
@@ -95,7 +101,6 @@ export class ItemsComponent implements OnInit {
       }
     } catch (err) {
       this.itemsMessage = new Message("danger", err.message);
-      console.log(this.itemsMessage);
     }
     this.loaderService.hideLoader()
   }

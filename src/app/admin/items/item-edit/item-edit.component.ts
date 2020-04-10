@@ -261,12 +261,12 @@ export class ItemEditComponent implements OnInit {
   }
 
   itemImageDelete(id) {
-    console.log(id)
+    this.itemImages = this.itemImages.filter(item => item.id != id)
   }
 
   uploadImageDelete($event, id) {
     $event.stopPropagation();
-    console.log(id)
+    this.uploadImages = this.uploadImages.filter(item => item.id != id)
   }
 
   async submitItemForm() {

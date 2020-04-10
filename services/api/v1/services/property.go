@@ -244,7 +244,7 @@ func (u *PropertyServiceImpl) EditPropertyValue(ctx context.Context, req *v1.Edi
 		directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(propertyValue.PropertyID)) + "/"
 		file, err := upload.UploadImage(req.Image, directory, "thumb-"+strconv.Itoa(int(propertyValue.ID)), config.AppConfig.PropertyThumbSize)
 		if err == nil {
-			propertyValue.Image = file
+			propertyValue.Image = *file
 			db.DB.Save(&propertyValue)
 		}
 	}

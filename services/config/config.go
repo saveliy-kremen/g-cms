@@ -6,6 +6,16 @@ import (
 	"os"
 )
 
+type ThumbStruct struct {
+	Title string
+	Size  string
+}
+
+type ThumbsStruct struct {
+	Item    string
+	Catalog []ThumbStruct
+}
+
 // Configuration Contains basic settings for connection to db
 type Configuration struct {
 	Name              string
@@ -19,10 +29,9 @@ type Configuration struct {
 	Password          string
 	Dbname            string
 	UploadPath        string
-	ItemThumbSize     string
 	CategoryThumbSize string
 	PropertyThumbSize string
-	CatalogThumbs     string
+	Thumbs            ThumbsStruct
 	JWTKey            string
 	JWTExpire         int
 }

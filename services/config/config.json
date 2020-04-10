@@ -10,10 +10,17 @@
 	"Dbname": "newud_gcms",
 	"Password": "MKTG853Vup",
 	"UploadPath": "../../public_html/uploads",
-	"ItemThumbSize": "450x600",
 	"CategoryThumbSize": "200x200",
 	"PropertyThumbSize": "30x30",
-	"CatalogThumbs": "{'catalog': '185x246'}",
+	"Thumbs": {
+		"Item": "500x600",
+		"Catalog": [
+			{
+				"title": "catalog",
+				"size": "208x250"
+			}
+		]
+	},
 	"JWTKey": "2Ye5_w1z3zpD4dSGdRp3s98ZipCNQqmsHRB9vioOx54",
 	"JWTExpire": 96
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	//"github.com/davecgh/go-spew/spew"
 	"os"
 	"strconv"
 	"strings"
@@ -19,6 +18,7 @@ import (
 	"../../../db"
 	"../../../models"
 	"../../../packages/auth"
+	"../../../packages/thumbs"
 	"../../../packages/utils"
 )
 
@@ -65,7 +65,7 @@ func (u *ItemServiceImpl) CreateDraftItem(ctx context.Context, req *v1.DraftRequ
 		draft.Draft = true
 		db.DB.Create(&draft)
 	}
-	db.DB.Where("user_id = ? AND draft = ? AND id <> ?", user_id, true, draft.ID).Delete(models.Item{})
+	db.DB.Unscoped().Where("user_id = ? AND draft = ? AND id <> ?", user_id, true, draft.ID).Delete(models.Item{})
 	if req.ParentId == 0 {
 		//Item
 		draft.ParentID = 0
@@ -138,7 +138,7 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 	}
 
 	//Images
-	directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/images/"
+	directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/items/"
 	if _, err := os.Stat(directory + strconv.Itoa(int(item.ID))); err != nil {
 		os.MkdirAll(directory+strconv.Itoa(int(item.ID)), 0775)
 	}
@@ -151,6 +151,7 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 			if uint(itemImage.ItemID) != item.ID {
 				itemImage.ItemID = uint32(item.ID)
 				os.Rename(directory+"0/"+itemImage.Filename, directory+strconv.Itoa(int(item.ID))+"/"+itemImage.Filename)
+				thumbs.CreateThumbs(directory+strconv.Itoa(int(item.ID)), itemImage.Filename, config.AppConfig.Thumbs.Catalog)
 			}
 			itemImage.Sort = uint32(i * 10)
 			db.DB.Save(&itemImage)
@@ -164,20 +165,29 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 			if uploadImage.ItemID != 0 {
 				uploadImage.ItemID = 0
 				os.Rename(directory+strconv.Itoa(int(item.ID))+"/"+uploadImage.Filename, directory+"0/"+uploadImage.Filename)
+				thumbs.DeleteThumbs(directory+strconv.Itoa(int(item.ID)), uploadImage.Filename, config.AppConfig.Thumbs.Catalog)
 			}
 			uploadImage.Sort = uint32(i * 10)
 			db.DB.Save(&uploadImage)
 		}
 	}
 	deleteImages := []models.ItemImage{}
-	db.DB.Where("user_id = ? AND item_id = ? AND id NOT IN(?) AND id NOT IN(?)", user_id, 0, req.ItemImages, req.UploadImages).Find(&deleteImages)
+	existImagesIDs := []uint32{}
+	existImagesIDs = append(existImagesIDs, req.ItemImages...)
+	existImagesIDs = append(existImagesIDs, req.UploadImages...)
+	if len(existImagesIDs) > 0 {
+		db.DB.Where("user_id = ? AND id NOT IN(?)", user_id, existImagesIDs).Find(&deleteImages)
+	} else {
+		db.DB.Where("user_id = ?", user_id).Find(&deleteImages)
+	}
 	for _, deleteImage := range deleteImages {
 		if deleteImage.ItemID == 0 {
 			os.Remove(directory + "0/" + deleteImage.Filename)
 		} else {
 			os.Remove(directory + strconv.Itoa(int(item.ID)) + "/" + deleteImage.Filename)
+			thumbs.DeleteThumbs(directory+strconv.Itoa(int(item.ID)), deleteImage.Filename, config.AppConfig.Thumbs.Catalog)
 		}
-		db.DB.Delete(&deleteImage)
+		db.DB.Unscoped().Delete(&deleteImage)
 	}
 	return &v1.ItemResponse{Item: models.ItemToResponse(item)}, nil
 }

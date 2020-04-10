@@ -74,22 +74,26 @@ func UploadFileHandler() http.HandlerFunc {
 		image.UserID = userID
 		image.Filename = handler.Filename
 		db.DB.Save(&image)
-		thumb := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.ItemThumbSize, directory, strconv.Itoa(int(image.ID)))
-		image.Filename = thumb
+		thumb, err := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.Thumbs.Item, directory, strconv.Itoa(int(image.ID)))
+		if err != nil {
+			http.Error(w, "Error create thumb file: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+		image.Filename = *thumb
 		db.DB.Save(&image)
-		if handler.Filename != thumb {
+		if handler.Filename != *thumb {
 			os.Remove(directory + handler.Filename)
 		}
 
 		// return that we have successfully uploaded our file!
 		resp := Response{
-			Url: directory + thumb,
+			Url: *thumb,
 		}
 		json.NewEncoder(w).Encode(resp)
 	})
 }
 
-func UploadImage(data string, directory string, file string, size string) (string, error) {
+func UploadImage(data string, directory string, file string, size string) (*string, error) {
 	os.RemoveAll(directory)
 	os.MkdirAll(directory, 0775)
 	secs := time.Now().Unix()
@@ -98,16 +102,20 @@ func UploadImage(data string, directory string, file string, size string) (strin
 
 	i := strings.Index(data, ",")
 	if i < 0 {
-		return "", errors.New("Unkwown format of image")
+		return nil, errors.New("Unkwown format of image")
 	}
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data[i+1:]))
 	src, _, err := image.Decode(reader)
 	if err != nil {
 		err := errors.New("Error decode image")
-		return "", err
+		return nil, err
 	}
 	jpeg.Encode(img, src, nil)
-	thumb := thumbs.CreateThumb(directory+file, size, directory, file)
+	thumb, err := thumbs.CreateThumb(directory+file, size, directory, file)
+	if err != nil {
+		return nil, err
+	}
 	os.Remove(directory + file)
-	return thumb + "?" + strconv.Itoa(int(secs)), nil
+	filename := *thumb + "?" + strconv.Itoa(int(secs))
+	return &filename, nil
 }

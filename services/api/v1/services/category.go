@@ -93,7 +93,7 @@ func (u *CategoryServiceImpl) EditCategory(ctx context.Context, req *v1.EditCate
 		directory := config.AppConfig.UploadPath + "/categories/" + strconv.Itoa(int(category.ID)) + "/"
 		file, err := upload.UploadImage(req.Image, directory, "category", config.AppConfig.CategoryThumbSize)
 		if err == nil {
-			category.Image = file
+			category.Image = *file
 			db.DB.Save(&category)
 		}
 	}

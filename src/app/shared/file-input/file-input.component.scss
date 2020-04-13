@@ -1,0 +1,48 @@
+.fake {
+  &__button {
+    margin-right: 16px;
+  }
+  &__no-file {
+    margin-right: 16px;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+}
+
+.input {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  &__left {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+  }
+  &__center {
+    flex: 0;
+  }
+}
+
+.clear-buttton {
+  color: rgba(red, 0.54);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  border: none;
+}
+
+button {
+  border: 1px solid currentColor;
+  padding: 0 15px;
+  line-height: 34px;
+  overflow: hidden;
+  border-color: rgba(0,0,0,.12);
+  border-radius: 4px;
+}
+
+.chips {
+  max-height: 130px;
+  overflow: auto;
+  margin-top: 4px;
+  margin-right: 8px;
+}

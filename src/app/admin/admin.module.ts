@@ -22,11 +22,13 @@ import { PropertyEditComponent } from './properties/property-edit/property-edit.
 import { PropertyValueComponent } from './properties/property-value/property-value.component'
 import { ItemsComponent } from './items/items.component'
 import { ItemEditComponent } from './items/item-edit/item-edit.component'
-import { UploadService } from '../shared/services/upload.service'
+import { UploadService } from '../shared/services/upload.service';
+import { XmlImportComponent } from './xml-import/xml-import.component'
+import { FileInputModule } from '../shared/file-input/file-input.module'
 
 @NgModule({
   declarations: [
-    AdminLayoutComponent, IndexComponent, CategoriesComponent, CategoryEditComponent, PropertiesComponent, PropertyEditComponent, PropertyValueComponent, ItemsComponent, ItemEditComponent
+    AdminLayoutComponent, IndexComponent, CategoriesComponent, CategoryEditComponent, PropertiesComponent, PropertyEditComponent, PropertyValueComponent, ItemsComponent, ItemEditComponent, XmlImportComponent
   ],
   imports: [
     CommonModule,
@@ -39,6 +41,7 @@ import { UploadService } from '../shared/services/upload.service'
     ReactiveFormsModule,
     TableModule,
     NgsgModule,
+    FileInputModule,
     NgDragDropModule.forRoot(),
     RouterModule.forChild(AdminRoutes),
   ],

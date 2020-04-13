@@ -1,0 +1,52 @@
+<div>
+  <div class="container__real">
+    <label #realLabel hidden aria-hidden="true">
+      <input #realInput type="file" [id]="id" [attr.multiple]="allowMultiple ? allowMultiple : null"
+        [attr.accept]="accept ? accept : null" (change)="handleRealInputChange($event)">
+    </label>
+  </div>
+  <div class="container__fake input">
+    <div class="input__left fake">
+      <ng-container>
+        <ng-container *ngIf="buttonType === 'basic'; then basicBtn"></ng-container>
+        <ng-container *ngIf="buttonType === 'raised'; then raisedBtn"></ng-container>
+        <ng-container *ngIf="buttonType === 'stroked'; then strokedBtn"></ng-container>
+        <ng-container *ngIf="buttonType === 'flat'; then flatBtn"></ng-container>
+      </ng-container>
+      <!-- [hidden]="realInput.files.length > 0" [attr.aria-hidden]="realInput.files.length > 0" -->
+      <span class="fake__no-file" [hidden]="realInput.files.length > 0"
+        [attr.aria-hidden]="realInput.files.length > 0">{{noFileText}}</span>
+    </div>
+    <!-- [hidden]="realInput.files.length <= 0" [attr.aria-hidden]="realInput.files.length <= 0" -->
+    <div class="input__center" [hidden]="realInput.files.length <= 0" [attr.aria-hidden]="realInput.files.length <= 0">
+      <div #chips class="chips"></div>
+    </div>
+    <!-- [hidden]="realInput.files.length <= 0" [attr.aria-hidden]="realInput.files.length <= 0" -->
+    <div class="input__right" [hidden]="realInput.files.length <= 0" [attr.aria-hidden]="realInput.files.length <= 0">
+      <button #clearBtn class="clear-buttton mat-icon-button" type="button" [attr.aria-label]="removeButtonLabel"
+        (click)="handleClearBtnClick($event)">
+        <i class="material-icons">highlight_off</i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TEMPLATES -->
+<ng-container>
+  <ng-template #basicBtn>
+    <button #fakeBtn class="fake__button mat-button" [style.background-color]="buttonColor"
+      [style.color]="buttonTextColor" type="button" (click)="realInput.click()">{{buttonText}}</button>
+  </ng-template>
+  <ng-template #raisedBtn>
+    <button #fakeBtn class="fake__button mat-raised-button" [style.background-color]="buttonColor"
+      [style.color]="buttonTextColor" type="button" (click)="realInput.click()">{{buttonText}}</button>
+  </ng-template>
+  <ng-template #strokedBtn>
+    <button #fakeBtn class="fake__button mat-stroked-button" [style.background-color]="buttonColor"
+      [style.color]="buttonTextColor" type="button" (click)="realInput.click()">{{buttonText}}</button>
+  </ng-template>
+  <ng-template #flatBtn>
+    <button #fakeBtn class="fake__button mat-flat-button" [style.background-color]="buttonColor"
+      [style.color]="buttonTextColor" type="button" (click)="realInput.click()">{{buttonText}}</button>
+  </ng-template>
+</ng-container>

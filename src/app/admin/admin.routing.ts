@@ -8,6 +8,7 @@ import { PropertiesComponent } from './properties/properties.component';
 import { PropertyEditComponent } from './properties/property-edit/property-edit.component';
 import { ItemsComponent } from './items/items.component';
 import { ItemEditComponent } from './items/item-edit/item-edit.component';
+import { XmlImportComponent } from './xml-import/xml-import.component';
 
 export const AdminRoutes: Routes = [
   {
@@ -23,7 +24,7 @@ export const AdminRoutes: Routes = [
       { path: 'items/:mode/:id', component: ItemEditComponent },
       { path: 'items/:mode/:id/offers/:offerMode', component: ItemEditComponent },
       { path: 'items/:mode/:id/offers/:offerMode/:offerID', component: ItemEditComponent },
-      { path: 'db', component: IndexComponent },
+      { path: 'xml_import', component: XmlImportComponent },
       { path: '**', redirectTo: '' }
     ]
   }

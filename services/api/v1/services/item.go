@@ -101,10 +101,10 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 	item.Title = req.Title
 	item.ParentID = req.ParentId
 	item.Article = req.Article
-	if item.Article == "" {
-		item.Article = utils.Translit(strings.ToLower(item.Title))
-	}
 	item.Alias = req.Alias
+	if item.Alias == "" {
+		item.Alias = utils.Translit(strings.ToLower(item.Title))
+	}
 	item.Count = req.Count
 	item.Description = req.Description
 	item.Price = req.Price

@@ -214,6 +214,28 @@ export namespace EditCategoryRequest {
   }
 }
 
+export class UploadCategoryRequest extends jspb.Message {
+  getTitle(): string;
+  setTitle(value: string): void;
+
+  getParentId(): number;
+  setParentId(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UploadCategoryRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UploadCategoryRequest): UploadCategoryRequest.AsObject;
+  static serializeBinaryToWriter(message: UploadCategoryRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UploadCategoryRequest;
+  static deserializeBinaryFromReader(message: UploadCategoryRequest, reader: jspb.BinaryReader): UploadCategoryRequest;
+}
+
+export namespace UploadCategoryRequest {
+  export type AsObject = {
+    title: string,
+    parentId: number,
+  }
+}
+
 export class CategoryResponse extends jspb.Message {
   getCategory(): Category | undefined;
   setCategory(value?: Category): void;

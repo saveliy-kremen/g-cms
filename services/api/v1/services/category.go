@@ -100,6 +100,37 @@ func (u *CategoryServiceImpl) EditCategory(ctx context.Context, req *v1.EditCate
 	return &v1.CategoryResponse{Category: models.CategoryToResponse(category)}, nil
 }
 
+func (u *CategoryServiceImpl) UploadCategory(ctx context.Context, req *v1.UploadCategoryRequest) (*v1.CategoryResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	parentCategory := models.Category{}
+	if db.DB.Where("user_id =? && parent = ?", user_id, "#").First(&parentCategory).RecordNotFound() {
+		parentCategory.UserID = user_id
+		parentCategory.Parent = "#"
+		parentCategory.Title = "Categories"
+		parentCategory.Alias = strconv.Itoa(int(user_id)) + "_categories"
+		parentCategory.Description = "Main category"
+		db.DB.Create(&parentCategory)
+	}
+
+	category := models.Category{}
+	alias := utils.Translit(strings.ToLower(req.Title))
+	db.DB.Where("user_id = ? AND alias = ?", user_id, alias).First(&category)
+
+	category.UserID = user_id
+	category.Title = req.Title
+	category.Alias = alias
+	if req.ParentId == 0 {
+		category.Parent = strconv.Itoa(int(parentCategory.ID))
+	} else {
+		category.Parent = strconv.Itoa(int(req.ParentId))
+	}
+	if db.DB.Save(&category).Error != nil {
+		return nil, status.Errorf(codes.Aborted, "Error save category")
+	}
+	return &v1.CategoryResponse{Category: models.CategoryToResponse(category)}, nil
+}
+
 func (u *CategoryServiceImpl) Categories(ctx context.Context, req *empty.Empty) (*v1.CategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 

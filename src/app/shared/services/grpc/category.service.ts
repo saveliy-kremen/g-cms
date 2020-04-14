@@ -170,4 +170,22 @@ export class CategoryGrpcService {
         });
         return grpcUnary<GRPC.CategoryResponse.AsObject>(promise);
     }
+
+    public uploadCategory(data): Observable<GRPC.CategoryResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.UploadCategoryRequest();
+            request.setTitle(data.title);
+            request.setParentId(data.parentID);
+            this.client.uploadCategory(request, meta, (err: grpcWeb.Error, response: GRPC.CategoryResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<GRPC.CategoryResponse.AsObject>(promise);
+    }
 }

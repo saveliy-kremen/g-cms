@@ -54,6 +54,12 @@ message EditCategoryRequest {
   string image = 5;
 }
 
+message UploadCategoryRequest {
+  string title = 1;
+  uint32 parent_id = 2;
+}
+
+
 message CategoryResponse {
   Category category = 1;
 }
@@ -71,4 +77,5 @@ service CategoryService {
   rpc DeleteCategory(DeleteCategoryRequest) returns (CategoriesResponse);
   rpc MoveCategory(MoveCategoryRequest) returns (CategoriesResponse);
   rpc EditCategory(EditCategoryRequest) returns (CategoryResponse);
+  rpc UploadCategory(UploadCategoryRequest) returns (CategoryResponse);
 }

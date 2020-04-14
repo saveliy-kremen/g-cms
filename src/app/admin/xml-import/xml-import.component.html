@@ -2,6 +2,10 @@
     <mat-card-title>{{"Import XML" | translate}}</mat-card-title>
 
     <mat-card-content>
+        <div class="alert alert-{{xmlMessage.type}}" *ngIf="xmlMessage.text">
+            {{xmlMessage.text}}
+        </div>
+        <br>
         <p>Кодировка XML</p>
         <mat-radio-group [(ngModel)]="coding" ngDefaultControl>
             <mat-radio-button value="utf8">UTF-8</mat-radio-button>
@@ -11,5 +15,14 @@
         <app-file-input #xmlReader allowMultiple="false" (inputChange)="uploadListener($event)"
             (clearClick)="fileReset()" buttonColor="#2196f3" accept=".xml">
         </app-file-input>
+        <br>
+        <div *ngIf="xmlImportData">
+            <p>{{xmlImportData.name["#text"]}}</p>
+            <p>Категорий: {{xmlImportData.categories?.category?.length}}</p>
+            <p>Товаров: {{xmlImportData.offers?.offer?.length}}</p>
+            <br>
+            <button mat-raised-button color="accent" (click)="loadData()"
+                [disabled]="loadDisabled">{{"Upload" | translate}}</button>
+        </div>
     </mat-card-content>
 </mat-card>

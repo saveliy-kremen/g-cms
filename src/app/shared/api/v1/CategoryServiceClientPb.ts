@@ -18,7 +18,8 @@ import {
   CategoryResponse,
   DeleteCategoryRequest,
   EditCategoryRequest,
-  MoveCategoryRequest} from './category_pb';
+  MoveCategoryRequest,
+  UploadCategoryRequest} from './category_pb';
 
 export class CategoryServiceClient {
   client_: grpcWeb.AbstractClientBase;
@@ -212,6 +213,28 @@ export class CategoryServiceClient {
       request,
       metadata || {},
       this.methodInfoEditCategory,
+      callback);
+  }
+
+  methodInfoUploadCategory = new grpcWeb.AbstractClientBase.MethodInfo(
+    CategoryResponse,
+    (request: UploadCategoryRequest) => {
+      return request.serializeBinary();
+    },
+    CategoryResponse.deserializeBinary
+  );
+
+  uploadCategory(
+    request: UploadCategoryRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: CategoryResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.CategoryService/UploadCategory',
+      request,
+      metadata || {},
+      this.methodInfoUploadCategory,
       callback);
   }
 

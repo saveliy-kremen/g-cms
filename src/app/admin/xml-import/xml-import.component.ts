@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 
+import { LoaderService } from 'src/app/shared/services/loader.service';
+import { Message } from 'src/app/shared/models/message.model';
+import { CategoryGrpcService } from 'src/app/shared/services/grpc/category.service';
+
 @Component({
   selector: 'app-xml-import',
   templateUrl: './xml-import.component.html',
@@ -8,14 +12,19 @@ import { Component, OnInit } from '@angular/core';
 export class XmlImportComponent implements OnInit {
   xmlImportData: any
   public coding: string = "utf8"
+  xmlMessage: Message = new Message("success", "")
+  loadDisabled: boolean
 
-  constructor() { }
+  constructor(
+    private loaderService: LoaderService,
+    private categoryService: CategoryGrpcService,
+  ) { }
 
   ngOnInit(): void {
   }
 
   uploadListener($event: any): void {
-    let files = $event.srcElement.files;
+    this.loaderService.showLoader()
 
     let input = $event.target;
     let reader = new FileReader();
@@ -29,14 +38,35 @@ export class XmlImportComponent implements OnInit {
       // Assuming xmlDoc is the XML DOM Document
       var oParser = new DOMParser();
       var oDOM = oParser.parseFromString(String(reader.result), "application/xml");
-      console.log(reader.result)
-      this.xmlImportData = this.xmlToJson(oDOM);
-      console.log(this.xmlImportData)
+      //console.log(reader.result)
+      this.xmlImportData = this.xmlToJson(oDOM)["yml_catalog"][1]["shop"];
+      //console.log(this.xmlImportData)
+      this.loadDisabled = false
+      this.loaderService.hideLoader()
     };
 
     reader.onerror = function () {
-      console.log('error is occured while reading file!');
-    };
+      this.loaderService.hideLoader()
+      this.xmlMessage = new Message("danger", 'Error is occured while reading file!');
+    }.bind(this);
+  }
+
+  async loadData() {
+    this.loadDisabled = true
+    this.loaderService.showLoader()
+    try {
+      for (let i = 0; i < this.xmlImportData.categories.category.length; i++) {
+        this.xmlImportData.categories.category[i].title = this.xmlImportData.categories.category[i]["#text"]
+        this.xmlImportData.categories.category[i].parentID = this.xmlImportData.categories.category[i]["@attributes"].parentId
+          ? Number(this.xmlImportData.categories.category.filter(item => item["@attributes"].id == this.xmlImportData.categories.category[i]["@attributes"].parentId)[0].id)
+          : 0
+        const res: any = await this.categoryService.uploadCategory(this.xmlImportData.categories.category[i]).toPromise()
+        this.xmlImportData.categories.category[i].id = res.category.id
+      }
+    } catch (err) {
+      this.xmlMessage = new Message("danger", err);
+    }
+    this.loaderService.hideLoader()
   }
 
   fileReset() {

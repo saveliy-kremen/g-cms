@@ -133,6 +133,7 @@ export class ItemEditComponent implements OnInit {
       this.uploadImages = res.imagesList
       res = await this.itemService.itemCategories(this.item.id).toPromise()
       this.categoriesData = res.categoriesList
+      await this.categoriesTranslate();
       await this.updateProperties();
     } catch (err) {
       this.itemMessage = new Message("danger", err.message);
@@ -142,6 +143,14 @@ export class ItemEditComponent implements OnInit {
 
   get properties(): FormArray {
     return this.itemForm.get('properties') as FormArray;
+  }
+
+  async categoriesTranslate() {
+    for (let i = 0; i < this.categoriesData.length; i++) {
+      if (this.categoriesData[i].parent === "#") {
+        this.categoriesData[i].text = await this.translateService.get(this.categoriesData[i].text).toPromise();
+      }
+    }
   }
 
   async updateProperties() {

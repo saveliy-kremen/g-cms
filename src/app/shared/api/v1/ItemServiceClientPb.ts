@@ -25,7 +25,8 @@ import {
   ItemsRequest,
   ItemsResponse,
   OffersRequest,
-  OffersResponse} from './item_pb';
+  OffersResponse,
+  UploadOfferRequest} from './item_pb';
 
 export class ItemServiceClient {
   client_: grpcWeb.AbstractClientBase;
@@ -307,6 +308,28 @@ export class ItemServiceClient {
       request,
       metadata || {},
       this.methodInfoItemOffers,
+      callback);
+  }
+
+  methodInfoUploadOffer = new grpcWeb.AbstractClientBase.MethodInfo(
+    ItemResponse,
+    (request: UploadOfferRequest) => {
+      return request.serializeBinary();
+    },
+    ItemResponse.deserializeBinary
+  );
+
+  uploadOffer(
+    request: UploadOfferRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: ItemResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.ItemService/UploadOffer',
+      request,
+      metadata || {},
+      this.methodInfoUploadOffer,
       callback);
   }
 

@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { LoaderService } from 'src/app/shared/services/loader.service';
 import { Message } from 'src/app/shared/models/message.model';
 import { CategoryGrpcService } from 'src/app/shared/services/grpc/category.service';
+import { ItemGrpcService } from 'src/app/shared/services/grpc/item.service';
 
 @Component({
   selector: 'app-xml-import',
@@ -18,6 +19,7 @@ export class XmlImportComponent implements OnInit {
   constructor(
     private loaderService: LoaderService,
     private categoryService: CategoryGrpcService,
+    private itemService: ItemGrpcService,
   ) { }
 
   ngOnInit(): void {
@@ -38,9 +40,7 @@ export class XmlImportComponent implements OnInit {
       // Assuming xmlDoc is the XML DOM Document
       var oParser = new DOMParser();
       var oDOM = oParser.parseFromString(String(reader.result), "application/xml");
-      //console.log(reader.result)
       this.xmlImportData = this.xmlToJson(oDOM)["yml_catalog"][1]["shop"];
-      //console.log(this.xmlImportData)
       this.loadDisabled = false
       this.loaderService.hideLoader()
     };
@@ -54,6 +54,7 @@ export class XmlImportComponent implements OnInit {
   async loadData() {
     this.loadDisabled = true
     this.loaderService.showLoader()
+    console.log(this.xmlImportData)
     try {
       for (let i = 0; i < this.xmlImportData.categories.category.length; i++) {
         this.xmlImportData.categories.category[i].title = this.xmlImportData.categories.category[i]["#text"]
@@ -63,8 +64,30 @@ export class XmlImportComponent implements OnInit {
         const res: any = await this.categoryService.uploadCategory(this.xmlImportData.categories.category[i]).toPromise()
         this.xmlImportData.categories.category[i].id = res.category.id
       }
+      for (let i = 0; i < (this.xmlImportData.offers.offer.length ? 10 : 10); i++) {
+        this.xmlImportData.offers.offer[i].title = this.xmlImportData.offers.offer[i].name["#text"]
+        if (this.xmlImportData.offers.offer[i]["@attributes"].group_id) {
+          const parentItem = this.xmlImportData.offers.offer.filter(item => item["@attributes"].id == this.xmlImportData.offers.offer[i]["@attributes"].group_id)[0]
+          if (parentItem) {
+            this.xmlImportData.offers.offer[i].parentID = parentItem.id
+          }
+        }
+        this.xmlImportData.offers.offer[i].price = this.xmlImportData.offers.offer[i].price["#text"]
+        this.xmlImportData.offers.offer[i].currency = this.xmlImportData.offers.offer[i].currencyId["#text"]
+        if (this.xmlImportData.offers.offer[i].categoryId) {
+          const category = this.xmlImportData.categories.category.filter(item => item["@attributes"].id == this.xmlImportData.offers.offer[i].categoryId["#text"])[0]
+          if (category) {
+            this.xmlImportData.offers.offer[i].categoryID = category.id
+          }
+        }
+        this.xmlImportData.offers.offer[i].description = this.xmlImportData.offers.offer[i].description["#cdata-section"]
+        this.xmlImportData.offers.offer[i].images = this.xmlImportData.offers.offer[i].picture.map(item => item["#text"])
+        const res: any = await this.itemService.uploadOffer(this.xmlImportData.offers.offer[i]).toPromise()
+        this.xmlImportData.offers.offer[i].id = res.item.id
+      }
     } catch (err) {
-      this.xmlMessage = new Message("danger", err);
+      console.log(err)
+      this.xmlMessage = new Message("danger", err.message);
     }
     this.loaderService.hideLoader()
   }
@@ -87,7 +110,7 @@ export class XmlImportComponent implements OnInit {
           obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
         }
       }
-    } else if (xml.nodeType == 3) { // text
+    } else if (xml.nodeType == 3 || xml.nodeType == 4) { // text || CDATA
       obj = xml.nodeValue;
     }
 

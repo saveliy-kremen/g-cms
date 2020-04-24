@@ -2,13 +2,15 @@ package auth
 
 import (
 	"context"
-	"github.com/dgrijalva/jwt-go"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"regexp"
 	"strconv"
 	"time"
+
+	//"github.com/davecgh/go-spew/spew"
+	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 
 	"../../config"
 	"../../db"

@@ -30,6 +30,7 @@ func main() {
 	v1.RegisterCategoryServiceServer(svr, &services.CategoryServiceImpl{})
 	v1.RegisterPropertyServiceServer(svr, &services.PropertyServiceImpl{})
 	v1.RegisterItemServiceServer(svr, &services.ItemServiceImpl{})
+	v1.RegisterEsp8266ServiceServer(svr, &services.Esp8266ServiceImpl{})
 
 	// trap SIGINT / SIGTERM to exit cleanly
 	//c := make(chan os.Signal, 1)

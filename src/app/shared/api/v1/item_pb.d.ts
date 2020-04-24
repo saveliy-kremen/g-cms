@@ -442,6 +442,56 @@ export namespace ItemBindRequest {
   }
 }
 
+export class UploadOfferRequest extends jspb.Message {
+  getTitle(): string;
+  setTitle(value: string): void;
+
+  getParentId(): number;
+  setParentId(value: number): void;
+
+  getPrice(): number;
+  setPrice(value: number): void;
+
+  getCurrency(): string;
+  setCurrency(value: string): void;
+
+  getCategoryId(): number;
+  setCategoryId(value: number): void;
+
+  getDescription(): string;
+  setDescription(value: string): void;
+
+  getImagesList(): Array<string>;
+  setImagesList(value: Array<string>): void;
+  clearImagesList(): void;
+  addImages(value: string, index?: number): void;
+
+  getPropertiesList(): Array<number>;
+  setPropertiesList(value: Array<number>): void;
+  clearPropertiesList(): void;
+  addProperties(value: number, index?: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UploadOfferRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UploadOfferRequest): UploadOfferRequest.AsObject;
+  static serializeBinaryToWriter(message: UploadOfferRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UploadOfferRequest;
+  static deserializeBinaryFromReader(message: UploadOfferRequest, reader: jspb.BinaryReader): UploadOfferRequest;
+}
+
+export namespace UploadOfferRequest {
+  export type AsObject = {
+    title: string,
+    parentId: number,
+    price: number,
+    currency: string,
+    categoryId: number,
+    description: string,
+    imagesList: Array<string>,
+    propertiesList: Array<number>,
+  }
+}
+
 export class ItemResponse extends jspb.Message {
   getItem(): Item | undefined;
   setItem(value?: Item): void;

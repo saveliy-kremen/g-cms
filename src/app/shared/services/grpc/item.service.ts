@@ -285,4 +285,27 @@ export class ItemGrpcService {
         });
         return grpcUnary<GRPC.OffersResponse.AsObject>(promise);
     }
+
+    public uploadOffer(data): Observable<GRPC.ItemResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.UploadOfferRequest()
+            request.setTitle(data.title)
+            request.setParentId(data.parentID)
+            request.setCategoryId(data.categoryID)
+            request.setPrice(data.price)
+            request.setCurrency(data.currency)
+            request.setDescription(data.description)
+            request.setImagesList(data.images)
+            this.client.uploadOffer(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<GRPC.ItemResponse.AsObject>(promise);
+    }
 }

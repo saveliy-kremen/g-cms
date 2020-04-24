@@ -109,6 +109,17 @@ message ItemBindRequest {
   string category_id = 2;
 }
 
+message UploadOfferRequest {
+  string title = 1;
+  uint32 parent_id = 2;
+  float price = 3;
+  string currency = 4;
+  uint32 category_id = 5;
+  string description = 6;
+  repeated string images = 7;
+  repeated uint32 properties = 8;
+}
+
 message ItemResponse {
   Item item = 1;
 }
@@ -140,4 +151,5 @@ service ItemService {
   rpc ItemUnbindCategory(ItemBindRequest) returns (CategoriesResponse);
   rpc ItemProperties(ItemRequest) returns (PropertiesResponse);
   rpc ItemOffers(OffersRequest) returns (OffersResponse);
+  rpc UploadOffer(UploadOfferRequest) returns (ItemResponse);
 }

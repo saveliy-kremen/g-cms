@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Observable, Observer, BehaviorSubject } from 'rxjs';
+import { Observable, Observer, BehaviorSubject, from } from 'rxjs';
 
 import { SessionService } from 'src/app/shared/services/session.service';
 import { User } from 'src/app/shared/api/v1/user_pb';
+import { User as UserModel } from 'src/app/shared/models/user.model';
 import { UserGrpcService } from 'src/app/shared/services/grpc/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private isAuthenticated = false;
-  private user: User.AsObject;
+  private user: User.AsObject = new UserModel();
 
   userChange: BehaviorSubject<User.AsObject> = new BehaviorSubject<User.AsObject>(null);
 

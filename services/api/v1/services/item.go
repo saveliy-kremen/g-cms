@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc/codes"
@@ -374,6 +375,43 @@ func (u *ItemServiceImpl) ItemOffers(ctx context.Context, req *v1.OffersRequest)
 	db.DB.Where("user_id = ? AND parent_id = ? AND draft <> ? ", user_id, item.ID, false).Find(&offers).Count(&total)
 	offers = itemOffers(user_id, &item, &req.Page, &req.PageSize, &req.Sort, &req.Direction)
 	return &v1.OffersResponse{Offers: models.ItemsToResponse(offers), Total: total}, nil
+}
+
+func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRequest) (*v1.ItemResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	item := models.Item{}
+	alias := utils.Translit(strings.ToLower(req.Title))
+	db.DB.Where("user_id = ? AND alias = ?", user_id, alias).First(&item)
+	if item.Sort == 0 {
+		lastItem := models.Item{}
+		db.DB.Where("user_id = ?", user_id).Order("sort DESC").First(&lastItem)
+		item.Sort = lastItem.Sort + 10
+	}
+	item.UserID = user_id
+	item.Title = req.Title
+	item.Alias = alias
+	item.ParentID = req.ParentId
+	item.Price = req.Price
+	item.Description = req.Description
+	spew.Dump(req.Images)
+	if db.DB.Save(&item).Error != nil {
+		return nil, status.Errorf(codes.Aborted, "Error save offer")
+	}
+
+	if req.CategoryId != 0 {
+		category := models.Category{}
+		if !db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryId).RecordNotFound() {
+			itemCategory := models.ItemsCategories{}
+			if db.DB.Where("user_id = ? AND item_id = ? AND category_id = ?", user_id, item.ID, category.ID).First(&itemCategory).RecordNotFound() {
+				itemCategory.UserID = user_id
+				itemCategory.ItemID = item.ID
+				itemCategory.CategoryID = category.ID
+				db.DB.Save(&itemCategory)
+			}
+		}
+	}
+	return &v1.ItemResponse{Item: models.ItemToResponse(item)}, nil
 }
 
 // compile-type check that our new type provides the

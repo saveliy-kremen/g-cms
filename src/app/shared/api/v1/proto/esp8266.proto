@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/empty.proto";
+
+message DataRequest{
+  uint32 adc = 1;
+}
+
+message DataResponse {
+  int32 status = 1;
+}
+
+service Esp8266Service {
+  rpc SendData(DataRequest) returns (DataResponse);
+}

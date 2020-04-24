@@ -15,6 +15,8 @@ export class XmlImportComponent implements OnInit {
   public coding: string = "utf8"
   xmlMessage: Message = new Message("success", "")
   loadDisabled: boolean
+  loaderVisible: boolean
+  loaderValue: number = 0
 
   constructor(
     private loaderService: LoaderService,
@@ -30,10 +32,16 @@ export class XmlImportComponent implements OnInit {
 
     let input = $event.target;
     let reader = new FileReader();
-    if (this.coding === "windows1251") {
-      reader.readAsText(input.files[0], "windows-1251");
+    if (input.files.length > 0) {
+      if (this.coding === "windows1251") {
+        reader.readAsText(input.files[0], "windows-1251");
+      } else {
+        reader.readAsText(input.files[0]);
+      }
     } else {
-      reader.readAsText(input.files[0]);
+      this.loadDisabled = true
+      this.xmlImportData = null
+      this.loaderService.hideLoader()
     }
 
     reader.onload = () => {
@@ -53,43 +61,43 @@ export class XmlImportComponent implements OnInit {
 
   async loadData() {
     this.loadDisabled = true
-    this.loaderService.showLoader()
+    this.loaderVisible = true
     console.log(this.xmlImportData)
+    let loadItemsPart = 100 / (this.xmlImportData.categories.category.length + this.xmlImportData.offers.offer.length)
     try {
       for (let i = 0; i < this.xmlImportData.categories.category.length; i++) {
-        this.xmlImportData.categories.category[i].title = this.xmlImportData.categories.category[i]["#text"]
-        this.xmlImportData.categories.category[i].parentID = this.xmlImportData.categories.category[i]["@attributes"].parentId
-          ? Number(this.xmlImportData.categories.category.filter(item => item["@attributes"].id == this.xmlImportData.categories.category[i]["@attributes"].parentId)[0].id)
+        this.xmlImportData.categories.category[i].title = this.xmlImportData.categories.category[i]?.["#text"]
+        this.xmlImportData.categories.category[i].parentID = this.xmlImportData.categories.category[i]["@attributes"]?.parentId
+          ? Number(this.xmlImportData.categories.category.filter(item => item["@attributes"].id == this.xmlImportData.categories.category[i]["@attributes"].parentId)[0]?.id)
           : 0
         const res: any = await this.categoryService.uploadCategory(this.xmlImportData.categories.category[i]).toPromise()
         this.xmlImportData.categories.category[i].id = res.category.id
+        this.loaderValue += loadItemsPart
       }
-      for (let i = 0; i < (this.xmlImportData.offers.offer.length ? 10 : 10); i++) {
-        this.xmlImportData.offers.offer[i].title = this.xmlImportData.offers.offer[i].name["#text"]
-        if (this.xmlImportData.offers.offer[i]["@attributes"].group_id) {
-          const parentItem = this.xmlImportData.offers.offer.filter(item => item["@attributes"].id == this.xmlImportData.offers.offer[i]["@attributes"].group_id)[0]
-          if (parentItem) {
-            this.xmlImportData.offers.offer[i].parentID = parentItem.id
-          }
+      for (let i = 0; i < this.xmlImportData.offers.offer.length; i++) {
+        this.xmlImportData.offers.offer[i].title = this.xmlImportData.offers.offer[i].name?.["#text"]
+        this.xmlImportData.offers.offer[i]["@attributes"].group_id
+          ? Number(this.xmlImportData.offers.offer[i].parentID = this.xmlImportData.offers.offer.filter(item => item["@attributes"].id == this.xmlImportData.offers.offer[i]["@attributes"].group_id)?.[0]?.id)
+          : 0
+        this.xmlImportData.offers.offer[i].price = this.xmlImportData.offers.offer[i].price?.["#text"]
+        this.xmlImportData.offers.offer[i].currency = this.xmlImportData.offers.offer[i].currencyId?.["#text"]
+        this.xmlImportData.offers.offer[i].categoryId
+          ? Number(this.xmlImportData.offers.offer[i].categoryID = this.xmlImportData.categories.category.filter(item => item["@attributes"].id == this.xmlImportData.offers.offer[i].categoryId["#text"])?.[0]?.id)
+          : 0
+        this.xmlImportData.offers.offer[i].description = this.xmlImportData.offers.offer[i].description?.["#cdata-section"]
+        if (this.xmlImportData.offers.offer[i].picture.length > 0) {
+          this.xmlImportData.offers.offer[i].images = this.xmlImportData.offers.offer[i].picture.map(item => item["#text"])
         }
-        this.xmlImportData.offers.offer[i].price = this.xmlImportData.offers.offer[i].price["#text"]
-        this.xmlImportData.offers.offer[i].currency = this.xmlImportData.offers.offer[i].currencyId["#text"]
-        if (this.xmlImportData.offers.offer[i].categoryId) {
-          const category = this.xmlImportData.categories.category.filter(item => item["@attributes"].id == this.xmlImportData.offers.offer[i].categoryId["#text"])[0]
-          if (category) {
-            this.xmlImportData.offers.offer[i].categoryID = category.id
-          }
-        }
-        this.xmlImportData.offers.offer[i].description = this.xmlImportData.offers.offer[i].description["#cdata-section"]
-        this.xmlImportData.offers.offer[i].images = this.xmlImportData.offers.offer[i].picture.map(item => item["#text"])
         const res: any = await this.itemService.uploadOffer(this.xmlImportData.offers.offer[i]).toPromise()
         this.xmlImportData.offers.offer[i].id = res.item.id
+        this.loaderValue += loadItemsPart
       }
     } catch (err) {
       console.log(err)
       this.xmlMessage = new Message("danger", err.message);
     }
-    this.loaderService.hideLoader()
+    this.loaderValue = 0
+    this.loaderVisible = false
   }
 
   fileReset() {

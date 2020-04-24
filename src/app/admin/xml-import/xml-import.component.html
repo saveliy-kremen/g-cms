@@ -24,5 +24,7 @@
             <button mat-raised-button color="accent" (click)="loadData()"
                 [disabled]="loadDisabled">{{"Upload" | translate}}</button>
         </div>
+        <br><br>
+        <mat-progress-bar mode="determinate" value="{{loaderValue}}" *ngIf="loaderVisible"></mat-progress-bar>
     </mat-card-content>
 </mat-card>

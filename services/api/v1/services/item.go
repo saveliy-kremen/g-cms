@@ -3,12 +3,13 @@ package services
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc/codes"
@@ -177,9 +178,9 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 	existImagesIDs = append(existImagesIDs, req.ItemImages...)
 	existImagesIDs = append(existImagesIDs, req.UploadImages...)
 	if len(existImagesIDs) > 0 {
-		db.DB.Where("user_id = ? AND (item_id == ? OR item_id = ?) AND id NOT IN(?)", user_id, 0, item.ID, existImagesIDs).Find(&deleteImages)
+		db.DB.Where("user_id = ? AND (item_id = ? OR item_id = ?) AND id NOT IN(?)", user_id, 0, item.ID, existImagesIDs).Find(&deleteImages)
 	} else {
-		db.DB.Where("user_id = ? AND (item_id == ? OR item_id = ?)", user_id, 0, item.ID).Find(&deleteImages)
+		db.DB.Where("user_id = ? AND (item_id = ? OR item_id = ?)", user_id, 0, item.ID).Find(&deleteImages)
 	}
 	for _, deleteImage := range deleteImages {
 		if deleteImage.ItemID == 0 {
@@ -394,7 +395,6 @@ func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRe
 	item.ParentID = req.ParentId
 	item.Price = req.Price
 	item.Description = req.Description
-	spew.Dump(req.Images)
 	if db.DB.Save(&item).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error save offer")
 	}
@@ -408,6 +408,46 @@ func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRe
 				itemCategory.ItemID = item.ID
 				itemCategory.CategoryID = category.ID
 				db.DB.Save(&itemCategory)
+			}
+		}
+	}
+
+	//Images
+	directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/items/" + strconv.Itoa(int(item.ID)) + "/"
+	os.RemoveAll(directory)
+	os.MkdirAll(directory, 0775)
+	itemImages := []models.ItemImage{}
+	db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ID).Find(&itemImages)
+	for _, itemImage := range itemImages {
+		db.DB.Unscoped().Delete(&itemImage)
+	}
+	for i, image := range req.Images {
+		resp, err := http.Get(image)
+		if err == nil {
+			defer resp.Body.Close()
+			filepath := strings.Split(image, "/")
+			filename := filepath[len(filepath)-1]
+			file, err := os.Create(directory + filename)
+			if err == nil {
+				defer file.Close()
+				_, err = io.Copy(file, resp.Body)
+				if err == nil {
+					itemImage := models.ItemImage{}
+					itemImage.UserID = user_id
+					itemImage.ItemID = uint32(item.ID)
+					itemImage.Filename = filename
+					itemImage.Sort = uint32(i * 10)
+					db.DB.Create(&itemImage)
+					thumb, err := thumbs.CreateThumb(directory+filename, config.AppConfig.Thumbs.Item, directory, strconv.Itoa(int(itemImage.ID)))
+					if err == nil {
+						itemImage.Filename = *thumb
+						db.DB.Save(&itemImage)
+						if filename != *thumb {
+							os.Remove(directory + filename)
+						}
+						thumbs.CreateThumbs(directory, itemImage.Filename, config.AppConfig.Thumbs.Catalog)
+					}
+				}
 			}
 		}
 	}

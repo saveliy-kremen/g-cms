@@ -91,7 +91,7 @@
           <br>
           <div class="sort-grid" droppable [dropScope]="'item'" (onDrop)="onItemDrop($event, 'item')">
             <div *ngFor="let image of itemImages" class="upload-images"
-              [ngStyle]="{backgroundImage: 'url('+uploadUrl + '0/' + image?.filename+')'}" ngSortgridItem
+              [ngStyle]="{backgroundImage: 'url('+uploadUrl + item.id +'/' + image?.filename+')'}" ngSortgridItem
               [ngSortGridItems]="itemImages" (sorted)="storeNewOrder($event, 'item')" ngSortGridGroup="item" draggable
               [dragData]="image" [dragScope]="'upload'">
               <i class="material-icons right-top-icon" (click)="itemImageDelete(image.id)"

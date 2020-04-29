@@ -386,7 +386,7 @@ func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRe
 	db.DB.Where("user_id = ? AND alias = ?", user_id, alias).First(&item)
 	if item.Sort == 0 {
 		lastItem := models.Item{}
-		db.DB.Where("user_id = ?", user_id).Order("sort DESC").First(&lastItem)
+		db.DB.Where("user_id = ? AND parent_id = ?", user_id, req.ParentId).Order("sort DESC").First(&lastItem)
 		item.Sort = lastItem.Sort + 10
 	}
 	item.UserID = user_id

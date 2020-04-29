@@ -17,6 +17,9 @@ export class XmlImportComponent implements OnInit {
   loadDisabled: boolean
   loaderVisible: boolean
   loaderValue: number = 0
+  categoriesMap: Map<string, string> = new Map();
+  offersMap: Map<string, string> = new Map();
+  propertiesMap: Map<string, string> = new Map();
 
   constructor(
     private loaderService: LoaderService,
@@ -67,29 +70,39 @@ export class XmlImportComponent implements OnInit {
     try {
       for (let i = 0; i < this.xmlImportData.categories.category.length; i++) {
         this.xmlImportData.categories.category[i].title = this.xmlImportData.categories.category[i]?.["#text"]
-        this.xmlImportData.categories.category[i].parentID = this.xmlImportData.categories.category[i]["@attributes"]?.parentId
-          ? Number(this.xmlImportData.categories.category.filter(item => item["@attributes"].id == this.xmlImportData.categories.category[i]["@attributes"].parentId)[0]?.id)
+        this.xmlImportData.categories.category[i].parentID = this.xmlImportData.categories.category[i]["@attributes"]?.parentId && this.categoriesMap.has(this.xmlImportData.categories.category[i]["@attributes"].parentId)
+          ? Number(this.categoriesMap.get(this.xmlImportData.categories.category[i]["@attributes"].parentId))
           : 0
         const res: any = await this.categoryService.uploadCategory(this.xmlImportData.categories.category[i]).toPromise()
-        this.xmlImportData.categories.category[i].id = res.category.id
+        this.categoriesMap.set(this.xmlImportData.categories.category[i]["@attributes"].id, res.category.id)
         this.loaderValue += loadItemsPart
       }
       for (let i = 0; i < this.xmlImportData.offers.offer.length; i++) {
+        if (this.xmlImportData.offers.offer[i]["@attributes"].group_id &&
+          this.offersMap.has(this.xmlImportData.offers.offer[i]["@attributes"].group_id)
+        ) {
+          this.xmlImportData.offers.offer[i].parentID = Number(this.offersMap.get(this.xmlImportData.offers.offer[i]["@attributes"].group_id))
+        } else {
+          let parentOffer = Object.assign({}, this.xmlImportData.offers.offer[i])
+          parentOffer.categoryID = this.xmlImportData.offers.offer[i].categoryId && this.categoriesMap.has(this.xmlImportData.offers.offer[i].categoryId["#text"])
+            ? Number(this.categoriesMap.get(this.xmlImportData.offers.offer[i].categoryId["#text"]))
+            : 0
+          parentOffer.title = this.xmlImportData.offers.offer[i].name?.["#text"].replace(/\s*\([^(]*?\)\s*$/g, '')
+          const res: any = await this.itemService.uploadOffer(parentOffer).toPromise()
+          this.offersMap.set(this.xmlImportData.offers.offer[i]["@attributes"].group_id, res.item.id)
+          this.xmlImportData.offers.offer[i].parentID = Number(res.item.id)
+        }
         this.xmlImportData.offers.offer[i].title = this.xmlImportData.offers.offer[i].name?.["#text"]
-        this.xmlImportData.offers.offer[i]["@attributes"].group_id
-          ? Number(this.xmlImportData.offers.offer[i].parentID = this.xmlImportData.offers.offer.filter(item => item["@attributes"].id == this.xmlImportData.offers.offer[i]["@attributes"].group_id)?.[0]?.id)
-          : 0
         this.xmlImportData.offers.offer[i].price = this.xmlImportData.offers.offer[i].price?.["#text"]
         this.xmlImportData.offers.offer[i].currency = this.xmlImportData.offers.offer[i].currencyId?.["#text"]
-        this.xmlImportData.offers.offer[i].categoryId
-          ? Number(this.xmlImportData.offers.offer[i].categoryID = this.xmlImportData.categories.category.filter(item => item["@attributes"].id == this.xmlImportData.offers.offer[i].categoryId["#text"])?.[0]?.id)
-          : 0
         this.xmlImportData.offers.offer[i].description = this.xmlImportData.offers.offer[i].description?.["#cdata-section"]
         if (this.xmlImportData.offers.offer[i].picture.length > 0) {
           this.xmlImportData.offers.offer[i].images = this.xmlImportData.offers.offer[i].picture.map(item => item["#text"])
+        } else if (this.xmlImportData.offers.offer[i].picture?.["#text"]) {
+          this.xmlImportData.offers.offer[i].images = [this.xmlImportData.offers.offer[i].picture["#text"]]
         }
         const res: any = await this.itemService.uploadOffer(this.xmlImportData.offers.offer[i]).toPromise()
-        this.xmlImportData.offers.offer[i].id = res.item.id
+        this.offersMap.set(this.xmlImportData.offers.offer[i]["@attributes"].id, res.item.id)
         this.loaderValue += loadItemsPart
       }
     } catch (err) {

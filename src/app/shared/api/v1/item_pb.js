@@ -3698,9 +3698,9 @@ proto.v1.UploadOfferRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     title: jspb.Message.getFieldWithDefault(msg, 1, ""),
     parentId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    price: jspb.Message.getFloatingPointFieldWithDefault(msg, 3, 0.0),
-    currency: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    categoryId: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    categoryId: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    price: jspb.Message.getFloatingPointFieldWithDefault(msg, 4, 0.0),
+    currency: jspb.Message.getFieldWithDefault(msg, 5, ""),
     description: jspb.Message.getFieldWithDefault(msg, 6, ""),
     imagesList: (f = jspb.Message.getRepeatedField(msg, 7)) == null ? undefined : f,
     propertiesList: (f = jspb.Message.getRepeatedField(msg, 8)) == null ? undefined : f
@@ -3749,16 +3749,16 @@ proto.v1.UploadOfferRequest.deserializeBinaryFromReader = function(msg, reader) 
       msg.setParentId(value);
       break;
     case 3:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCategoryId(value);
+      break;
+    case 4:
       var value = /** @type {number} */ (reader.readFloat());
       msg.setPrice(value);
       break;
-    case 4:
+    case 5:
       var value = /** @type {string} */ (reader.readString());
       msg.setCurrency(value);
-      break;
-    case 5:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setCategoryId(value);
       break;
     case 6:
       var value = /** @type {string} */ (reader.readString());
@@ -3815,23 +3815,23 @@ proto.v1.UploadOfferRequest.serializeBinaryToWriter = function(message, writer) 
       f
     );
   }
+  f = message.getCategoryId();
+  if (f !== 0) {
+    writer.writeUint32(
+      3,
+      f
+    );
+  }
   f = message.getPrice();
   if (f !== 0.0) {
     writer.writeFloat(
-      3,
+      4,
       f
     );
   }
   f = message.getCurrency();
   if (f.length > 0) {
     writer.writeString(
-      4,
-      f
-    );
-  }
-  f = message.getCategoryId();
-  if (f !== 0) {
-    writer.writeUint32(
       5,
       f
     );
@@ -3897,47 +3897,11 @@ proto.v1.UploadOfferRequest.prototype.setParentId = function(value) {
 
 
 /**
- * optional float price = 3;
- * @return {number}
- */
-proto.v1.UploadOfferRequest.prototype.getPrice = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 3, 0.0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.v1.UploadOfferRequest} returns this
- */
-proto.v1.UploadOfferRequest.prototype.setPrice = function(value) {
-  return jspb.Message.setProto3FloatField(this, 3, value);
-};
-
-
-/**
- * optional string currency = 4;
- * @return {string}
- */
-proto.v1.UploadOfferRequest.prototype.getCurrency = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.v1.UploadOfferRequest} returns this
- */
-proto.v1.UploadOfferRequest.prototype.setCurrency = function(value) {
-  return jspb.Message.setProto3StringField(this, 4, value);
-};
-
-
-/**
- * optional uint32 category_id = 5;
+ * optional uint32 category_id = 3;
  * @return {number}
  */
 proto.v1.UploadOfferRequest.prototype.getCategoryId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
@@ -3946,7 +3910,43 @@ proto.v1.UploadOfferRequest.prototype.getCategoryId = function() {
  * @return {!proto.v1.UploadOfferRequest} returns this
  */
 proto.v1.UploadOfferRequest.prototype.setCategoryId = function(value) {
-  return jspb.Message.setProto3IntField(this, 5, value);
+  return jspb.Message.setProto3IntField(this, 3, value);
+};
+
+
+/**
+ * optional float price = 4;
+ * @return {number}
+ */
+proto.v1.UploadOfferRequest.prototype.getPrice = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 4, 0.0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.v1.UploadOfferRequest} returns this
+ */
+proto.v1.UploadOfferRequest.prototype.setPrice = function(value) {
+  return jspb.Message.setProto3FloatField(this, 4, value);
+};
+
+
+/**
+ * optional string currency = 5;
+ * @return {string}
+ */
+proto.v1.UploadOfferRequest.prototype.getCurrency = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.UploadOfferRequest} returns this
+ */
+proto.v1.UploadOfferRequest.prototype.setCurrency = function(value) {
+  return jspb.Message.setProto3StringField(this, 5, value);
 };
 
 

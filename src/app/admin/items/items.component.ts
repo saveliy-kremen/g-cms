@@ -69,9 +69,24 @@ export class ItemsComponent implements OnInit {
 
   updateItemsData(data) {
     this.itemsData = data.itemsList.map((item, index) => {
+      let imageSrc = ""
+      if (item.imagesList && item.imagesList.length > 0) {
+        imageSrc = `${this.uploadUrl + item.id}/${item.imagesList[0].filename}`
+      } else if (item.offersList && item.offersList.length > 0) {
+        if (item.offersList[0].imagesList && item.offersList[0].imagesList.length > 0) {
+          imageSrc = `${this.uploadUrl + item.offersList[0].id}/${item.offersList[0].imagesList[0].filename}`
+        }
+      }
+      let price = item.price
+      if (price == 0 && item.offersList && item.offersList.length > 0) {
+        const minPrice = item.offersList.reduce((min, offer) => offer.price < min ? offer.price : min, item.offersList[0].price);
+        const maxPrice = item.offersList.reduce((max, offer) => offer.price > max ? offer.price : max, item.offersList[0].price);
+        price = `${minPrice} - ${maxPrice}`
+      }
       return {
         ...item,
-        image: item.imagesList && item.imagesList.length > 0 ? `<img src="${this.uploadUrl + item.id}/${item.imagesList[0].filename}" alt="${item.title}" width="100" height="120">` : `<img src="" alt="${item.title}" width="100" height="120">`,
+        image: `<img src="${imageSrc}" alt="${item.title}" width="100" height="120">`,
+        price: price,
         actions: [
           { icon: "edit", class: "button-edit", handler: this.editAction.bind(this), id: item.id },
           { icon: "delete", class: "button-delete", handler: this.deleteItemConfirm.bind(this), id: item.id }

@@ -205,4 +205,24 @@ export class PropertyGrpcService {
         });
         return grpcUnary<GRPC.PropertyResponse.AsObject>(promise);
     }
+
+    public uploadProperty(data): Observable<GRPC.PropertyResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.UploadPropertyRequest();
+            request.setTitle(data.title)
+            request.setValue(data.value)
+            request.setItemId(data.itemID)
+            this.client.uploadProperty(request, meta, (err: grpcWeb.Error, response: GRPC.PropertyResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<GRPC.PropertyResponse.AsObject>(promise);
+    }
 }

@@ -55,6 +55,11 @@ func (u *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.
 	db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
 		return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
 	}).Where("user_id = ? AND draft <> ? AND parent_id = ?", user_id, true, 0).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&items)
+	for i, item := range items {
+		db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
+			return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
+		}).Where("user_id = ? AND parent_id = ?", user_id, item.ID).Order(order).Find(&items[i].Offers)
+	}
 	return &v1.ItemsResponse{Items: models.ItemsToResponse(items), Total: total}, nil
 }
 

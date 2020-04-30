@@ -76,6 +76,12 @@ message EditPropertyValueRequest {
   string image = 5;
 }
 
+message UploadPropertyRequest {
+  string title = 1;
+  string value = 2;
+  uint32 item_id = 3;
+}
+
 message PropertyResponse {
   Property property = 1;
 }
@@ -100,4 +106,5 @@ service PropertyService {
   rpc PropertyCategories(PropertyRequest) returns (CategoriesResponse);
   rpc PropertyBindCategory(PropertyBindRequest) returns (CategoriesResponse);
   rpc PropertyUnbindCategory(PropertyBindRequest) returns (CategoriesResponse);
+  rpc UploadProperty(UploadPropertyRequest) returns (PropertyResponse);
 }

@@ -305,6 +305,32 @@ export namespace EditPropertyValueRequest {
   }
 }
 
+export class UploadPropertyRequest extends jspb.Message {
+  getTitle(): string;
+  setTitle(value: string): void;
+
+  getValue(): string;
+  setValue(value: string): void;
+
+  getItemId(): number;
+  setItemId(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UploadPropertyRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UploadPropertyRequest): UploadPropertyRequest.AsObject;
+  static serializeBinaryToWriter(message: UploadPropertyRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UploadPropertyRequest;
+  static deserializeBinaryFromReader(message: UploadPropertyRequest, reader: jspb.BinaryReader): UploadPropertyRequest;
+}
+
+export namespace UploadPropertyRequest {
+  export type AsObject = {
+    title: string,
+    value: string,
+    itemId: number,
+  }
+}
+
 export class PropertyResponse extends jspb.Message {
   getProperty(): Property | undefined;
   setProperty(value?: Property): void;

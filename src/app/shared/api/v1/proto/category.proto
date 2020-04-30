@@ -59,7 +59,6 @@ message UploadCategoryRequest {
   uint32 parent_id = 2;
 }
 
-
 message CategoryResponse {
   Category category = 1;
 }

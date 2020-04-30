@@ -21,7 +21,8 @@ import {
   PropertyBindRequest,
   PropertyRequest,
   PropertyResponse,
-  PropertyValueRequest} from './property_pb';
+  PropertyValueRequest,
+  UploadPropertyRequest} from './property_pb';
 
 export class PropertyServiceClient {
   client_: grpcWeb.AbstractClientBase;
@@ -237,6 +238,28 @@ export class PropertyServiceClient {
       request,
       metadata || {},
       this.methodInfoPropertyUnbindCategory,
+      callback);
+  }
+
+  methodInfoUploadProperty = new grpcWeb.AbstractClientBase.MethodInfo(
+    PropertyResponse,
+    (request: UploadPropertyRequest) => {
+      return request.serializeBinary();
+    },
+    PropertyResponse.deserializeBinary
+  );
+
+  uploadProperty(
+    request: UploadPropertyRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: PropertyResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.PropertyService/UploadProperty',
+      request,
+      metadata || {},
+      this.methodInfoUploadProperty,
       callback);
   }
 

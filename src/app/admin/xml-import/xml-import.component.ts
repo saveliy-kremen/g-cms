@@ -4,6 +4,7 @@ import { LoaderService } from 'src/app/shared/services/loader.service';
 import { Message } from 'src/app/shared/models/message.model';
 import { CategoryGrpcService } from 'src/app/shared/services/grpc/category.service';
 import { ItemGrpcService } from 'src/app/shared/services/grpc/item.service';
+import { PropertyGrpcService } from 'src/app/shared/services/grpc/property.service';
 
 @Component({
   selector: 'app-xml-import',
@@ -19,12 +20,12 @@ export class XmlImportComponent implements OnInit {
   loaderValue: number = 0
   categoriesMap: Map<string, string> = new Map();
   offersMap: Map<string, string> = new Map();
-  propertiesMap: Map<string, string> = new Map();
 
   constructor(
     private loaderService: LoaderService,
     private categoryService: CategoryGrpcService,
     private itemService: ItemGrpcService,
+    private propertyService: PropertyGrpcService,
   ) { }
 
   ngOnInit(): void {
@@ -68,6 +69,7 @@ export class XmlImportComponent implements OnInit {
     console.log(this.xmlImportData)
     let loadItemsPart = 100 / (this.xmlImportData.categories.category.length + this.xmlImportData.offers.offer.length)
     try {
+      ///categories
       for (let i = 0; i < this.xmlImportData.categories.category.length; i++) {
         this.xmlImportData.categories.category[i].title = this.xmlImportData.categories.category[i]?.["#text"]
         this.xmlImportData.categories.category[i].parentID = this.xmlImportData.categories.category[i]["@attributes"]?.parentId && this.categoriesMap.has(this.xmlImportData.categories.category[i]["@attributes"].parentId)
@@ -77,6 +79,7 @@ export class XmlImportComponent implements OnInit {
         this.categoriesMap.set(this.xmlImportData.categories.category[i]["@attributes"].id, res.category.id)
         this.loaderValue += loadItemsPart
       }
+      ///offers
       for (let i = 0; i < this.xmlImportData.offers.offer.length; i++) {
         if (this.xmlImportData.offers.offer[i]["@attributes"].group_id &&
           this.offersMap.has(this.xmlImportData.offers.offer[i]["@attributes"].group_id)
@@ -103,6 +106,13 @@ export class XmlImportComponent implements OnInit {
         }
         const res: any = await this.itemService.uploadOffer(this.xmlImportData.offers.offer[i]).toPromise()
         this.offersMap.set(this.xmlImportData.offers.offer[i]["@attributes"].id, res.item.id)
+        ///params
+        for (let j = 0; j < this.xmlImportData.offers.offer[i].param.length; j++) {
+          this.xmlImportData.offers.offer[i].param[j].title = this.xmlImportData.offers.offer[i].param[j]["@attributes"].name
+          this.xmlImportData.offers.offer[i].param[j].value = this.xmlImportData.offers.offer[i].param[j]["#text"]
+          this.xmlImportData.offers.offer[i].param[j].itemID = res.item.id
+          await this.propertyService.uploadProperty(this.xmlImportData.offers.offer[i].param[j]).toPromise()
+        }
         this.loaderValue += loadItemsPart
       }
     } catch (err) {

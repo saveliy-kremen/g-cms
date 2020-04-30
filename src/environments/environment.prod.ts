@@ -4,7 +4,7 @@ export const environment = {
   uploadURL: "http://alllead.best/upload/",
   grpcUrl: "http://alllead.best:2091",
   jwtCoockieName: "ngJWT",
-  propertyTypes: ["Строка", "Число", "Изображение"],
+  propertyTypes: ["Число", "Строка", "Изображение"],
   propertyDisplayTypes: ["Список", "Флажки", "Слайдер", "Изображения"],
   pageSizeOptions: [5, 10, 20]
 };

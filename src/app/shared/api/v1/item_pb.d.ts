@@ -449,14 +449,14 @@ export class UploadOfferRequest extends jspb.Message {
   getParentId(): number;
   setParentId(value: number): void;
 
+  getCategoryId(): number;
+  setCategoryId(value: number): void;
+
   getPrice(): number;
   setPrice(value: number): void;
 
   getCurrency(): string;
   setCurrency(value: string): void;
-
-  getCategoryId(): number;
-  setCategoryId(value: number): void;
 
   getDescription(): string;
   setDescription(value: string): void;
@@ -483,9 +483,9 @@ export namespace UploadOfferRequest {
   export type AsObject = {
     title: string,
     parentId: number,
+    categoryId: number,
     price: number,
     currency: string,
-    categoryId: number,
     description: string,
     imagesList: Array<string>,
     propertiesList: Array<number>,

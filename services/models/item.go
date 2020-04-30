@@ -1,9 +1,10 @@
 package models
 
 import (
+	"strconv"
+
 	v1 "../api/v1"
 	"github.com/jinzhu/gorm"
-	"strconv"
 )
 
 type Item struct {
@@ -12,7 +13,6 @@ type Item struct {
 	UserID         uint32
 	VendorID       uint32
 	ParentID       uint32
-	CategoryID     uint32
 	Draft          bool
 	Title          string `sql:"type:text"`
 	Article        string
@@ -84,7 +84,6 @@ func ItemToResponse(item Item) *v1.Item {
 		UserId:         item.UserID,
 		VendorId:       item.VendorID,
 		ParentId:       item.ParentID,
-		CategoryId:     item.CategoryID,
 		Title:          item.Title,
 		Article:        item.Article,
 		Alias:          item.Alias,

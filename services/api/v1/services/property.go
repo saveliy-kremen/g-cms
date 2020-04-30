@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	//"github.com/davecgh/go-spew/spew"
+
 	//"github.com/golang/protobuf/ptypes/empty"
 	"os"
 	"strconv"
@@ -266,6 +266,71 @@ func (u *PropertyServiceImpl) DeletePropertyValue(ctx context.Context, req *v1.P
 		directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(propertyValue.PropertyID)) + "/thumb-" + strconv.Itoa(int(propertyValue.ID)) + ".jpeg"
 		os.RemoveAll(directory)
 	}
+	return u.Property(ctx, &v1.PropertyRequest{Id: uint32(propertyValue.PropertyID)})
+}
+
+func (u *PropertyServiceImpl) UploadProperty(ctx context.Context, req *v1.UploadPropertyRequest) (*v1.PropertyResponse, error) {
+	user_id := auth.GetUserUID(ctx)
+
+	code := utils.Translit(strings.ToLower(req.Title))
+	property := models.Property{}
+	if db.DB.Where("user_id = ? AND code = ?", user_id, code).First(&property).RecordNotFound() {
+		property.UserID = user_id
+		property.Title = req.Title
+		property.Code = code
+		property.Type = models.PropertyType(models.StringProperty)
+		property.Display = models.PropertyDisplayType(models.PropertyDisplayList)
+		lastProperty := models.Property{}
+		db.DB.Where("user_id = ?", user_id).Order("sort DESC").First(&lastProperty)
+		property.Sort = lastProperty.Sort + 10
+		db.DB.Create(&property)
+	}
+
+	propertyValue := models.PropertyValue{}
+	if db.DB.Where("user_id = ? AND value = ?", user_id, strings.ToLower(strings.TrimSpace(req.Value))).First(&propertyValue).RecordNotFound() {
+		propertyValue.UserID = user_id
+		propertyValue.PropertyID = property.ID
+		propertyValue.Value = req.Value
+		lastPropertyValue := models.PropertyValue{}
+		db.DB.Where("user_id = ? AND property_id = ?", user_id, property.ID).Order("sort DESC").First(&lastPropertyValue)
+		propertyValue.Sort = lastPropertyValue.Sort + 10
+		db.DB.Create(&propertyValue)
+	}
+
+	offer := models.Item{}
+	if db.DB.Where("user_id = ?", user_id).First(&offer, req.ItemId).RecordNotFound() {
+		return nil, status.Errorf(codes.NotFound, "Item not found")
+	}
+	if offer.ParentID != 0 {
+		offer.ID = 0
+		if db.DB.Where("user_id = ?", user_id).First(&offer, offer.ParentID).RecordNotFound() {
+			return nil, status.Errorf(codes.NotFound, "Parent item not found")
+		}
+	}
+	offerCategory := models.ItemsCategories{}
+	db.DB.Where("user_id = ? AND item_id = ?", user_id, offer.ID).First(&offerCategory)
+
+	propertyCategory := models.PropertiesCategories{}
+	if db.DB.Where("user_id = ? AND property_id = ? AND category_id = ?", user_id, propertyValue.ID, offerCategory.CategoryID).First(&propertyCategory).RecordNotFound() {
+		propertyCategory.UserID = user_id
+		propertyCategory.PropertyID = propertyValue.ID
+		propertyCategory.CategoryID = offerCategory.CategoryID
+		if db.DB.Save(&propertyCategory).Error != nil {
+			return nil, status.Errorf(codes.Aborted, "Error bind property ")
+		}
+	}
+
+	offerProperty := models.ItemProperty{}
+	if db.DB.Where("user_id = ? AND item_id = ? AND property_id = ? AND property_value_id = ?", user_id, req.ItemId, property.ID, propertyValue.ID).First(&offerProperty).RecordNotFound() {
+		offerProperty.UserID = user_id
+		offerProperty.ItemID = req.ItemId
+		offerProperty.PropertyID = uint32(property.ID)
+		offerProperty.PropertyValueID = uint32(propertyValue.ID)
+		if db.DB.Save(&offerProperty).Error != nil {
+			return nil, status.Errorf(codes.Aborted, "Error save item property ")
+		}
+	}
+
 	return u.Property(ctx, &v1.PropertyRequest{Id: uint32(propertyValue.PropertyID)})
 }
 

@@ -112,9 +112,9 @@ message ItemBindRequest {
 message UploadOfferRequest {
   string title = 1;
   uint32 parent_id = 2;
-  float price = 3;
-  string currency = 4;
-  uint32 category_id = 5;
+  uint32 category_id = 3;
+  float price = 4;
+  string currency = 5;
   string description = 6;
   repeated string images = 7;
   repeated uint32 properties = 8;

@@ -31,7 +31,7 @@ func (u *ItemServiceImpl) Item(ctx context.Context, req *v1.ItemRequest) (*v1.It
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
-	if db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
+	if db.DB.Preload("Vendor").Preload("Currency").Preload("Images", func(db *gorm.DB) *gorm.DB {
 		return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
 	}).Where("user_id = ?", user_id).First(&item, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Item not found")
@@ -51,12 +51,12 @@ func (u *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.
 	if req.Sort != "" {
 		order = req.Sort + " " + req.Direction
 	}
-	db.DB.Where("user_id = ? AND draft <> ? AND parent_id = ?", user_id, true, 0).Order("sort").Find(&items).Count(&total)
-	db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
+	db.DB.Where("user_id = ? AND draft <> ? AND parent_id = ?", user_id, true, 0).Find(&items).Count(&total)
+	db.DB.Preload("Vendor").Preload("Currency").Preload("Images", func(db *gorm.DB) *gorm.DB {
 		return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
 	}).Where("user_id = ? AND draft <> ? AND parent_id = ?", user_id, true, 0).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&items)
 	for i, item := range items {
-		db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
+		db.DB.Preload("Vendor").Preload("Currency").Preload("Images", func(db *gorm.DB) *gorm.DB {
 			return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
 		}).Where("user_id = ? AND parent_id = ?", user_id, item.ID).Order(order).Find(&items[i].Offers)
 	}
@@ -115,7 +115,7 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 	item.Count = req.Count
 	item.InStock = req.InStock
 	item.Description = req.Description
-	item.Vendor = req.Vendor
+	item.VendorID = req.VendorId
 	item.Price = req.Price
 	item.OldPrice = req.OldPrice
 	item.CurrencyID = req.CurrencyId
@@ -399,12 +399,28 @@ func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRe
 	item.UserID = user_id
 	item.Title = req.Title
 	item.Alias = alias
+	item.Article = req.Article
 	item.ParentID = req.ParentId
 	item.Price = req.Price
 	item.Count = req.Count
 	item.InStock = req.InStock
 	item.Description = req.Description
-	item.Vendor = req.Vendor
+
+	currency := models.Currency{}
+	if db.DB.Where("code = ?", req.Currency).First(&currency).RecordNotFound() {
+		currency.Code = req.Currency
+		currency.Name = req.Currency
+		currency.ShortName = req.Currency
+		db.DB.Create(&currency)
+	}
+	item.CurrencyID = uint32(currency.ID)
+	vendor := models.Vendor{}
+	if db.DB.Where("name = ?", req.Vendor).First(&vendor).RecordNotFound() {
+		vendor.Name = req.Vendor
+		vendor.Country = req.Country
+		db.DB.Create(&vendor)
+	}
+	item.VendorID = uint32(vendor.ID)
 	if db.DB.Save(&item).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error save offer")
 	}

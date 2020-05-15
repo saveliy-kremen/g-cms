@@ -11,6 +11,8 @@ import { UploadService } from 'src/app/shared/services/upload.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { TranslateService } from '@ngx-translate/core';
+import { VendorGrpcService } from 'src/app/shared/services/grpc/vendor.service';
+import { CurrencyGrpcService } from 'src/app/shared/services/grpc/currency.service';
 
 declare var $: any
 
@@ -75,10 +77,18 @@ export class ItemEditComponent implements OnInit {
   offerID: number
   total: number
 
+  //Vendors
+  vendors: any = []
+
+  //Currencies
+  currencies: any = []
+
   constructor(
     private router: Router,
     private loaderService: LoaderService,
     private itemService: ItemGrpcService,
+    private vendorService: VendorGrpcService,
+    private currencyService: CurrencyGrpcService,
     private activeRoute: ActivatedRoute,
     private authService: AuthService,
     private uploadService: UploadService,
@@ -92,7 +102,7 @@ export class ItemEditComponent implements OnInit {
       article: new FormControl(''),
       alias: new FormControl(''),
       description: new FormControl('', Validators.required),
-      vendor: new FormControl(''),
+      vendorId: new FormControl(''),
       price: new FormControl(''),
       oldPrice: new FormControl(''),
       currencyId: new FormControl(''),
@@ -127,6 +137,8 @@ export class ItemEditComponent implements OnInit {
         this.mode = "draft"
       }
       this.changeInStock(this.item.inStock)
+      this.item.vendorId = this.item.vendor.id
+      this.item.currencyId = this.item.currency.id
       this.itemForm.patchValue(this.item)
       if (this.parentID) {
         this.itemForm.controls['alias'].disable()
@@ -138,6 +150,14 @@ export class ItemEditComponent implements OnInit {
       this.categoriesData = res.categoriesList
       await this.categoriesTranslate();
       await this.updateProperties();
+    } catch (err) {
+      this.itemMessage = new Message("danger", err.message);
+    }
+    try {
+      let res: any = await this.vendorService.vendors(0, 0, "name", "ASC").toPromise()
+      this.vendors = res.vendorsList
+      res = await this.currencyService.currencies(0, 0, "name", "ASC").toPromise()
+      this.currencies = res.currenciesList
     } catch (err) {
       this.itemMessage = new Message("danger", err.message);
     }

@@ -91,14 +91,21 @@ export class XmlImportComponent implements OnInit {
             ? Number(this.categoriesMap.get(this.xmlImportData.offers.offer[i].categoryId["#text"]))
             : 0
           parentOffer.title = this.xmlImportData.offers.offer[i].name?.["#text"].replace(/\s*\([^(]*?\)\s*$/g, '')
+          parentOffer.vendor = this.xmlImportData.offers.offer[i].vendor?.["#text"]
+          parentOffer.currency = this.xmlImportData.offers.offer[i].currencyId?.["#text"]
+          parentOffer.country = this.xmlImportData.offers.offer[i].country?.["#text"]
           const res: any = await this.itemService.uploadOffer(parentOffer).toPromise()
           this.offersMap.set(this.xmlImportData.offers.offer[i]["@attributes"].group_id, res.item.id)
           this.xmlImportData.offers.offer[i].parentID = Number(res.item.id)
         }
         this.xmlImportData.offers.offer[i].title = this.xmlImportData.offers.offer[i].name?.["#text"]
+        this.xmlImportData.offers.offer[i].article = this.xmlImportData.offers.offer[i].vendorCode?.["#text"]
+        this.xmlImportData.offers.offer[i].vendor = this.xmlImportData.offers.offer[i].vendor?.["#text"]
+        this.xmlImportData.offers.offer[i].country = this.xmlImportData.offers.offer[i].country?.["#text"]
         this.xmlImportData.offers.offer[i].price = this.xmlImportData.offers.offer[i].price?.["#text"]
         this.xmlImportData.offers.offer[i].currency = this.xmlImportData.offers.offer[i].currencyId?.["#text"]
         this.xmlImportData.offers.offer[i].description = this.xmlImportData.offers.offer[i].description?.["#cdata-section"]
+        this.xmlImportData.offers.offer[i].inStock = this.xmlImportData.offers.offer[i].available?.["#text"] ?? false
         if (this.xmlImportData.offers.offer[i].picture.length > 0) {
           this.xmlImportData.offers.offer[i].images = this.xmlImportData.offers.offer[i].picture.map(item => item["#text"])
         } else if (this.xmlImportData.offers.offer[i].picture?.["#text"]) {

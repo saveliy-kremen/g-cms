@@ -5,12 +5,13 @@ package v1;
 import "google/protobuf/empty.proto";
 import "category.proto";
 import "property.proto";
+import "vendor.proto";
+import "currency.proto";
 //import "google/protobuf/wrappers.proto";
 
 message Item {
   string id = 1;
   uint32 user_id = 2;
-  uint32 vendor_id = 3;
   uint32 parent_id = 4;
   uint32 category_id = 5;
   string title = 6;
@@ -19,18 +20,18 @@ message Item {
   string description = 9;
   float price = 10;
   float old_price = 11;
-  string currency_id = 12;
   int32 count = 13;
   bool in_stock = 14;
   bool disable = 15;
-  string vendor = 16;
-  uint32 sort = 17;
-  string seo_title = 18;
-  string seo_description = 19;
-  string seo_keywords = 20;
+  uint32 sort = 16;
+  string seo_title = 17;
+  string seo_description = 18;
+  string seo_keywords = 19;
 
-  repeated ItemImage images = 21;
-  repeated Item offers = 22;
+  Vendor vendor = 20;
+  Currency currency = 21;
+  repeated ItemImage images = 22;
+  repeated Item offers = 23;
 }
 
 message ItemImage {
@@ -82,10 +83,10 @@ message EditItemRequest {
   string description = 8;
   float price = 9;
   float old_price = 10;
-  string currency_id = 11;
+  uint32 currency_id = 11;
   bool disable = 12;
   uint32 sort = 13;
-  string vendor = 14;
+  uint32 vendor_id = 14;
   repeated uint32 item_images = 15;
   repeated uint32 upload_images = 16;
   repeated ItemProperty properties = 17;
@@ -124,8 +125,9 @@ message UploadOfferRequest {
   bool inStock = 8;
   string description = 9;
   string vendor = 10;
-  repeated string images = 11;
-  repeated uint32 properties = 12;
+  string country = 11;
+  repeated string images = 12;
+  repeated uint32 properties = 13;
 }
 
 message ItemResponse {

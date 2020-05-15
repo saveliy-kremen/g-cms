@@ -97,7 +97,7 @@ export class ItemGrpcService {
             request.setCount(data.count)
             request.setInstock(data.inStock)
             request.setDescription(data.description)
-            request.setVendor(data.vendor)
+            request.setVendorId(data.vendorId)
             request.setPrice(data.price)
             request.setOldPrice(data.oldPrice)
             request.setCurrencyId(data.currencyId)
@@ -303,6 +303,7 @@ export class ItemGrpcService {
             request.setInstock(data.inStock)
             request.setDescription(data.description)
             request.setVendor(data.vendor)
+            request.setCountry(data.country)
             request.setImagesList(data.images)
             this.client.uploadOffer(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
                 if (err) {

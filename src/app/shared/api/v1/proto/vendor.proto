@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package v1;
+
+message Vendor{
+  uint32 id = 1;
+  string name = 2;
+  string country = 3;
+}
+
+message VendorRequest {
+  uint32 id = 1;
+}
+
+message VendorsRequest {
+  uint32 page = 1;
+  uint32 page_size = 2;
+  string sort = 3;
+  string direction = 4;
+}
+
+message VendorResponse {
+  Vendor vendor = 1;
+}
+
+message VendorsResponse {
+  repeated Vendor vendors = 1;
+  uint32 total = 2;
+}
+
+service VendorService {
+  rpc Vendor(VendorRequest) returns (VendorResponse);
+  rpc Vendors(VendorsRequest) returns (VendorsResponse);
+}

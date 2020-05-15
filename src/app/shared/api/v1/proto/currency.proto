@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package v1;
+
+message Currency{
+  uint32 id = 1;
+  string name = 2;
+  string short_name = 3;
+  string code = 4;
+  float rate = 5;
+}
+
+
+message CurrencyRequest {
+  uint32 id = 1;
+}
+
+message CurrenciesRequest {
+  uint32 page = 1;
+  uint32 page_size = 2;
+  string sort = 3;
+  string direction = 4;
+}
+
+message CurrencyResponse {
+  Currency currency = 1;
+}
+
+message CurrenciesResponse {
+  repeated Currency Currencies = 1;
+  uint32 total = 2;
+}
+
+service CurrencyService {
+  rpc Currency(CurrencyRequest) returns (CurrencyResponse);
+  rpc Currencies(CurrenciesRequest) returns (CurrenciesResponse);
+}
+

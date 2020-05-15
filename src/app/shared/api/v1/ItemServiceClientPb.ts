@@ -12,6 +12,8 @@ import * as grpcWeb from 'grpc-web';
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 import * as category_pb from './category_pb';
 import * as property_pb from './property_pb';
+import * as vendor_pb from './vendor_pb';
+import * as currency_pb from './currency_pb';
 
 import {
   DeleteItemRequest,

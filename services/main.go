@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"google.golang.org/grpc"
 	"net"
 	"net/http"
 	"os"
 	"strconv"
+
+	"google.golang.org/grpc"
 
 	v1 "./api/v1"
 	"./api/v1/services"
@@ -30,6 +31,8 @@ func main() {
 	v1.RegisterCategoryServiceServer(svr, &services.CategoryServiceImpl{})
 	v1.RegisterPropertyServiceServer(svr, &services.PropertyServiceImpl{})
 	v1.RegisterItemServiceServer(svr, &services.ItemServiceImpl{})
+	v1.RegisterVendorServiceServer(svr, &services.VendorServiceImpl{})
+	v1.RegisterCurrencyServiceServer(svr, &services.CurrencyServiceImpl{})
 	v1.RegisterEsp8266ServiceServer(svr, &services.Esp8266ServiceImpl{})
 
 	// trap SIGINT / SIGTERM to exit cleanly

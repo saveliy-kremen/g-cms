@@ -3,6 +3,8 @@ import * as jspb from "google-protobuf"
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 import * as category_pb from './category_pb';
 import * as property_pb from './property_pb';
+import * as vendor_pb from './vendor_pb';
+import * as currency_pb from './currency_pb';
 
 export class Item extends jspb.Message {
   getId(): string;
@@ -10,9 +12,6 @@ export class Item extends jspb.Message {
 
   getUserId(): number;
   setUserId(value: number): void;
-
-  getVendorId(): number;
-  setVendorId(value: number): void;
 
   getParentId(): number;
   setParentId(value: number): void;
@@ -38,9 +37,6 @@ export class Item extends jspb.Message {
   getOldPrice(): number;
   setOldPrice(value: number): void;
 
-  getCurrencyId(): string;
-  setCurrencyId(value: string): void;
-
   getCount(): number;
   setCount(value: number): void;
 
@@ -49,9 +45,6 @@ export class Item extends jspb.Message {
 
   getDisable(): boolean;
   setDisable(value: boolean): void;
-
-  getVendor(): string;
-  setVendor(value: string): void;
 
   getSort(): number;
   setSort(value: number): void;
@@ -64,6 +57,16 @@ export class Item extends jspb.Message {
 
   getSeoKeywords(): string;
   setSeoKeywords(value: string): void;
+
+  getVendor(): vendor_pb.Vendor | undefined;
+  setVendor(value?: vendor_pb.Vendor): void;
+  hasVendor(): boolean;
+  clearVendor(): void;
+
+  getCurrency(): currency_pb.Currency | undefined;
+  setCurrency(value?: currency_pb.Currency): void;
+  hasCurrency(): boolean;
+  clearCurrency(): void;
 
   getImagesList(): Array<ItemImage>;
   setImagesList(value: Array<ItemImage>): void;
@@ -87,7 +90,6 @@ export namespace Item {
   export type AsObject = {
     id: string,
     userId: number,
-    vendorId: number,
     parentId: number,
     categoryId: number,
     title: string,
@@ -96,15 +98,15 @@ export namespace Item {
     description: string,
     price: number,
     oldPrice: number,
-    currencyId: string,
     count: number,
     inStock: boolean,
     disable: boolean,
-    vendor: string,
     sort: number,
     seoTitle: string,
     seoDescription: string,
     seoKeywords: string,
+    vendor?: vendor_pb.Vendor.AsObject,
+    currency?: currency_pb.Currency.AsObject,
     imagesList: Array<ItemImage.AsObject>,
     offersList: Array<Item.AsObject>,
   }
@@ -307,8 +309,8 @@ export class EditItemRequest extends jspb.Message {
   getOldPrice(): number;
   setOldPrice(value: number): void;
 
-  getCurrencyId(): string;
-  setCurrencyId(value: string): void;
+  getCurrencyId(): number;
+  setCurrencyId(value: number): void;
 
   getDisable(): boolean;
   setDisable(value: boolean): void;
@@ -316,8 +318,8 @@ export class EditItemRequest extends jspb.Message {
   getSort(): number;
   setSort(value: number): void;
 
-  getVendor(): string;
-  setVendor(value: string): void;
+  getVendorId(): number;
+  setVendorId(value: number): void;
 
   getItemImagesList(): Array<number>;
   setItemImagesList(value: Array<number>): void;
@@ -354,10 +356,10 @@ export namespace EditItemRequest {
     description: string,
     price: number,
     oldPrice: number,
-    currencyId: string,
+    currencyId: number,
     disable: boolean,
     sort: number,
-    vendor: string,
+    vendorId: number,
     itemImagesList: Array<number>,
     uploadImagesList: Array<number>,
     propertiesList: Array<ItemProperty.AsObject>,
@@ -489,6 +491,9 @@ export class UploadOfferRequest extends jspb.Message {
   getVendor(): string;
   setVendor(value: string): void;
 
+  getCountry(): string;
+  setCountry(value: string): void;
+
   getImagesList(): Array<string>;
   setImagesList(value: Array<string>): void;
   clearImagesList(): void;
@@ -519,6 +524,7 @@ export namespace UploadOfferRequest {
     instock: boolean,
     description: string,
     vendor: string,
+    country: string,
     imagesList: Array<string>,
     propertiesList: Array<number>,
   }

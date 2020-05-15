@@ -35,9 +35,13 @@
             </mat-error>
           </mat-form-field>
           <mat-form-field class="half-width">
-            <input matInput formControlName="vendor" placeholder="{{'Vendor' | translate}}">
+            <mat-label>{{'Vendor' | translate}}</mat-label>
+            <mat-select formControlName="vendorId">
+              <mat-option *ngFor="let vendor of vendors" [value]="vendor.id">
+                {{vendor.name}}</mat-option>
+            </mat-select>
             <mat-error>
-              <validator-message [field]="itemForm.get('vendor')" [submitted]="itemFormSubmitted" title="Vendor">
+              <validator-message [field]="itemForm.get('vendorId')" [submitted]="itemFormSubmitted" title="Vendor">
               </validator-message>
             </mat-error>
           </mat-form-field>
@@ -67,10 +71,14 @@
             </mat-error>
           </mat-form-field>
           <mat-form-field class="third-width">
-            <input matInput formControlName="currencyId" placeholder="{{'Currency' | translate}}">
+            <mat-label>{{'Currency' | translate}}</mat-label>
+            <mat-select formControlName="currencyId">
+              <mat-option *ngFor="let currency of currencies" [value]="currency.id">
+                {{currency.name}}</mat-option>
+            </mat-select>
             <mat-error>
               <validator-message [field]="itemForm.get('currencyId')" [submitted]="itemFormSubmitted"
-                title="currencyId">
+                title="currencyIdy">
               </validator-message>
             </mat-error>
           </mat-form-field>

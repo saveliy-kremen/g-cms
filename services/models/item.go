@@ -20,10 +20,9 @@ type Item struct {
 	Description    string  `sql:"type:text"`
 	Price          float32 `sql:"type:decimal(10,2)"`
 	OldPrice       float32 `sql:"type:decimal(10,2)"`
-	CurrencyID     string
+	CurrencyID     uint32
 	Count          int32
 	InStock        bool
-	Vendor         string
 	Disable        bool
 	Sort           uint32
 	SeoTitle       string `sql:"type:text" json:"seo_title"`
@@ -34,6 +33,7 @@ type Item struct {
 	Properties []Property
 	Images     []ItemImage
 	Offers     []Item
+	Vendor     Vendor
 	Currency   Currency
 }
 
@@ -63,15 +63,6 @@ type ItemsCategories struct {
 	CategoryID uint
 }
 
-type Currency struct {
-	gorm.Model
-
-	Name      string
-	ShortName string
-	CurencyID string
-	Rate      float64
-}
-
 func ItemsToResponse(items []Item) []*v1.Item {
 	respItems := []*v1.Item{}
 	for _, item := range items {
@@ -84,7 +75,6 @@ func ItemToResponse(item Item) *v1.Item {
 	return &v1.Item{
 		Id:             strconv.Itoa(int(item.ID)),
 		UserId:         item.UserID,
-		VendorId:       item.VendorID,
 		ParentId:       item.ParentID,
 		Title:          item.Title,
 		Article:        item.Article,
@@ -92,18 +82,18 @@ func ItemToResponse(item Item) *v1.Item {
 		Description:    item.Description,
 		Price:          item.Price,
 		OldPrice:       item.OldPrice,
-		CurrencyId:     item.CurrencyID,
 		Count:          item.Count,
 		InStock:        item.InStock,
 		Disable:        item.Disable,
-		Vendor:         item.Vendor,
 		Sort:           item.Sort,
 		SeoTitle:       item.SeoTitle,
 		SeoDescription: item.SeoDescription,
 		SeoKeywords:    item.SeoKeywords,
 
-		Images: ItemImagesToResponse(item.Images),
-		Offers: ItemsToResponse(item.Offers),
+		Images:   ItemImagesToResponse(item.Images),
+		Offers:   ItemsToResponse(item.Offers),
+		Vendor:   VendorToResponse(item.Vendor),
+		Currency: CurrencyToResponse(item.Currency),
 	}
 }
 

@@ -106,7 +106,7 @@ export class XmlImportComponent implements OnInit {
         this.xmlImportData.offers.offer[i].currency = this.xmlImportData.offers.offer[i].currencyId?.["#text"]
         this.xmlImportData.offers.offer[i].description = this.xmlImportData.offers.offer[i].description?.["#cdata-section"]
         this.xmlImportData.offers.offer[i].inStock = this.xmlImportData.offers.offer[i].available?.["#text"] ?? false
-        if (this.xmlImportData.offers.offer[i].picture.length > 0) {
+        if (this.xmlImportData.offers.offer[i].picture?.length > 0) {
           this.xmlImportData.offers.offer[i].images = this.xmlImportData.offers.offer[i].picture.map(item => item["#text"])
         } else if (this.xmlImportData.offers.offer[i].picture?.["#text"]) {
           this.xmlImportData.offers.offer[i].images = [this.xmlImportData.offers.offer[i].picture["#text"]]
@@ -114,7 +114,7 @@ export class XmlImportComponent implements OnInit {
         const res: any = await this.itemService.uploadOffer(this.xmlImportData.offers.offer[i]).toPromise()
         this.offersMap.set(this.xmlImportData.offers.offer[i]["@attributes"].id, res.item.id)
         ///params
-        for (let j = 0; j < this.xmlImportData.offers.offer[i].param.length; j++) {
+        for (let j = 0; j < this.xmlImportData.offers.offer[i].param?.length; j++) {
           this.xmlImportData.offers.offer[i].param[j].title = this.xmlImportData.offers.offer[i].param[j]["@attributes"].name
           this.xmlImportData.offers.offer[i].param[j].value = this.xmlImportData.offers.offer[i].param[j]["#text"]
           this.xmlImportData.offers.offer[i].param[j].itemID = res.item.id

@@ -13,10 +13,17 @@
       <mat-tab-group [(selectedIndex)]="itemTabIndex" (selectedTabChange)="onTabChange($event)">
         <mat-tab label="{{'Основные характеристики'}}">
           <br>
-          <mat-form-field class="half-width">
+          <mat-form-field class="full-width">
             <input matInput formControlName="title" placeholder="{{'Title' | translate}}">
             <mat-error>
               <validator-message [field]="itemForm.get('title')" [submitted]="itemFormSubmitted" title="Title">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width">
+            <input matInput formControlName="alias" placeholder="Alias">
+            <mat-error>
+              <validator-message [field]="itemForm.get('alias')" [submitted]="itemFormSubmitted" title="Alias">
               </validator-message>
             </mat-error>
           </mat-form-field>
@@ -28,16 +35,9 @@
             </mat-error>
           </mat-form-field>
           <mat-form-field class="half-width">
-            <input matInput formControlName="alias" placeholder="Alias">
+            <input matInput formControlName="vendor" placeholder="{{'Vendor' | translate}}">
             <mat-error>
-              <validator-message [field]="itemForm.get('alias')" [submitted]="itemFormSubmitted" title="Alias">
-              </validator-message>
-            </mat-error>
-          </mat-form-field>
-          <mat-form-field class="half-width">
-            <input matInput formControlName="count" type="number" placeholder="{{'Count' | translate}}">
-            <mat-error>
-              <validator-message [field]="itemForm.get('count')" [submitted]="itemFormSubmitted" title="Count">
+              <validator-message [field]="itemForm.get('vendor')" [submitted]="itemFormSubmitted" title="Vendor">
               </validator-message>
             </mat-error>
           </mat-form-field>
@@ -67,16 +67,27 @@
             </mat-error>
           </mat-form-field>
           <mat-form-field class="third-width">
-            <input matInput formControlName="currencyID" placeholder="{{'Currency' | translate}}">
+            <input matInput formControlName="currencyId" placeholder="{{'Currency' | translate}}">
             <mat-error>
-              <validator-message [field]="itemForm.get('currencyID')" [submitted]="itemFormSubmitted"
-                title="currencyID">
+              <validator-message [field]="itemForm.get('currencyId')" [submitted]="itemFormSubmitted"
+                title="currencyId">
               </validator-message>
             </mat-error>
           </mat-form-field>
-          <mat-checkbox labelPosition="before" formControlName="disable">{{"Disabled" | translate}}
+          <mat-form-field class="half-width">
+            <input matInput formControlName="count" type="number" placeholder="{{'Count' | translate}}">
+            <mat-error>
+              <validator-message [field]="itemForm.get('count')" [submitted]="itemFormSubmitted" title="Count">
+              </validator-message>
+            </mat-error>
+          </mat-form-field>
+          <mat-checkbox labelPosition="after" formControlName="inStock" (change)="changeInStock($event.checked)">
+            {{"InStock" | translate}}
           </mat-checkbox>
           <br>
+          <mat-checkbox labelPosition="before" formControlName="disable">{{"Disabled" | translate}}
+          </mat-checkbox>
+          <br><br>
           <mat-form-field>
             <input matInput formControlName="sort" type="number" placeholder="{{'Sort' | translate}}">
             <mat-error>

@@ -92,10 +92,12 @@ export class ItemEditComponent implements OnInit {
       article: new FormControl(''),
       alias: new FormControl(''),
       description: new FormControl('', Validators.required),
+      vendor: new FormControl(''),
       price: new FormControl(''),
       oldPrice: new FormControl(''),
-      currencyID: new FormControl(''),
+      currencyId: new FormControl(''),
       count: new FormControl(''),
+      inStock: new FormControl(''),
       disable: new FormControl(''),
       sort: new FormControl('', Validators.required),
       properties: new FormArray([])
@@ -124,6 +126,7 @@ export class ItemEditComponent implements OnInit {
         this.item = res.item
         this.mode = "draft"
       }
+      this.changeInStock(this.item.inStock)
       this.itemForm.patchValue(this.item)
       if (this.parentID) {
         this.itemForm.controls['alias'].disable()
@@ -172,6 +175,14 @@ export class ItemEditComponent implements OnInit {
       }
     } catch (err) {
       console.log(err)
+    }
+  }
+
+  changeInStock(value) {
+    if (value) {
+      this.itemForm.get('count')['disable']();
+    } else {
+      this.itemForm.get('count')['enable']();
     }
   }
 

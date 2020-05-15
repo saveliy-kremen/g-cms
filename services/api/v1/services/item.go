@@ -113,7 +113,9 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 		item.Alias = utils.Translit(strings.ToLower(item.Title))
 	}
 	item.Count = req.Count
+	item.InStock = req.InStock
 	item.Description = req.Description
+	item.Vendor = req.Vendor
 	item.Price = req.Price
 	item.OldPrice = req.OldPrice
 	item.CurrencyID = req.CurrencyId
@@ -399,7 +401,10 @@ func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRe
 	item.Alias = alias
 	item.ParentID = req.ParentId
 	item.Price = req.Price
+	item.Count = req.Count
+	item.InStock = req.InStock
 	item.Description = req.Description
+	item.Vendor = req.Vendor
 	if db.DB.Save(&item).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error save offer")
 	}

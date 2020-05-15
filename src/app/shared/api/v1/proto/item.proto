@@ -19,16 +19,18 @@ message Item {
   string description = 9;
   float price = 10;
   float old_price = 11;
-  uint32 currency_id = 12;
+  string currency_id = 12;
   int32 count = 13;
-  bool disable = 14;
-  uint32 sort = 15;
-  string seo_title = 16;
-  string seo_description = 17;
-  string seo_keywords = 18;
+  bool in_stock = 14;
+  bool disable = 15;
+  string vendor = 16;
+  uint32 sort = 17;
+  string seo_title = 18;
+  string seo_description = 19;
+  string seo_keywords = 20;
 
-  repeated ItemImage images = 19;
-  repeated Item offers = 20;
+  repeated ItemImage images = 21;
+  repeated Item offers = 22;
 }
 
 message ItemImage {
@@ -76,15 +78,17 @@ message EditItemRequest {
   string article = 4;
   string alias = 5;
   int32 count = 6;
-  string description = 7;
-  float price = 8;
-  float old_price = 9;
-  uint32 currency_id = 10;
-  bool disable = 11;
-  uint32 sort = 12;
-  repeated uint32 item_images = 13;
-  repeated uint32 upload_images = 14;
-  repeated ItemProperty properties = 15;
+  bool inStock = 7;
+  string description = 8;
+  float price = 9;
+  float old_price = 10;
+  string currency_id = 11;
+  bool disable = 12;
+  uint32 sort = 13;
+  string vendor = 14;
+  repeated uint32 item_images = 15;
+  repeated uint32 upload_images = 16;
+  repeated ItemProperty properties = 17;
 }
 
 message DeleteItemRequest {
@@ -111,13 +115,17 @@ message ItemBindRequest {
 
 message UploadOfferRequest {
   string title = 1;
-  uint32 parent_id = 2;
-  uint32 category_id = 3;
-  float price = 4;
-  string currency = 5;
-  string description = 6;
-  repeated string images = 7;
-  repeated uint32 properties = 8;
+  string article = 2;
+  uint32 parent_id = 3;
+  uint32 category_id = 4;
+  float price = 5;
+  string currency = 6;
+  int32 count = 7;
+  bool inStock = 8;
+  string description = 9;
+  string vendor = 10;
+  repeated string images = 11;
+  repeated uint32 properties = 12;
 }
 
 message ItemResponse {

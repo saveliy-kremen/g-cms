@@ -28,7 +28,16 @@ import { FileInputModule } from '../shared/file-input/file-input.module'
 
 @NgModule({
   declarations: [
-    AdminLayoutComponent, IndexComponent, CategoriesComponent, CategoryEditComponent, PropertiesComponent, PropertyEditComponent, PropertyValueComponent, ItemsComponent, ItemEditComponent, XmlImportComponent
+    AdminLayoutComponent,
+    IndexComponent,
+    CategoriesComponent,
+    CategoryEditComponent,
+    PropertiesComponent,
+    PropertyEditComponent,
+    PropertyValueComponent,
+    ItemsComponent,
+    ItemEditComponent,
+    XmlImportComponent
   ],
   imports: [
     CommonModule,

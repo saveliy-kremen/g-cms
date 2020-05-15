@@ -376,7 +376,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.v1.Item.repeatedFields_ = [19,20];
+proto.v1.Item.repeatedFields_ = [21,22];
 
 
 
@@ -420,13 +420,15 @@ proto.v1.Item.toObject = function(includeInstance, msg) {
     description: jspb.Message.getFieldWithDefault(msg, 9, ""),
     price: jspb.Message.getFloatingPointFieldWithDefault(msg, 10, 0.0),
     oldPrice: jspb.Message.getFloatingPointFieldWithDefault(msg, 11, 0.0),
-    currencyId: jspb.Message.getFieldWithDefault(msg, 12, 0),
+    currencyId: jspb.Message.getFieldWithDefault(msg, 12, ""),
     count: jspb.Message.getFieldWithDefault(msg, 13, 0),
-    disable: jspb.Message.getBooleanFieldWithDefault(msg, 14, false),
-    sort: jspb.Message.getFieldWithDefault(msg, 15, 0),
-    seoTitle: jspb.Message.getFieldWithDefault(msg, 16, ""),
-    seoDescription: jspb.Message.getFieldWithDefault(msg, 17, ""),
-    seoKeywords: jspb.Message.getFieldWithDefault(msg, 18, ""),
+    inStock: jspb.Message.getBooleanFieldWithDefault(msg, 14, false),
+    disable: jspb.Message.getBooleanFieldWithDefault(msg, 15, false),
+    vendor: jspb.Message.getFieldWithDefault(msg, 16, ""),
+    sort: jspb.Message.getFieldWithDefault(msg, 17, 0),
+    seoTitle: jspb.Message.getFieldWithDefault(msg, 18, ""),
+    seoDescription: jspb.Message.getFieldWithDefault(msg, 19, ""),
+    seoKeywords: jspb.Message.getFieldWithDefault(msg, 20, ""),
     imagesList: jspb.Message.toObjectList(msg.getImagesList(),
     proto.v1.ItemImage.toObject, includeInstance),
     offersList: jspb.Message.toObjectList(msg.getOffersList(),
@@ -512,7 +514,7 @@ proto.v1.Item.deserializeBinaryFromReader = function(msg, reader) {
       msg.setOldPrice(value);
       break;
     case 12:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {string} */ (reader.readString());
       msg.setCurrencyId(value);
       break;
     case 13:
@@ -521,30 +523,38 @@ proto.v1.Item.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 14:
       var value = /** @type {boolean} */ (reader.readBool());
-      msg.setDisable(value);
+      msg.setInStock(value);
       break;
     case 15:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setSort(value);
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setDisable(value);
       break;
     case 16:
       var value = /** @type {string} */ (reader.readString());
-      msg.setSeoTitle(value);
+      msg.setVendor(value);
       break;
     case 17:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setSeoDescription(value);
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setSort(value);
       break;
     case 18:
       var value = /** @type {string} */ (reader.readString());
-      msg.setSeoKeywords(value);
+      msg.setSeoTitle(value);
       break;
     case 19:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setSeoDescription(value);
+      break;
+    case 20:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setSeoKeywords(value);
+      break;
+    case 21:
       var value = new proto.v1.ItemImage;
       reader.readMessage(value,proto.v1.ItemImage.deserializeBinaryFromReader);
       msg.addImages(value);
       break;
-    case 20:
+    case 22:
       var value = new proto.v1.Item;
       reader.readMessage(value,proto.v1.Item.deserializeBinaryFromReader);
       msg.addOffers(value);
@@ -656,8 +666,8 @@ proto.v1.Item.serializeBinaryToWriter = function(message, writer) {
     );
   }
   f = message.getCurrencyId();
-  if (f !== 0) {
-    writer.writeUint32(
+  if (f.length > 0) {
+    writer.writeString(
       12,
       f
     );
@@ -669,45 +679,59 @@ proto.v1.Item.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getDisable();
+  f = message.getInStock();
   if (f) {
     writer.writeBool(
       14,
       f
     );
   }
-  f = message.getSort();
-  if (f !== 0) {
-    writer.writeUint32(
+  f = message.getDisable();
+  if (f) {
+    writer.writeBool(
       15,
       f
     );
   }
-  f = message.getSeoTitle();
+  f = message.getVendor();
   if (f.length > 0) {
     writer.writeString(
       16,
       f
     );
   }
-  f = message.getSeoDescription();
-  if (f.length > 0) {
-    writer.writeString(
+  f = message.getSort();
+  if (f !== 0) {
+    writer.writeUint32(
       17,
       f
     );
   }
-  f = message.getSeoKeywords();
+  f = message.getSeoTitle();
   if (f.length > 0) {
     writer.writeString(
       18,
       f
     );
   }
+  f = message.getSeoDescription();
+  if (f.length > 0) {
+    writer.writeString(
+      19,
+      f
+    );
+  }
+  f = message.getSeoKeywords();
+  if (f.length > 0) {
+    writer.writeString(
+      20,
+      f
+    );
+  }
   f = message.getImagesList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      19,
+      21,
       f,
       proto.v1.ItemImage.serializeBinaryToWriter
     );
@@ -715,7 +739,7 @@ proto.v1.Item.serializeBinaryToWriter = function(message, writer) {
   f = message.getOffersList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      20,
+      22,
       f,
       proto.v1.Item.serializeBinaryToWriter
     );
@@ -922,20 +946,20 @@ proto.v1.Item.prototype.setOldPrice = function(value) {
 
 
 /**
- * optional uint32 currency_id = 12;
- * @return {number}
+ * optional string currency_id = 12;
+ * @return {string}
  */
 proto.v1.Item.prototype.getCurrencyId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 12, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
 };
 
 
 /**
- * @param {number} value
+ * @param {string} value
  * @return {!proto.v1.Item} returns this
  */
 proto.v1.Item.prototype.setCurrencyId = function(value) {
-  return jspb.Message.setProto3IntField(this, 12, value);
+  return jspb.Message.setProto3StringField(this, 12, value);
 };
 
 
@@ -958,10 +982,10 @@ proto.v1.Item.prototype.setCount = function(value) {
 
 
 /**
- * optional bool disable = 14;
+ * optional bool in_stock = 14;
  * @return {boolean}
  */
-proto.v1.Item.prototype.getDisable = function() {
+proto.v1.Item.prototype.getInStock = function() {
   return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 14, false));
 };
 
@@ -970,34 +994,34 @@ proto.v1.Item.prototype.getDisable = function() {
  * @param {boolean} value
  * @return {!proto.v1.Item} returns this
  */
-proto.v1.Item.prototype.setDisable = function(value) {
+proto.v1.Item.prototype.setInStock = function(value) {
   return jspb.Message.setProto3BooleanField(this, 14, value);
 };
 
 
 /**
- * optional uint32 sort = 15;
- * @return {number}
+ * optional bool disable = 15;
+ * @return {boolean}
  */
-proto.v1.Item.prototype.getSort = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 15, 0));
+proto.v1.Item.prototype.getDisable = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 15, false));
 };
 
 
 /**
- * @param {number} value
+ * @param {boolean} value
  * @return {!proto.v1.Item} returns this
  */
-proto.v1.Item.prototype.setSort = function(value) {
-  return jspb.Message.setProto3IntField(this, 15, value);
+proto.v1.Item.prototype.setDisable = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 15, value);
 };
 
 
 /**
- * optional string seo_title = 16;
+ * optional string vendor = 16;
  * @return {string}
  */
-proto.v1.Item.prototype.getSeoTitle = function() {
+proto.v1.Item.prototype.getVendor = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 16, ""));
 };
 
@@ -1006,34 +1030,34 @@ proto.v1.Item.prototype.getSeoTitle = function() {
  * @param {string} value
  * @return {!proto.v1.Item} returns this
  */
-proto.v1.Item.prototype.setSeoTitle = function(value) {
+proto.v1.Item.prototype.setVendor = function(value) {
   return jspb.Message.setProto3StringField(this, 16, value);
 };
 
 
 /**
- * optional string seo_description = 17;
- * @return {string}
+ * optional uint32 sort = 17;
+ * @return {number}
  */
-proto.v1.Item.prototype.getSeoDescription = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
+proto.v1.Item.prototype.getSort = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 17, 0));
 };
 
 
 /**
- * @param {string} value
+ * @param {number} value
  * @return {!proto.v1.Item} returns this
  */
-proto.v1.Item.prototype.setSeoDescription = function(value) {
-  return jspb.Message.setProto3StringField(this, 17, value);
+proto.v1.Item.prototype.setSort = function(value) {
+  return jspb.Message.setProto3IntField(this, 17, value);
 };
 
 
 /**
- * optional string seo_keywords = 18;
+ * optional string seo_title = 18;
  * @return {string}
  */
-proto.v1.Item.prototype.getSeoKeywords = function() {
+proto.v1.Item.prototype.getSeoTitle = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 18, ""));
 };
 
@@ -1042,18 +1066,54 @@ proto.v1.Item.prototype.getSeoKeywords = function() {
  * @param {string} value
  * @return {!proto.v1.Item} returns this
  */
-proto.v1.Item.prototype.setSeoKeywords = function(value) {
+proto.v1.Item.prototype.setSeoTitle = function(value) {
   return jspb.Message.setProto3StringField(this, 18, value);
 };
 
 
 /**
- * repeated ItemImage images = 19;
+ * optional string seo_description = 19;
+ * @return {string}
+ */
+proto.v1.Item.prototype.getSeoDescription = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 19, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.Item} returns this
+ */
+proto.v1.Item.prototype.setSeoDescription = function(value) {
+  return jspb.Message.setProto3StringField(this, 19, value);
+};
+
+
+/**
+ * optional string seo_keywords = 20;
+ * @return {string}
+ */
+proto.v1.Item.prototype.getSeoKeywords = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 20, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.Item} returns this
+ */
+proto.v1.Item.prototype.setSeoKeywords = function(value) {
+  return jspb.Message.setProto3StringField(this, 20, value);
+};
+
+
+/**
+ * repeated ItemImage images = 21;
  * @return {!Array<!proto.v1.ItemImage>}
  */
 proto.v1.Item.prototype.getImagesList = function() {
   return /** @type{!Array<!proto.v1.ItemImage>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.v1.ItemImage, 19));
+    jspb.Message.getRepeatedWrapperField(this, proto.v1.ItemImage, 21));
 };
 
 
@@ -1062,7 +1122,7 @@ proto.v1.Item.prototype.getImagesList = function() {
  * @return {!proto.v1.Item} returns this
 */
 proto.v1.Item.prototype.setImagesList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 19, value);
+  return jspb.Message.setRepeatedWrapperField(this, 21, value);
 };
 
 
@@ -1072,7 +1132,7 @@ proto.v1.Item.prototype.setImagesList = function(value) {
  * @return {!proto.v1.ItemImage}
  */
 proto.v1.Item.prototype.addImages = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 19, opt_value, proto.v1.ItemImage, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 21, opt_value, proto.v1.ItemImage, opt_index);
 };
 
 
@@ -1086,12 +1146,12 @@ proto.v1.Item.prototype.clearImagesList = function() {
 
 
 /**
- * repeated Item offers = 20;
+ * repeated Item offers = 22;
  * @return {!Array<!proto.v1.Item>}
  */
 proto.v1.Item.prototype.getOffersList = function() {
   return /** @type{!Array<!proto.v1.Item>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.v1.Item, 20));
+    jspb.Message.getRepeatedWrapperField(this, proto.v1.Item, 22));
 };
 
 
@@ -1100,7 +1160,7 @@ proto.v1.Item.prototype.getOffersList = function() {
  * @return {!proto.v1.Item} returns this
 */
 proto.v1.Item.prototype.setOffersList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 20, value);
+  return jspb.Message.setRepeatedWrapperField(this, 22, value);
 };
 
 
@@ -1110,7 +1170,7 @@ proto.v1.Item.prototype.setOffersList = function(value) {
  * @return {!proto.v1.Item}
  */
 proto.v1.Item.prototype.addOffers = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 20, opt_value, proto.v1.Item, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 22, opt_value, proto.v1.Item, opt_index);
 };
 
 
@@ -2355,7 +2415,7 @@ proto.v1.OffersRequest.prototype.setDirection = function(value) {
  * @private {!Array<number>}
  * @const
  */
-proto.v1.EditItemRequest.repeatedFields_ = [13,14,15];
+proto.v1.EditItemRequest.repeatedFields_ = [15,16,17];
 
 
 
@@ -2394,14 +2454,16 @@ proto.v1.EditItemRequest.toObject = function(includeInstance, msg) {
     article: jspb.Message.getFieldWithDefault(msg, 4, ""),
     alias: jspb.Message.getFieldWithDefault(msg, 5, ""),
     count: jspb.Message.getFieldWithDefault(msg, 6, 0),
-    description: jspb.Message.getFieldWithDefault(msg, 7, ""),
-    price: jspb.Message.getFloatingPointFieldWithDefault(msg, 8, 0.0),
-    oldPrice: jspb.Message.getFloatingPointFieldWithDefault(msg, 9, 0.0),
-    currencyId: jspb.Message.getFieldWithDefault(msg, 10, 0),
-    disable: jspb.Message.getBooleanFieldWithDefault(msg, 11, false),
-    sort: jspb.Message.getFieldWithDefault(msg, 12, 0),
-    itemImagesList: (f = jspb.Message.getRepeatedField(msg, 13)) == null ? undefined : f,
-    uploadImagesList: (f = jspb.Message.getRepeatedField(msg, 14)) == null ? undefined : f,
+    instock: jspb.Message.getBooleanFieldWithDefault(msg, 7, false),
+    description: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    price: jspb.Message.getFloatingPointFieldWithDefault(msg, 9, 0.0),
+    oldPrice: jspb.Message.getFloatingPointFieldWithDefault(msg, 10, 0.0),
+    currencyId: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    disable: jspb.Message.getBooleanFieldWithDefault(msg, 12, false),
+    sort: jspb.Message.getFieldWithDefault(msg, 13, 0),
+    vendor: jspb.Message.getFieldWithDefault(msg, 14, ""),
+    itemImagesList: (f = jspb.Message.getRepeatedField(msg, 15)) == null ? undefined : f,
+    uploadImagesList: (f = jspb.Message.getRepeatedField(msg, 16)) == null ? undefined : f,
     propertiesList: jspb.Message.toObjectList(msg.getPropertiesList(),
     proto.v1.ItemProperty.toObject, includeInstance)
   };
@@ -2465,38 +2527,46 @@ proto.v1.EditItemRequest.deserializeBinaryFromReader = function(msg, reader) {
       msg.setCount(value);
       break;
     case 7:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setInstock(value);
+      break;
+    case 8:
       var value = /** @type {string} */ (reader.readString());
       msg.setDescription(value);
       break;
-    case 8:
+    case 9:
       var value = /** @type {number} */ (reader.readFloat());
       msg.setPrice(value);
       break;
-    case 9:
+    case 10:
       var value = /** @type {number} */ (reader.readFloat());
       msg.setOldPrice(value);
       break;
-    case 10:
-      var value = /** @type {number} */ (reader.readUint32());
+    case 11:
+      var value = /** @type {string} */ (reader.readString());
       msg.setCurrencyId(value);
       break;
-    case 11:
+    case 12:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setDisable(value);
       break;
-    case 12:
+    case 13:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setSort(value);
       break;
-    case 13:
+    case 14:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setVendor(value);
+      break;
+    case 15:
       var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
       msg.setItemImagesList(value);
       break;
-    case 14:
+    case 16:
       var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
       msg.setUploadImagesList(value);
       break;
-    case 15:
+    case 17:
       var value = new proto.v1.ItemProperty;
       reader.readMessage(value,proto.v1.ItemProperty.deserializeBinaryFromReader);
       msg.addProperties(value);
@@ -2572,66 +2642,80 @@ proto.v1.EditItemRequest.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getInstock();
+  if (f) {
+    writer.writeBool(
+      7,
+      f
+    );
+  }
   f = message.getDescription();
   if (f.length > 0) {
     writer.writeString(
-      7,
+      8,
       f
     );
   }
   f = message.getPrice();
   if (f !== 0.0) {
     writer.writeFloat(
-      8,
+      9,
       f
     );
   }
   f = message.getOldPrice();
   if (f !== 0.0) {
     writer.writeFloat(
-      9,
+      10,
       f
     );
   }
   f = message.getCurrencyId();
-  if (f !== 0) {
-    writer.writeUint32(
-      10,
+  if (f.length > 0) {
+    writer.writeString(
+      11,
       f
     );
   }
   f = message.getDisable();
   if (f) {
     writer.writeBool(
-      11,
+      12,
       f
     );
   }
   f = message.getSort();
   if (f !== 0) {
     writer.writeUint32(
-      12,
+      13,
+      f
+    );
+  }
+  f = message.getVendor();
+  if (f.length > 0) {
+    writer.writeString(
+      14,
       f
     );
   }
   f = message.getItemImagesList();
   if (f.length > 0) {
     writer.writePackedUint32(
-      13,
+      15,
       f
     );
   }
   f = message.getUploadImagesList();
   if (f.length > 0) {
     writer.writePackedUint32(
-      14,
+      16,
       f
     );
   }
   f = message.getPropertiesList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      15,
+      17,
       f,
       proto.v1.ItemProperty.serializeBinaryToWriter
     );
@@ -2748,11 +2832,29 @@ proto.v1.EditItemRequest.prototype.setCount = function(value) {
 
 
 /**
- * optional string description = 7;
+ * optional bool inStock = 7;
+ * @return {boolean}
+ */
+proto.v1.EditItemRequest.prototype.getInstock = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 7, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.v1.EditItemRequest} returns this
+ */
+proto.v1.EditItemRequest.prototype.setInstock = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 7, value);
+};
+
+
+/**
+ * optional string description = 8;
  * @return {string}
  */
 proto.v1.EditItemRequest.prototype.getDescription = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
 };
 
 
@@ -2761,33 +2863,15 @@ proto.v1.EditItemRequest.prototype.getDescription = function() {
  * @return {!proto.v1.EditItemRequest} returns this
  */
 proto.v1.EditItemRequest.prototype.setDescription = function(value) {
-  return jspb.Message.setProto3StringField(this, 7, value);
+  return jspb.Message.setProto3StringField(this, 8, value);
 };
 
 
 /**
- * optional float price = 8;
+ * optional float price = 9;
  * @return {number}
  */
 proto.v1.EditItemRequest.prototype.getPrice = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 8, 0.0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.v1.EditItemRequest} returns this
- */
-proto.v1.EditItemRequest.prototype.setPrice = function(value) {
-  return jspb.Message.setProto3FloatField(this, 8, value);
-};
-
-
-/**
- * optional float old_price = 9;
- * @return {number}
- */
-proto.v1.EditItemRequest.prototype.getOldPrice = function() {
   return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 9, 0.0));
 };
 
@@ -2796,17 +2880,17 @@ proto.v1.EditItemRequest.prototype.getOldPrice = function() {
  * @param {number} value
  * @return {!proto.v1.EditItemRequest} returns this
  */
-proto.v1.EditItemRequest.prototype.setOldPrice = function(value) {
+proto.v1.EditItemRequest.prototype.setPrice = function(value) {
   return jspb.Message.setProto3FloatField(this, 9, value);
 };
 
 
 /**
- * optional uint32 currency_id = 10;
+ * optional float old_price = 10;
  * @return {number}
  */
-proto.v1.EditItemRequest.prototype.getCurrencyId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 10, 0));
+proto.v1.EditItemRequest.prototype.getOldPrice = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 10, 0.0));
 };
 
 
@@ -2814,17 +2898,35 @@ proto.v1.EditItemRequest.prototype.getCurrencyId = function() {
  * @param {number} value
  * @return {!proto.v1.EditItemRequest} returns this
  */
-proto.v1.EditItemRequest.prototype.setCurrencyId = function(value) {
-  return jspb.Message.setProto3IntField(this, 10, value);
+proto.v1.EditItemRequest.prototype.setOldPrice = function(value) {
+  return jspb.Message.setProto3FloatField(this, 10, value);
 };
 
 
 /**
- * optional bool disable = 11;
+ * optional string currency_id = 11;
+ * @return {string}
+ */
+proto.v1.EditItemRequest.prototype.getCurrencyId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.EditItemRequest} returns this
+ */
+proto.v1.EditItemRequest.prototype.setCurrencyId = function(value) {
+  return jspb.Message.setProto3StringField(this, 11, value);
+};
+
+
+/**
+ * optional bool disable = 12;
  * @return {boolean}
  */
 proto.v1.EditItemRequest.prototype.getDisable = function() {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 11, false));
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 12, false));
 };
 
 
@@ -2833,16 +2935,16 @@ proto.v1.EditItemRequest.prototype.getDisable = function() {
  * @return {!proto.v1.EditItemRequest} returns this
  */
 proto.v1.EditItemRequest.prototype.setDisable = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 11, value);
+  return jspb.Message.setProto3BooleanField(this, 12, value);
 };
 
 
 /**
- * optional uint32 sort = 12;
+ * optional uint32 sort = 13;
  * @return {number}
  */
 proto.v1.EditItemRequest.prototype.getSort = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 12, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 13, 0));
 };
 
 
@@ -2851,16 +2953,34 @@ proto.v1.EditItemRequest.prototype.getSort = function() {
  * @return {!proto.v1.EditItemRequest} returns this
  */
 proto.v1.EditItemRequest.prototype.setSort = function(value) {
-  return jspb.Message.setProto3IntField(this, 12, value);
+  return jspb.Message.setProto3IntField(this, 13, value);
 };
 
 
 /**
- * repeated uint32 item_images = 13;
+ * optional string vendor = 14;
+ * @return {string}
+ */
+proto.v1.EditItemRequest.prototype.getVendor = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.EditItemRequest} returns this
+ */
+proto.v1.EditItemRequest.prototype.setVendor = function(value) {
+  return jspb.Message.setProto3StringField(this, 14, value);
+};
+
+
+/**
+ * repeated uint32 item_images = 15;
  * @return {!Array<number>}
  */
 proto.v1.EditItemRequest.prototype.getItemImagesList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 13));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 15));
 };
 
 
@@ -2869,7 +2989,7 @@ proto.v1.EditItemRequest.prototype.getItemImagesList = function() {
  * @return {!proto.v1.EditItemRequest} returns this
  */
 proto.v1.EditItemRequest.prototype.setItemImagesList = function(value) {
-  return jspb.Message.setField(this, 13, value || []);
+  return jspb.Message.setField(this, 15, value || []);
 };
 
 
@@ -2879,7 +2999,7 @@ proto.v1.EditItemRequest.prototype.setItemImagesList = function(value) {
  * @return {!proto.v1.EditItemRequest} returns this
  */
 proto.v1.EditItemRequest.prototype.addItemImages = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 13, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 15, value, opt_index);
 };
 
 
@@ -2893,11 +3013,11 @@ proto.v1.EditItemRequest.prototype.clearItemImagesList = function() {
 
 
 /**
- * repeated uint32 upload_images = 14;
+ * repeated uint32 upload_images = 16;
  * @return {!Array<number>}
  */
 proto.v1.EditItemRequest.prototype.getUploadImagesList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 14));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 16));
 };
 
 
@@ -2906,7 +3026,7 @@ proto.v1.EditItemRequest.prototype.getUploadImagesList = function() {
  * @return {!proto.v1.EditItemRequest} returns this
  */
 proto.v1.EditItemRequest.prototype.setUploadImagesList = function(value) {
-  return jspb.Message.setField(this, 14, value || []);
+  return jspb.Message.setField(this, 16, value || []);
 };
 
 
@@ -2916,7 +3036,7 @@ proto.v1.EditItemRequest.prototype.setUploadImagesList = function(value) {
  * @return {!proto.v1.EditItemRequest} returns this
  */
 proto.v1.EditItemRequest.prototype.addUploadImages = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 14, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 16, value, opt_index);
 };
 
 
@@ -2930,12 +3050,12 @@ proto.v1.EditItemRequest.prototype.clearUploadImagesList = function() {
 
 
 /**
- * repeated ItemProperty properties = 15;
+ * repeated ItemProperty properties = 17;
  * @return {!Array<!proto.v1.ItemProperty>}
  */
 proto.v1.EditItemRequest.prototype.getPropertiesList = function() {
   return /** @type{!Array<!proto.v1.ItemProperty>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.v1.ItemProperty, 15));
+    jspb.Message.getRepeatedWrapperField(this, proto.v1.ItemProperty, 17));
 };
 
 
@@ -2944,7 +3064,7 @@ proto.v1.EditItemRequest.prototype.getPropertiesList = function() {
  * @return {!proto.v1.EditItemRequest} returns this
 */
 proto.v1.EditItemRequest.prototype.setPropertiesList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 15, value);
+  return jspb.Message.setRepeatedWrapperField(this, 17, value);
 };
 
 
@@ -2954,7 +3074,7 @@ proto.v1.EditItemRequest.prototype.setPropertiesList = function(value) {
  * @return {!proto.v1.ItemProperty}
  */
 proto.v1.EditItemRequest.prototype.addProperties = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 15, opt_value, proto.v1.ItemProperty, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 17, opt_value, proto.v1.ItemProperty, opt_index);
 };
 
 
@@ -3663,7 +3783,7 @@ proto.v1.ItemBindRequest.prototype.setCategoryId = function(value) {
  * @private {!Array<number>}
  * @const
  */
-proto.v1.UploadOfferRequest.repeatedFields_ = [7,8];
+proto.v1.UploadOfferRequest.repeatedFields_ = [11,12];
 
 
 
@@ -3697,13 +3817,17 @@ proto.v1.UploadOfferRequest.prototype.toObject = function(opt_includeInstance) {
 proto.v1.UploadOfferRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     title: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    parentId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    categoryId: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    price: jspb.Message.getFloatingPointFieldWithDefault(msg, 4, 0.0),
-    currency: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    description: jspb.Message.getFieldWithDefault(msg, 6, ""),
-    imagesList: (f = jspb.Message.getRepeatedField(msg, 7)) == null ? undefined : f,
-    propertiesList: (f = jspb.Message.getRepeatedField(msg, 8)) == null ? undefined : f
+    article: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    parentId: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    categoryId: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    price: jspb.Message.getFloatingPointFieldWithDefault(msg, 5, 0.0),
+    currency: jspb.Message.getFieldWithDefault(msg, 6, ""),
+    count: jspb.Message.getFieldWithDefault(msg, 7, 0),
+    instock: jspb.Message.getBooleanFieldWithDefault(msg, 8, false),
+    description: jspb.Message.getFieldWithDefault(msg, 9, ""),
+    vendor: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    imagesList: (f = jspb.Message.getRepeatedField(msg, 11)) == null ? undefined : f,
+    propertiesList: (f = jspb.Message.getRepeatedField(msg, 12)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -3745,30 +3869,46 @@ proto.v1.UploadOfferRequest.deserializeBinaryFromReader = function(msg, reader) 
       msg.setTitle(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setParentId(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setArticle(value);
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint32());
-      msg.setCategoryId(value);
+      msg.setParentId(value);
       break;
     case 4:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setCategoryId(value);
+      break;
+    case 5:
       var value = /** @type {number} */ (reader.readFloat());
       msg.setPrice(value);
       break;
-    case 5:
+    case 6:
       var value = /** @type {string} */ (reader.readString());
       msg.setCurrency(value);
       break;
-    case 6:
+    case 7:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setCount(value);
+      break;
+    case 8:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setInstock(value);
+      break;
+    case 9:
       var value = /** @type {string} */ (reader.readString());
       msg.setDescription(value);
       break;
-    case 7:
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setVendor(value);
+      break;
+    case 11:
       var value = /** @type {string} */ (reader.readString());
       msg.addImages(value);
       break;
-    case 8:
+    case 12:
       var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
       msg.setPropertiesList(value);
       break;
@@ -3808,52 +3948,80 @@ proto.v1.UploadOfferRequest.serializeBinaryToWriter = function(message, writer) 
       f
     );
   }
-  f = message.getParentId();
-  if (f !== 0) {
-    writer.writeUint32(
+  f = message.getArticle();
+  if (f.length > 0) {
+    writer.writeString(
       2,
       f
     );
   }
-  f = message.getCategoryId();
+  f = message.getParentId();
   if (f !== 0) {
     writer.writeUint32(
       3,
       f
     );
   }
+  f = message.getCategoryId();
+  if (f !== 0) {
+    writer.writeUint32(
+      4,
+      f
+    );
+  }
   f = message.getPrice();
   if (f !== 0.0) {
     writer.writeFloat(
-      4,
+      5,
       f
     );
   }
   f = message.getCurrency();
   if (f.length > 0) {
     writer.writeString(
-      5,
+      6,
+      f
+    );
+  }
+  f = message.getCount();
+  if (f !== 0) {
+    writer.writeInt32(
+      7,
+      f
+    );
+  }
+  f = message.getInstock();
+  if (f) {
+    writer.writeBool(
+      8,
       f
     );
   }
   f = message.getDescription();
   if (f.length > 0) {
     writer.writeString(
-      6,
+      9,
+      f
+    );
+  }
+  f = message.getVendor();
+  if (f.length > 0) {
+    writer.writeString(
+      10,
       f
     );
   }
   f = message.getImagesList();
   if (f.length > 0) {
     writer.writeRepeatedString(
-      7,
+      11,
       f
     );
   }
   f = message.getPropertiesList();
   if (f.length > 0) {
     writer.writePackedUint32(
-      8,
+      12,
       f
     );
   }
@@ -3879,28 +4047,28 @@ proto.v1.UploadOfferRequest.prototype.setTitle = function(value) {
 
 
 /**
- * optional uint32 parent_id = 2;
+ * optional string article = 2;
+ * @return {string}
+ */
+proto.v1.UploadOfferRequest.prototype.getArticle = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.UploadOfferRequest} returns this
+ */
+proto.v1.UploadOfferRequest.prototype.setArticle = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional uint32 parent_id = 3;
  * @return {number}
  */
 proto.v1.UploadOfferRequest.prototype.getParentId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.v1.UploadOfferRequest} returns this
- */
-proto.v1.UploadOfferRequest.prototype.setParentId = function(value) {
-  return jspb.Message.setProto3IntField(this, 2, value);
-};
-
-
-/**
- * optional uint32 category_id = 3;
- * @return {number}
- */
-proto.v1.UploadOfferRequest.prototype.getCategoryId = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
@@ -3909,17 +4077,35 @@ proto.v1.UploadOfferRequest.prototype.getCategoryId = function() {
  * @param {number} value
  * @return {!proto.v1.UploadOfferRequest} returns this
  */
-proto.v1.UploadOfferRequest.prototype.setCategoryId = function(value) {
+proto.v1.UploadOfferRequest.prototype.setParentId = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
 
 
 /**
- * optional float price = 4;
+ * optional uint32 category_id = 4;
+ * @return {number}
+ */
+proto.v1.UploadOfferRequest.prototype.getCategoryId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.v1.UploadOfferRequest} returns this
+ */
+proto.v1.UploadOfferRequest.prototype.setCategoryId = function(value) {
+  return jspb.Message.setProto3IntField(this, 4, value);
+};
+
+
+/**
+ * optional float price = 5;
  * @return {number}
  */
 proto.v1.UploadOfferRequest.prototype.getPrice = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 4, 0.0));
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 5, 0.0));
 };
 
 
@@ -3928,33 +4114,15 @@ proto.v1.UploadOfferRequest.prototype.getPrice = function() {
  * @return {!proto.v1.UploadOfferRequest} returns this
  */
 proto.v1.UploadOfferRequest.prototype.setPrice = function(value) {
-  return jspb.Message.setProto3FloatField(this, 4, value);
+  return jspb.Message.setProto3FloatField(this, 5, value);
 };
 
 
 /**
- * optional string currency = 5;
+ * optional string currency = 6;
  * @return {string}
  */
 proto.v1.UploadOfferRequest.prototype.getCurrency = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.v1.UploadOfferRequest} returns this
- */
-proto.v1.UploadOfferRequest.prototype.setCurrency = function(value) {
-  return jspb.Message.setProto3StringField(this, 5, value);
-};
-
-
-/**
- * optional string description = 6;
- * @return {string}
- */
-proto.v1.UploadOfferRequest.prototype.getDescription = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
 };
 
@@ -3963,17 +4131,89 @@ proto.v1.UploadOfferRequest.prototype.getDescription = function() {
  * @param {string} value
  * @return {!proto.v1.UploadOfferRequest} returns this
  */
-proto.v1.UploadOfferRequest.prototype.setDescription = function(value) {
+proto.v1.UploadOfferRequest.prototype.setCurrency = function(value) {
   return jspb.Message.setProto3StringField(this, 6, value);
 };
 
 
 /**
- * repeated string images = 7;
+ * optional int32 count = 7;
+ * @return {number}
+ */
+proto.v1.UploadOfferRequest.prototype.getCount = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.v1.UploadOfferRequest} returns this
+ */
+proto.v1.UploadOfferRequest.prototype.setCount = function(value) {
+  return jspb.Message.setProto3IntField(this, 7, value);
+};
+
+
+/**
+ * optional bool inStock = 8;
+ * @return {boolean}
+ */
+proto.v1.UploadOfferRequest.prototype.getInstock = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 8, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.v1.UploadOfferRequest} returns this
+ */
+proto.v1.UploadOfferRequest.prototype.setInstock = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 8, value);
+};
+
+
+/**
+ * optional string description = 9;
+ * @return {string}
+ */
+proto.v1.UploadOfferRequest.prototype.getDescription = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.UploadOfferRequest} returns this
+ */
+proto.v1.UploadOfferRequest.prototype.setDescription = function(value) {
+  return jspb.Message.setProto3StringField(this, 9, value);
+};
+
+
+/**
+ * optional string vendor = 10;
+ * @return {string}
+ */
+proto.v1.UploadOfferRequest.prototype.getVendor = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.UploadOfferRequest} returns this
+ */
+proto.v1.UploadOfferRequest.prototype.setVendor = function(value) {
+  return jspb.Message.setProto3StringField(this, 10, value);
+};
+
+
+/**
+ * repeated string images = 11;
  * @return {!Array<string>}
  */
 proto.v1.UploadOfferRequest.prototype.getImagesList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 7));
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 11));
 };
 
 
@@ -3982,7 +4222,7 @@ proto.v1.UploadOfferRequest.prototype.getImagesList = function() {
  * @return {!proto.v1.UploadOfferRequest} returns this
  */
 proto.v1.UploadOfferRequest.prototype.setImagesList = function(value) {
-  return jspb.Message.setField(this, 7, value || []);
+  return jspb.Message.setField(this, 11, value || []);
 };
 
 
@@ -3992,7 +4232,7 @@ proto.v1.UploadOfferRequest.prototype.setImagesList = function(value) {
  * @return {!proto.v1.UploadOfferRequest} returns this
  */
 proto.v1.UploadOfferRequest.prototype.addImages = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 7, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 11, value, opt_index);
 };
 
 
@@ -4006,11 +4246,11 @@ proto.v1.UploadOfferRequest.prototype.clearImagesList = function() {
 
 
 /**
- * repeated uint32 properties = 8;
+ * repeated uint32 properties = 12;
  * @return {!Array<number>}
  */
 proto.v1.UploadOfferRequest.prototype.getPropertiesList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 8));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 12));
 };
 
 
@@ -4019,7 +4259,7 @@ proto.v1.UploadOfferRequest.prototype.getPropertiesList = function() {
  * @return {!proto.v1.UploadOfferRequest} returns this
  */
 proto.v1.UploadOfferRequest.prototype.setPropertiesList = function(value) {
-  return jspb.Message.setField(this, 8, value || []);
+  return jspb.Message.setField(this, 12, value || []);
 };
 
 
@@ -4029,7 +4269,7 @@ proto.v1.UploadOfferRequest.prototype.setPropertiesList = function(value) {
  * @return {!proto.v1.UploadOfferRequest} returns this
  */
 proto.v1.UploadOfferRequest.prototype.addProperties = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 8, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 12, value, opt_index);
 };
 
 

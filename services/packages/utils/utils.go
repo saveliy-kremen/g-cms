@@ -104,6 +104,7 @@ func Translit(s string) string {
 		"\\.": "",
 		"/":   "_",
 		"&":   "and",
+		",":   "",
 	}
 
 	translate_string := s

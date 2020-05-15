@@ -20,8 +20,10 @@ type Item struct {
 	Description    string  `sql:"type:text"`
 	Price          float32 `sql:"type:decimal(10,2)"`
 	OldPrice       float32 `sql:"type:decimal(10,2)"`
-	CurrencyID     uint32
+	CurrencyID     string
 	Count          int32
+	InStock        bool
+	Vendor         string
 	Disable        bool
 	Sort           uint32
 	SeoTitle       string `sql:"type:text" json:"seo_title"`
@@ -66,7 +68,7 @@ type Currency struct {
 
 	Name      string
 	ShortName string
-	Code      string
+	CurencyID string
 	Rate      float64
 }
 
@@ -92,7 +94,9 @@ func ItemToResponse(item Item) *v1.Item {
 		OldPrice:       item.OldPrice,
 		CurrencyId:     item.CurrencyID,
 		Count:          item.Count,
+		InStock:        item.InStock,
 		Disable:        item.Disable,
+		Vendor:         item.Vendor,
 		Sort:           item.Sort,
 		SeoTitle:       item.SeoTitle,
 		SeoDescription: item.SeoDescription,

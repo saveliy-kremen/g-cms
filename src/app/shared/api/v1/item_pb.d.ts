@@ -38,14 +38,20 @@ export class Item extends jspb.Message {
   getOldPrice(): number;
   setOldPrice(value: number): void;
 
-  getCurrencyId(): number;
-  setCurrencyId(value: number): void;
+  getCurrencyId(): string;
+  setCurrencyId(value: string): void;
 
   getCount(): number;
   setCount(value: number): void;
 
+  getInStock(): boolean;
+  setInStock(value: boolean): void;
+
   getDisable(): boolean;
   setDisable(value: boolean): void;
+
+  getVendor(): string;
+  setVendor(value: string): void;
 
   getSort(): number;
   setSort(value: number): void;
@@ -90,9 +96,11 @@ export namespace Item {
     description: string,
     price: number,
     oldPrice: number,
-    currencyId: number,
+    currencyId: string,
     count: number,
+    inStock: boolean,
     disable: boolean,
+    vendor: string,
     sort: number,
     seoTitle: string,
     seoDescription: string,
@@ -287,6 +295,9 @@ export class EditItemRequest extends jspb.Message {
   getCount(): number;
   setCount(value: number): void;
 
+  getInstock(): boolean;
+  setInstock(value: boolean): void;
+
   getDescription(): string;
   setDescription(value: string): void;
 
@@ -296,14 +307,17 @@ export class EditItemRequest extends jspb.Message {
   getOldPrice(): number;
   setOldPrice(value: number): void;
 
-  getCurrencyId(): number;
-  setCurrencyId(value: number): void;
+  getCurrencyId(): string;
+  setCurrencyId(value: string): void;
 
   getDisable(): boolean;
   setDisable(value: boolean): void;
 
   getSort(): number;
   setSort(value: number): void;
+
+  getVendor(): string;
+  setVendor(value: string): void;
 
   getItemImagesList(): Array<number>;
   setItemImagesList(value: Array<number>): void;
@@ -336,12 +350,14 @@ export namespace EditItemRequest {
     article: string,
     alias: string,
     count: number,
+    instock: boolean,
     description: string,
     price: number,
     oldPrice: number,
-    currencyId: number,
+    currencyId: string,
     disable: boolean,
     sort: number,
+    vendor: string,
     itemImagesList: Array<number>,
     uploadImagesList: Array<number>,
     propertiesList: Array<ItemProperty.AsObject>,
@@ -446,6 +462,9 @@ export class UploadOfferRequest extends jspb.Message {
   getTitle(): string;
   setTitle(value: string): void;
 
+  getArticle(): string;
+  setArticle(value: string): void;
+
   getParentId(): number;
   setParentId(value: number): void;
 
@@ -458,8 +477,17 @@ export class UploadOfferRequest extends jspb.Message {
   getCurrency(): string;
   setCurrency(value: string): void;
 
+  getCount(): number;
+  setCount(value: number): void;
+
+  getInstock(): boolean;
+  setInstock(value: boolean): void;
+
   getDescription(): string;
   setDescription(value: string): void;
+
+  getVendor(): string;
+  setVendor(value: string): void;
 
   getImagesList(): Array<string>;
   setImagesList(value: Array<string>): void;
@@ -482,11 +510,15 @@ export class UploadOfferRequest extends jspb.Message {
 export namespace UploadOfferRequest {
   export type AsObject = {
     title: string,
+    article: string,
     parentId: number,
     categoryId: number,
     price: number,
     currency: string,
+    count: number,
+    instock: boolean,
     description: string,
+    vendor: string,
     imagesList: Array<string>,
     propertiesList: Array<number>,
   }

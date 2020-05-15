@@ -114,11 +114,18 @@ export class XmlImportComponent implements OnInit {
         const res: any = await this.itemService.uploadOffer(this.xmlImportData.offers.offer[i]).toPromise()
         this.offersMap.set(this.xmlImportData.offers.offer[i]["@attributes"].id, res.item.id)
         ///params
-        for (let j = 0; j < this.xmlImportData.offers.offer[i].param?.length; j++) {
-          this.xmlImportData.offers.offer[i].param[j].title = this.xmlImportData.offers.offer[i].param[j]["@attributes"].name
-          this.xmlImportData.offers.offer[i].param[j].value = this.xmlImportData.offers.offer[i].param[j]["#text"]
-          this.xmlImportData.offers.offer[i].param[j].itemID = res.item.id
-          await this.propertyService.uploadProperty(this.xmlImportData.offers.offer[i].param[j]).toPromise()
+        if (this.xmlImportData.offers.offer[i].param?.length > 0) {
+          for (let j = 0; j < this.xmlImportData.offers.offer[i].param?.length; j++) {
+            this.xmlImportData.offers.offer[i].param[j].title = this.xmlImportData.offers.offer[i].param[j]["@attributes"].name
+            this.xmlImportData.offers.offer[i].param[j].value = this.xmlImportData.offers.offer[i].param[j]["#text"]
+            this.xmlImportData.offers.offer[i].param[j].itemID = res.item.id
+            await this.propertyService.uploadProperty(this.xmlImportData.offers.offer[i].param[j]).toPromise()
+          }
+        } else if (this.xmlImportData.offers.offer[i].param) {
+          this.xmlImportData.offers.offer[i].param.title = this.xmlImportData.offers.offer[i].param["@attributes"].name
+          this.xmlImportData.offers.offer[i].param.value = this.xmlImportData.offers.offer[i].param["#text"]
+          this.xmlImportData.offers.offer[i].param.itemID = res.item.id
+          await this.propertyService.uploadProperty(this.xmlImportData.offers.offer[i].param).toPromise()
         }
         this.loaderValue += loadItemsPart
       }

@@ -81,24 +81,25 @@ export class XmlImportComponent implements OnInit {
       }
       ///offers
       for (let i = 0; i < this.xmlImportData.offers.offer.length; i++) {
-        if (this.xmlImportData.offers.offer[i]["@attributes"].group_id &&
-          this.offersMap.has(this.xmlImportData.offers.offer[i]["@attributes"].group_id)
-        ) {
-          this.xmlImportData.offers.offer[i].parentID = Number(this.offersMap.get(this.xmlImportData.offers.offer[i]["@attributes"].group_id))
+        const offerTitle = this.xmlImportData.offers.offer[i].name?.["#text"] || this.xmlImportData.offers.offer[i].model?.["#text"]
+        const parentKey = this.xmlImportData.offers.offer[i]["@attributes"].group_id ?
+          this.xmlImportData.offers.offer[i]["@attributes"].group_id : offerTitle
+        if (this.offersMap.has(parentKey)) {
+          this.xmlImportData.offers.offer[i].parentID = Number(this.offersMap.get(parentKey))
         } else {
           let parentOffer = Object.assign({}, this.xmlImportData.offers.offer[i])
           parentOffer.categoryID = this.xmlImportData.offers.offer[i].categoryId && this.categoriesMap.has(this.xmlImportData.offers.offer[i].categoryId["#text"])
             ? Number(this.categoriesMap.get(this.xmlImportData.offers.offer[i].categoryId["#text"]))
             : 0
-          parentOffer.title = this.xmlImportData.offers.offer[i].name?.["#text"].replace(/\s*\([^(]*?\)\s*$/g, '')
+          parentOffer.title = offerTitle.replace(/\s*\([^(]*?\)\s*$/g, '')
           parentOffer.vendor = this.xmlImportData.offers.offer[i].vendor?.["#text"]
           parentOffer.currency = this.xmlImportData.offers.offer[i].currencyId?.["#text"]
           parentOffer.country = this.xmlImportData.offers.offer[i].country?.["#text"]
           const res: any = await this.itemService.uploadOffer(parentOffer).toPromise()
-          this.offersMap.set(this.xmlImportData.offers.offer[i]["@attributes"].group_id, res.item.id)
+          this.offersMap.set(parentKey, res.item.id)
           this.xmlImportData.offers.offer[i].parentID = Number(res.item.id)
         }
-        this.xmlImportData.offers.offer[i].title = this.xmlImportData.offers.offer[i].name?.["#text"]
+        this.xmlImportData.offers.offer[i].title = offerTitle
         this.xmlImportData.offers.offer[i].article = this.xmlImportData.offers.offer[i].vendorCode?.["#text"]
         this.xmlImportData.offers.offer[i].vendor = this.xmlImportData.offers.offer[i].vendor?.["#text"]
         this.xmlImportData.offers.offer[i].country = this.xmlImportData.offers.offer[i].country?.["#text"]

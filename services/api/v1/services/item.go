@@ -388,9 +388,16 @@ func (u *ItemServiceImpl) ItemOffers(ctx context.Context, req *v1.OffersRequest)
 func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRequest) (*v1.ItemResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
+	vendor := models.Vendor{}
+	if db.DB.Where("name = ?", req.Vendor).First(&vendor).RecordNotFound() {
+		vendor.Name = req.Vendor
+		vendor.Country = req.Country
+		db.DB.Create(&vendor)
+	}
+
 	item := models.Item{}
 	alias := utils.Translit(strings.ToLower(req.Title))
-	db.DB.Where("user_id = ? AND alias = ?", user_id, alias).First(&item)
+	db.DB.Where("user_id = ? AND alias = ? AND parent_id = ? AND vendor_id = ?", user_id, alias, req.ParentId, vendor.ID).First(&item)
 	if item.Sort == 0 {
 		lastItem := models.Item{}
 		db.DB.Where("user_id = ? AND parent_id = ?", user_id, req.ParentId).Order("sort DESC").First(&lastItem)
@@ -414,12 +421,6 @@ func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRe
 		db.DB.Create(&currency)
 	}
 	item.CurrencyID = uint32(currency.ID)
-	vendor := models.Vendor{}
-	if db.DB.Where("name = ?", req.Vendor).First(&vendor).RecordNotFound() {
-		vendor.Name = req.Vendor
-		vendor.Country = req.Country
-		db.DB.Create(&vendor)
-	}
 	item.VendorID = uint32(vendor.ID)
 	if db.DB.Save(&item).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error save offer")

@@ -3,5 +3,14 @@ CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
 cp server ../docker/server/
 cp config/config.json ../docker/server/config/config.json
 cd ../docker/server/
+
 docker build -t alllead-server:v1 .
-docker run  -p 2090:2090 -p 2092:2092 --name=alllead --net=host -d --rm alllead-server:v1
+docker run  -p 2090:2090 -p 2092:2092 -v /home/newud/web/alllead.best/public_html/uploads:/public_html/uploads --name=alllead --net=host --rm alllead-server:v1
+
+docker run -d \
+  -p 2090:2090 -p 2092:2092 \
+  -v /home/newud/web/alllead.best/public_html/uploads:/public_html/uploads \
+  --name=alllead \
+  --net=host \
+  --rm \
+  alllead-server:v1

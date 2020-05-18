@@ -1,4 +1,5 @@
 FROM scratch
-ADD server /
-ADD config/config.json /config/config.json
-CMD ["./server"]
+ADD server /src/services/
+ADD config/config.json /src/services/config/config.json
+WORKDIR /src/services
+CMD ["/src/services/server"]

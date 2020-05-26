@@ -9,7 +9,7 @@ import { UserGrpcService } from 'src/app/shared/services/grpc/user.service';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private isAuthenticated = false;
-  private user: User.AsObject = new UserModel();
+  private user: User.AsObject;
 
   userChange: BehaviorSubject<User.AsObject> = new BehaviorSubject<User.AsObject>(null);
 
@@ -51,7 +51,10 @@ export class AuthService {
     })
   }
 
-  getUser(): User.AsObject {
+  async getUser() {
+    if (!this.user) {
+      await this.profileMe()
+    }
     return this.user;
   }
 
@@ -59,15 +62,12 @@ export class AuthService {
     try {
       const token = await this.session.getToken()
       if (token) {
-        this.userService.me().subscribe((value) => {
-          this.isAuthenticated = true
-          this.session.setToken(value.token)
-          this.user = value.user
-          this.userChange.next(this.user)
-          window.localStorage.setItem('user', JSON.stringify(value.user))
-        }, (err) => {
-          console.log(err)
-        })
+        const response = await this.userService.me().toPromise()
+        this.isAuthenticated = true
+        this.session.setToken(response.token)
+        this.user = response.user
+        this.userChange.next(this.user)
+        window.localStorage.setItem('user', JSON.stringify(response.user))
       } else {
         this.logout()
       }
@@ -78,7 +78,7 @@ export class AuthService {
 
   logout() {
     this.isAuthenticated = false
-    this.user = null
+    this.user = new UserModel();
     window.localStorage.clear()
     this.session.destroy()
     this.userChange.next(this.user)

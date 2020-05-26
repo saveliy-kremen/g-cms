@@ -11,9 +11,10 @@ import { ValidationModule } from '../shared/validation/validation.module';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ErrorPageComponent } from './error-page/error-page.component';
 
 @NgModule({
-  declarations: [HomeLayoutComponent, IndexComponent, RegisterComponent, LoginComponent, ForgotPasswordComponent],
+  declarations: [HomeLayoutComponent, IndexComponent, RegisterComponent, LoginComponent, ForgotPasswordComponent, ErrorPageComponent],
   imports: [
     CommonModule,
     MaterialModule,

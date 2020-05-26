@@ -9,10 +9,11 @@ import { PropertyEditComponent } from './properties/property-edit/property-edit.
 import { ItemsComponent } from './items/items.component';
 import { ItemEditComponent } from './items/item-edit/item-edit.component';
 import { XmlImportComponent } from './xml-import/xml-import.component';
+import { AdminAuthGuard } from '../shared/guards/guards';
 
 export const AdminRoutes: Routes = [
   {
-    path: '', component: AdminLayoutComponent, children: [
+    path: '', component: AdminLayoutComponent, canActivate: [AdminAuthGuard], children: [
       { path: '', component: IndexComponent },
       { path: 'categories', component: CategoriesComponent },
       { path: 'categories/edit/:alias', component: CategoryEditComponent },

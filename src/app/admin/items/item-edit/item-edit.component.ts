@@ -178,8 +178,8 @@ export class ItemEditComponent implements OnInit {
 
   async updateProperties() {
     try {
-      const res: any = await this.itemService.itemProperties(this.item.id).toPromise();
-      let formArray = <FormArray>this.itemForm.get("properties");
+      const res: any = await this.itemService.itemProperties(this.item.id).toPromise()
+      let formArray = <FormArray>this.itemForm.get("properties")
       while (formArray.length !== 0) {
         formArray.removeAt(0)
       }
@@ -314,7 +314,7 @@ export class ItemEditComponent implements OnInit {
   async submitItemForm() {
     this.loaderService.showLoader()
     this.itemFormSubmitted = true;
-    this.matcher.changeFormState(this.itemFormSubmitted)
+    this.matcher.changeFormState(true)
     if (this.itemForm.valid) {
       try {
         this.itemForm.value.id = (this.mode == "edit" || this.mode == "draft") ? Number(this.item.id) : null
@@ -323,7 +323,7 @@ export class ItemEditComponent implements OnInit {
         this.itemForm.value.parentID = this.parentID
         await this.itemService.editItem(this.itemForm.value)
         this.itemFormSubmitted = false;
-        this.matcher.changeFormState(this.itemFormSubmitted)
+        this.matcher.changeFormState(false)
         this.itemMessage = new Message("success", "");
         this.itemForm.reset();
         if (this.activeRoute.snapshot.params["offerMode"]) {

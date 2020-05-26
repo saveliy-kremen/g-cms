@@ -25,6 +25,7 @@ import { ItemEditComponent } from './items/item-edit/item-edit.component'
 import { UploadService } from '../shared/services/upload.service';
 import { XmlImportComponent } from './xml-import/xml-import.component'
 import { FileInputModule } from '../shared/file-input/file-input.module'
+import { AdminAuthGuard } from '../shared/guards/guards'
 
 @NgModule({
   declarations: [
@@ -54,6 +55,6 @@ import { FileInputModule } from '../shared/file-input/file-input.module'
     NgDragDropModule.forRoot(),
     RouterModule.forChild(AdminRoutes),
   ],
-  providers: [LoaderService, UploadService],
+  providers: [LoaderService, UploadService, AdminAuthGuard],
 })
 export class AdminModule { }

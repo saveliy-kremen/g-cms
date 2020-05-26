@@ -26,11 +26,11 @@ export class SessionService {
   }
 
   public setToken(jwt: string): void {
-    this.cookieService.set(environment.jwtCoockieName, jwt);
+    this.cookieService.set(environment.jwtCoockieName, jwt, null, "/");
   }
 
   public destroy(): void {
-    this.cookieService.delete(environment.jwtCoockieName);
+    this.cookieService.deleteAll("/")
   }
 
   private getCookie(cookies, name) {

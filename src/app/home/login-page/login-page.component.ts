@@ -6,11 +6,11 @@ import { Message } from '../../shared/models/message.model';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  selector: 'app-login-page',
+  templateUrl: './login-page.component.html',
+  styleUrls: ['./login-page.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginPageComponent implements OnInit {
   loginForm: FormGroup
   loginFormSubmitted: boolean = false;
   loginMessage: Message;

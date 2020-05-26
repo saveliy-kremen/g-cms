@@ -9,7 +9,7 @@ import { NgDragDropModule } from 'ng-drag-drop';
 
 import { AdminRoutes } from './admin.routing'
 import { AdminLayoutComponent } from './admin-layout/admin-layout.component'
-import { IndexComponent } from './index/index.component'
+import { IndexComponent } from './index-page/index.component'
 import { MaterialModule } from '../shared/material/material.module'
 import { CategoriesComponent } from './categories/categories.component'
 import { ModalModule } from '../shared/modal/modal.module'
@@ -26,6 +26,7 @@ import { UploadService } from '../shared/services/upload.service';
 import { XmlImportComponent } from './xml-import/xml-import.component'
 import { FileInputModule } from '../shared/file-input/file-input.module'
 import { AdminAuthGuard } from '../shared/guards/guards'
+import { OrdersPageComponent } from './orders-page/orders-page.component'
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { AdminAuthGuard } from '../shared/guards/guards'
     PropertyValueComponent,
     ItemsComponent,
     ItemEditComponent,
-    XmlImportComponent
+    XmlImportComponent,
+    OrdersPageComponent
   ],
   imports: [
     CommonModule,

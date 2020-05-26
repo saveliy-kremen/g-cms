@@ -3,7 +3,7 @@ export const environment = {
   siteUrl: "http://alllead.best",
   uploadURL: "http://alllead.best/upload/",
   grpcUrl: "http://alllead.best:2091",
-  roles: ["Пользователь", "Администратор"],
+  roles: ["user", "admin"],
   jwtCoockieName: "ngJWT",
   propertyTypes: ["Число", "Строка", "Изображение"],
   propertyDisplayTypes: ["Список", "Флажки", "Слайдер", "Изображения"],

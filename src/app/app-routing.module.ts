@@ -1,18 +1,14 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 
-import { HomeLayoutComponent } from './home/home-layout/home-layout.component';
-import { HomeModule } from './home/home.module';
-import { AdminModule } from './admin/admin.module';
-
 const routes: Routes = [
   {
     path: '',
-    loadChildren: './home/home.module#HomeModule'
+    loadChildren: () => import("./home/home.module").then(m => m.HomeModule)
   },
   {
     path: 'admin',
-    loadChildren: './admin/admin.module#AdminModule'
+    loadChildren: () => import("./admin/admin.module").then(m => m.AdminModule)
   },
   { path: '**', redirectTo: '/error' },
 ];

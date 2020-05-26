@@ -13,7 +13,7 @@ export class AdminAuthGuard {
 
   async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     const user = await this.auth.getUser();
-    if (user && environment.roles[user.role] === "Администратор") {
+    if (user && environment.roles[user.role] === "admin") {
       return true;
     }
     this.router.navigateByUrl("/");

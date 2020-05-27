@@ -5,90 +5,90 @@ import * as grpcWeb from 'grpc-web';
 
 import { grpcUnary } from './helpers/grpc-unary';
 
-import * as GRPC from 'src/app/shared/api/v1/item_pb';
-import * as CategoryGRPC from 'src/app/shared/api/v1/category_pb';
-import * as PropertyGRPC from 'src/app/shared/api/v1/property_pb';
+import * as GRPC from 'src/app/shared/api/v1/admin-item_pb';
+import * as CategoryGRPC from 'src/app/shared/api/v1/admin-category_pb';
+import * as PropertyGRPC from 'src/app/shared/api/v1/admin-property_pb';
 import { Empty } from 'src/app/shared/api/v1/google/protobuf/empty_pb';
-import { ItemServiceClient } from 'src/app/shared/api/v1/ItemServiceClientPb';
+import { AdminItemServiceClient } from 'src/app/shared/api/v1/Admin-itemServiceClientPb';
 import { environment } from 'src/environments/environment';
 import { SessionService } from 'src/app/shared/services/session.service';
 
 @Injectable({
     providedIn: 'root',
 })
-export class ItemGrpcService {
-    client: ItemServiceClient;
+export class AdminItemGrpcService {
+    client: AdminItemServiceClient;
 
     constructor(
         private session: SessionService
     ) {
-        this.client = new ItemServiceClient(environment.grpcUrl);
+        this.client = new AdminItemServiceClient(environment.grpcUrl);
     }
 
-    public items(page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.ItemsResponse.AsObject> {
+    public items(page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.AdminItemsResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.ItemsRequest()
+            var request = new GRPC.AdminItemsRequest()
             request.setPage(page)
             request.setPageSize(pageSize)
             request.setSort(sort)
             request.setDirection(direction)
-            this.client.items(request, meta, (err: grpcWeb.Error, response: GRPC.ItemsResponse) => {
+            this.client.adminItems(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemsResponse) => {
                 if (err) {
                     return reject(err)
                 }
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.ItemsResponse.AsObject>(promise);
+        return grpcUnary<GRPC.AdminItemsResponse.AsObject>(promise);
     }
 
-    public item(id: number): Observable<GRPC.ItemResponse.AsObject> {
+    public item(id: number): Observable<GRPC.AdminItemResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.ItemRequest();
+            var request = new GRPC.AdminItemRequest();
             request.setId(id)
-            this.client.item(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
+            this.client.adminItem(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemResponse) => {
                 if (err) {
                     return reject(err)
                 }
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.ItemResponse.AsObject>(promise);
+        return grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
     }
 
-    public createDraftItem(parentID: number): Observable<GRPC.ItemResponse.AsObject> {
+    public createDraftItem(parentID: number): Observable<GRPC.AdminItemResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.DraftRequest();
+            var request = new GRPC.AdminDraftRequest();
             request.setParentId(parentID)
-            this.client.createDraftItem(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
+            this.client.adminCreateDraftItem(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemResponse) => {
                 if (err) {
                     return reject(err)
                 }
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.ItemResponse.AsObject>(promise);
+        return grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
     }
 
-    public editItem(data): Observable<GRPC.ItemResponse.AsObject> {
+    public editItem(data): Observable<GRPC.AdminItemResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.EditItemRequest()
+            var request = new GRPC.AdminEditItemRequest()
             request.setId(data.id)
             request.setTitle(data.title)
             request.setParentId(data.parentID)
@@ -106,7 +106,7 @@ export class ItemGrpcService {
             request.setItemImagesList(data.itemImages)
             request.setUploadImagesList(data.uploadImages)
             request.setPropertiesList(data.properties.map(item => {
-                const wrapper = new GRPC.ItemProperty
+                const wrapper = new GRPC.AdminItemProperty
                 const code = Object.keys(item)[0]
                 if (item[code]) {
                     wrapper.setCode(code)
@@ -120,180 +120,180 @@ export class ItemGrpcService {
                 }
                 return wrapper
             }))
-            this.client.editItem(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
+            this.client.adminEditItem(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemResponse) => {
                 if (err) {
                     return reject(err);
                 }
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.ItemResponse.AsObject>(promise);
+        return grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
     }
 
-    public deleteItem(id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.ItemsResponse.AsObject> {
+    public deleteItem(id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.AdminItemsResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.DeleteItemRequest();
+            var request = new GRPC.AdminDeleteItemRequest();
             request.setId(id)
             request.setPage(page)
             request.setPageSize(pageSize)
             request.setSort(sort)
             request.setDirection(direction)
-            this.client.deleteItem(request, meta, (err: grpcWeb.Error, response: GRPC.ItemsResponse) => {
+            this.client.adminDeleteItem(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemsResponse) => {
                 if (err) {
                     return reject(err);
                 }
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.ItemsResponse.AsObject>(promise);
+        return grpcUnary<GRPC.AdminItemsResponse.AsObject>(promise);
     }
 
-    public getUploadImages(): Observable<GRPC.ItemImagesResponse.AsObject> {
+    public getUploadImages(): Observable<GRPC.AdminItemImagesResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
             var request = new Empty();
-            this.client.getUploadImages(request, meta, (err: grpcWeb.Error, response: GRPC.ItemImagesResponse) => {
+            this.client.adminGetUploadImages(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemImagesResponse) => {
                 if (err) {
                     return reject(err)
                 }
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.ItemImagesResponse.AsObject>(promise);
+        return grpcUnary<GRPC.AdminItemImagesResponse.AsObject>(promise);
     }
 
-    public itemCategories(id: number): Observable<CategoryGRPC.CategoriesResponse.AsObject> {
+    public itemCategories(id: number): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.ItemRequest();
+            var request = new GRPC.AdminItemRequest();
             request.setId(id)
-            this.client.itemCategories(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.CategoriesResponse) => {
+            this.client.adminItemCategories(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.AdminCategoriesResponse) => {
                 if (err) {
                     return reject(err);
                 }
                 resolve(response);
             });
         });
-        return grpcUnary<CategoryGRPC.CategoriesResponse.AsObject>(promise);
+        return grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
-    public itemBindCategory(id: number, categoryID: string): Observable<CategoryGRPC.CategoriesResponse.AsObject> {
+    public itemBindCategory(id: number, categoryID: string): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.ItemBindRequest();
-            request.setId(id)
-            request.setCategoryId(categoryID)
-            this.client.itemBindCategory(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.CategoriesResponse) => {
-                if (err) {
-                    return reject(err);
-                }
-                resolve(response);
-            });
-        });
-        return grpcUnary<CategoryGRPC.CategoriesResponse.AsObject>(promise);
-    }
-
-    public itemUnbindCategory(id: number, categoryID: string): Observable<CategoryGRPC.CategoriesResponse.AsObject> {
-        const meta: Metadata = {
-            Authorization: "Bearer " + this.session.getToken()
-        };
-
-        const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.ItemBindRequest();
+            var request = new GRPC.AdminItemBindRequest();
             request.setId(id)
             request.setCategoryId(categoryID)
-            this.client.itemUnbindCategory(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.CategoriesResponse) => {
+            this.client.adminItemBindCategory(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.AdminCategoriesResponse) => {
                 if (err) {
                     return reject(err);
                 }
                 resolve(response);
             });
         });
-        return grpcUnary<CategoryGRPC.CategoriesResponse.AsObject>(promise);
+        return grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
-    public itemProperties(id: number): Observable<PropertyGRPC.PropertiesResponse.AsObject> {
+    public itemUnbindCategory(id: number, categoryID: string): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.ItemRequest();
+            var request = new GRPC.AdminItemBindRequest();
             request.setId(id)
-            this.client.itemProperties(request, meta, (err: grpcWeb.Error, response: PropertyGRPC.PropertiesResponse) => {
+            request.setCategoryId(categoryID)
+            this.client.adminItemUnbindCategory(request, meta, (err: grpcWeb.Error, response: CategoryGRPC.AdminCategoriesResponse) => {
                 if (err) {
                     return reject(err);
                 }
                 resolve(response);
             });
         });
-        return grpcUnary<PropertyGRPC.PropertiesResponse.AsObject>(promise);
+        return grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
-    public itemOffers(item_id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.OffersResponse.AsObject> {
+    public itemProperties(id: number): Observable<PropertyGRPC.AdminPropertiesResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.OffersRequest();
+            var request = new GRPC.AdminItemRequest();
+            request.setId(id)
+            this.client.adminItemProperties(request, meta, (err: grpcWeb.Error, response: PropertyGRPC.AdminPropertiesResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return grpcUnary<PropertyGRPC.AdminPropertiesResponse.AsObject>(promise);
+    }
+
+    public itemOffers(item_id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.AdminOffersResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.AdminOffersRequest();
             request.setItemId(item_id)
             request.setPage(page)
             request.setPageSize(pageSize)
             request.setSort(sort)
             request.setDirection(direction)
-            this.client.itemOffers(request, meta, (err: grpcWeb.Error, response: GRPC.OffersResponse) => {
+            this.client.adminItemOffers(request, meta, (err: grpcWeb.Error, response: GRPC.AdminOffersResponse) => {
                 if (err) {
                     return reject(err);
                 }
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.OffersResponse.AsObject>(promise);
+        return grpcUnary<GRPC.AdminOffersResponse.AsObject>(promise);
     }
 
-    public deleteOffer(id: number, parent_id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.OffersResponse.AsObject> {
+    public deleteOffer(id: number, parent_id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.AdminOffersResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.DeleteOfferRequest();
+            var request = new GRPC.AdminDeleteOfferRequest();
             request.setId(id)
             request.setParentId(parent_id)
             request.setPage(page)
             request.setPageSize(pageSize)
             request.setSort(sort)
             request.setDirection(direction)
-            this.client.deleteOffer(request, meta, (err: grpcWeb.Error, response: GRPC.OffersResponse) => {
+            this.client.adminDeleteOffer(request, meta, (err: grpcWeb.Error, response: GRPC.AdminOffersResponse) => {
                 if (err) {
                     return reject(err);
                 }
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.OffersResponse.AsObject>(promise);
+        return grpcUnary<GRPC.AdminOffersResponse.AsObject>(promise);
     }
 
-    public uploadOffer(data): Observable<GRPC.ItemResponse.AsObject> {
+    public uploadOffer(data): Observable<GRPC.AdminItemResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
         const promise = new Promise((resolve, reject) => {
-            var request = new GRPC.UploadOfferRequest()
+            var request = new GRPC.AdminUploadOfferRequest()
             request.setTitle(data.title)
             request.setParentId(data.parentID)
             request.setCategoryId(data.categoryID)
@@ -305,13 +305,13 @@ export class ItemGrpcService {
             request.setVendor(data.vendor)
             request.setCountry(data.country)
             request.setImagesList(data.images)
-            this.client.uploadOffer(request, meta, (err: grpcWeb.Error, response: GRPC.ItemResponse) => {
+            this.client.adminUploadOffer(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemResponse) => {
                 if (err) {
                     return reject(err);
                 }
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.ItemResponse.AsObject>(promise);
+        return grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
     }
 }

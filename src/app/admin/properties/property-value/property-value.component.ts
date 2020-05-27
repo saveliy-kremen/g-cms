@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Message } from 'src/app/shared/models/message.model';
-import { PropertyGrpcService } from 'src/app/shared/services/grpc/property.service';
+import { AdminPropertyGrpcService } from 'src/app/shared/services/grpc/admin-property.service';
 import { environment } from 'src/environments/environment';
 import { LoaderService } from 'src/app/shared/services/loader.service';
 
@@ -21,7 +21,7 @@ export class PropertyValueComponent implements OnInit {
 
 
   constructor(
-    private propertyService: PropertyGrpcService,
+    private adminPropertyService: AdminPropertyGrpcService,
     public dialogRef: MatDialogRef<PropertyValueComponent>,
     private loaderService: LoaderService,
     @Inject(MAT_DIALOG_DATA) public data) { }
@@ -61,7 +61,7 @@ export class PropertyValueComponent implements OnInit {
     if (this.propertyValueForm.valid) {
       try {
         this.propertyValueForm.value.image = this.image
-        const res = await this.propertyService.editPropertyValue(
+        const res = await this.adminPropertyService.editPropertyValue(
           this.data,
           this.propertyValueForm.value,
         ).toPromise();

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { LoaderService } from 'src/app/shared/services/loader.service';
-import { ItemGrpcService } from 'src/app/shared/services/grpc/item.service';
+import { AdminItemGrpcService } from 'src/app/shared/services/grpc/admin-item.service';
 import { Message } from 'src/app/shared/models/message.model';
 import { environment } from 'src/environments/environment';
 import { ModalService } from 'src/app/shared/modal/modal.service';
@@ -37,7 +37,7 @@ export class ItemsComponent implements OnInit {
   constructor(
     private router: Router,
     private loaderService: LoaderService,
-    private itemService: ItemGrpcService,
+    private adminItemService: AdminItemGrpcService,
     private modalService: ModalService,
     private translateService: TranslateService,
     private authService: AuthService
@@ -49,7 +49,7 @@ export class ItemsComponent implements OnInit {
     this.itemsPageSize = environment.pageSizeOptions[0]
     let res: any = await this.authService.getUser()
     this.uploadUrl = `${environment.siteUrl}/uploads/users/${res.id}/items/`
-    res = await this.itemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
+    res = await this.adminItemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
     this.updateItemsData(res)
     this.loaderService.hideLoader()
   }
@@ -59,7 +59,7 @@ export class ItemsComponent implements OnInit {
     this.itemsPageSize = event.pageSize
     this.itemsSort = event.sort
     this.itemsDirection = event.direction
-    let res = await this.itemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
+    let res = await this.adminItemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
     this.updateItemsData(res)
   }
 
@@ -111,7 +111,7 @@ export class ItemsComponent implements OnInit {
     this.loaderService.showLoader()
     try {
       if (confirm) {
-        const res = await this.itemService.deleteItem(this.itemID, this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
+        const res = await this.adminItemService.deleteItem(this.itemID, this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
         this.updateItemsData(res)
       }
     } catch (err) {

@@ -3,13 +3,13 @@ syntax = "proto3";
 package v1;
 
 import "google/protobuf/empty.proto";
-import "category.proto";
-import "property.proto";
+import "admin-category.proto";
+import "admin-property.proto";
 import "vendor.proto";
 import "currency.proto";
 //import "google/protobuf/wrappers.proto";
 
-message Item {
+message AdminItem {
   string id = 1;
   uint32 user_id = 2;
   uint32 parent_id = 4;
@@ -30,11 +30,11 @@ message Item {
 
   Vendor vendor = 20;
   Currency currency = 21;
-  repeated ItemImage images = 22;
-  repeated Item offers = 23;
+  repeated AdminItemImage images = 22;
+  repeated AdminItem offers = 23;
 }
 
-message ItemImage {
+message AdminItemImage {
   uint32 id = 1;
   uint32 user_id = 2;
   uint32 item_id = 3;
@@ -44,27 +44,27 @@ message ItemImage {
   bool main = 7;
 }
 
-message ItemProperty {
+message AdminItemProperty {
   string code = 1;
   repeated uint32 property_value_ids = 2;
 }
 
-message ItemRequest {
+message AdminItemRequest {
   uint32 id = 1;
 }
 
-message DraftRequest {
+message AdminDraftRequest {
   uint32 parent_id = 1;
 }
 
-message ItemsRequest {
+message AdminItemsRequest {
   uint32 page = 1;
   uint32 page_size = 2;
   string sort = 3;
   string direction = 4;
 }
 
-message OffersRequest {
+message AdminOffersRequest {
   uint32 item_id = 1;
   uint32 page = 2;
   uint32 page_size = 3;
@@ -72,7 +72,7 @@ message OffersRequest {
   string direction = 5;
 }
 
-message EditItemRequest {
+message AdminEditItemRequest {
   uint32 id = 1;
   uint32 parent_id = 2;
   string title = 3;
@@ -89,10 +89,10 @@ message EditItemRequest {
   uint32 vendor_id = 14;
   repeated uint32 item_images = 15;
   repeated uint32 upload_images = 16;
-  repeated ItemProperty properties = 17;
+  repeated AdminItemProperty properties = 17;
 }
 
-message DeleteItemRequest {
+message AdminDeleteItemRequest {
   uint32 id = 1;
   uint32 page = 2;
   uint32 page_size = 3;
@@ -100,7 +100,7 @@ message DeleteItemRequest {
   string direction = 5;
 }
 
-message DeleteOfferRequest {
+message AdminDeleteOfferRequest {
   uint32 id = 1;
   uint32 parent_id = 2;
   uint32 page = 3;
@@ -109,12 +109,12 @@ message DeleteOfferRequest {
   string direction = 6;
 }
 
-message ItemBindRequest {
+message AdminItemBindRequest {
   uint32 id = 1;
   string category_id = 2;
 }
 
-message UploadOfferRequest {
+message AdminUploadOfferRequest {
   string title = 1;
   string article = 2;
   uint32 parent_id = 3;
@@ -130,36 +130,36 @@ message UploadOfferRequest {
   repeated uint32 properties = 13;
 }
 
-message ItemResponse {
-  Item item = 1;
+message AdminItemResponse {
+  AdminItem item = 1;
 }
 
-message ItemsResponse {
-  repeated Item items = 1;
+message AdminItemsResponse {
+  repeated AdminItem items = 1;
   uint32 total = 2;
 }
 
-message OffersResponse {
-  repeated Item offers = 1;
+message AdminOffersResponse {
+  repeated AdminItem offers = 1;
   uint32 total = 2;
 }
 
-message ItemImagesResponse {
-  repeated ItemImage images = 1;
+message AdminItemImagesResponse {
+  repeated AdminItemImage images = 1;
 }
 
-service ItemService {
-  rpc Item(ItemRequest) returns (ItemResponse);
-  rpc CreateDraftItem(DraftRequest) returns (ItemResponse);
-  rpc EditItem(EditItemRequest) returns (ItemResponse);
-  rpc DeleteItem(DeleteItemRequest) returns (ItemsResponse);
-  rpc DeleteOffer(DeleteOfferRequest) returns (OffersResponse);
-  rpc Items(ItemsRequest) returns (ItemsResponse);
-  rpc GetUploadImages(google.protobuf.Empty) returns (ItemImagesResponse);
-  rpc ItemCategories(ItemRequest) returns (CategoriesResponse);
-  rpc ItemBindCategory(ItemBindRequest) returns (CategoriesResponse);
-  rpc ItemUnbindCategory(ItemBindRequest) returns (CategoriesResponse);
-  rpc ItemProperties(ItemRequest) returns (PropertiesResponse);
-  rpc ItemOffers(OffersRequest) returns (OffersResponse);
-  rpc UploadOffer(UploadOfferRequest) returns (ItemResponse);
+service AdminItemService {
+  rpc AdminItem(AdminItemRequest) returns (AdminItemResponse);
+  rpc AdminCreateDraftItem(AdminDraftRequest) returns (AdminItemResponse);
+  rpc AdminEditItem(AdminEditItemRequest) returns (AdminItemResponse);
+  rpc AdminDeleteItem(AdminDeleteItemRequest) returns (AdminItemsResponse);
+  rpc AdminDeleteOffer(AdminDeleteOfferRequest) returns (AdminOffersResponse);
+  rpc AdminItems(AdminItemsRequest) returns (AdminItemsResponse);
+  rpc AdminGetUploadImages(google.protobuf.Empty) returns (AdminItemImagesResponse);
+  rpc AdminItemCategories(AdminItemRequest) returns (AdminCategoriesResponse);
+  rpc AdminItemBindCategory(AdminItemBindRequest) returns (AdminCategoriesResponse);
+  rpc AdminItemUnbindCategory(AdminItemBindRequest) returns (AdminCategoriesResponse);
+  rpc AdminItemProperties(AdminItemRequest) returns (AdminPropertiesResponse);
+  rpc AdminItemOffers(AdminOffersRequest) returns (AdminOffersResponse);
+  rpc AdminUploadOffer(AdminUploadOfferRequest) returns (AdminItemResponse);
 }

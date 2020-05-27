@@ -63,16 +63,16 @@ type ItemsCategories struct {
 	CategoryID uint
 }
 
-func ItemsToResponse(items []Item) []*v1.Item {
-	respItems := []*v1.Item{}
+func AdminItemsToResponse(items []Item) []*v1.AdminItem {
+	respItems := []*v1.AdminItem{}
 	for _, item := range items {
-		respItems = append(respItems, ItemToResponse(item))
+		respItems = append(respItems, AdminItemToResponse(item))
 	}
 	return respItems
 }
 
-func ItemToResponse(item Item) *v1.Item {
-	return &v1.Item{
+func AdminItemToResponse(item Item) *v1.AdminItem {
+	return &v1.AdminItem{
 		Id:             strconv.Itoa(int(item.ID)),
 		UserId:         item.UserID,
 		ParentId:       item.ParentID,
@@ -90,23 +90,23 @@ func ItemToResponse(item Item) *v1.Item {
 		SeoDescription: item.SeoDescription,
 		SeoKeywords:    item.SeoKeywords,
 
-		Images:   ItemImagesToResponse(item.Images),
-		Offers:   ItemsToResponse(item.Offers),
+		Images:   AdminItemImagesToResponse(item.Images),
+		Offers:   AdminItemsToResponse(item.Offers),
 		Vendor:   VendorToResponse(item.Vendor),
 		Currency: CurrencyToResponse(item.Currency),
 	}
 }
 
-func ItemImagesToResponse(images []ItemImage) []*v1.ItemImage {
-	respImages := []*v1.ItemImage{}
+func AdminItemImagesToResponse(images []ItemImage) []*v1.AdminItemImage {
+	respImages := []*v1.AdminItemImage{}
 	for _, image := range images {
-		respImages = append(respImages, ItemImageToResponse(image))
+		respImages = append(respImages, AdminItemImageToResponse(image))
 	}
 	return respImages
 }
 
-func ItemImageToResponse(image ItemImage) *v1.ItemImage {
-	return &v1.ItemImage{
+func AdminItemImageToResponse(image ItemImage) *v1.AdminItemImage {
+	return &v1.AdminItemImage{
 		Id:              uint32(image.ID),
 		UserId:          image.UserID,
 		ItemId:          image.ItemID,

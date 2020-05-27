@@ -1,9 +1,10 @@
 package models
 
 import (
+	"strconv"
+
 	v1 "../api/v1"
 	"github.com/jinzhu/gorm"
-	"strconv"
 )
 
 type Category struct {
@@ -26,8 +27,8 @@ type Category struct {
 	Children []Category
 }
 
-func CategoryToResponse(category Category) *v1.Category {
-	return &v1.Category{
+func AdminCategoryToResponse(category Category) *v1.AdminCategory {
+	return &v1.AdminCategory{
 		Id:          strconv.Itoa(int(category.ID)),
 		UserId:      uint32(category.UserID),
 		Text:        category.Title,
@@ -36,7 +37,7 @@ func CategoryToResponse(category Category) *v1.Category {
 		Image:       category.Image,
 		Parent:      category.Parent,
 		Sort:        uint32(category.Sort),
-		State: &v1.State{
+		State: &v1.AdminCategoryState{
 			Disabled: category.Disabled,
 			Opened:   category.Opened,
 			Selected: category.Selected,
@@ -47,15 +48,15 @@ func CategoryToResponse(category Category) *v1.Category {
 	}
 }
 
-func CategoriesToResponse(categories []Category) []*v1.Category {
-	respCategories := []*v1.Category{}
+func AdminCategoriesToResponse(categories []Category) []*v1.AdminCategory {
+	respCategories := []*v1.AdminCategory{}
 	for _, category := range categories {
 		if category.Parent == "#" {
 			category.Opened = true
 		} else {
 			category.Opened = false
 		}
-		respCategories = append(respCategories, CategoryToResponse(category))
+		respCategories = append(respCategories, AdminCategoryToResponse(category))
 	}
 	return respCategories
 }

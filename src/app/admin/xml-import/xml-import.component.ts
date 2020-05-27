@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 
 import { LoaderService } from 'src/app/shared/services/loader.service';
 import { Message } from 'src/app/shared/models/message.model';
-import { CategoryGrpcService } from 'src/app/shared/services/grpc/category.service';
-import { ItemGrpcService } from 'src/app/shared/services/grpc/item.service';
-import { PropertyGrpcService } from 'src/app/shared/services/grpc/property.service';
+import { AdminCategoryGrpcService } from 'src/app/shared/services/grpc/admin-category.service';
+import { AdminItemGrpcService } from 'src/app/shared/services/grpc/admin-item.service';
+import { AdminPropertyGrpcService } from 'src/app/shared/services/grpc/admin-property.service';
 
 @Component({
   selector: 'app-xml-import',
@@ -23,9 +23,9 @@ export class XmlImportComponent implements OnInit {
 
   constructor(
     private loaderService: LoaderService,
-    private categoryService: CategoryGrpcService,
-    private itemService: ItemGrpcService,
-    private propertyService: PropertyGrpcService,
+    private adminCategoryService: AdminCategoryGrpcService,
+    private adminItemService: AdminItemGrpcService,
+    private adminPropertyService: AdminPropertyGrpcService,
   ) { }
 
   ngOnInit(): void {
@@ -75,7 +75,7 @@ export class XmlImportComponent implements OnInit {
         this.xmlImportData.categories.category[i].parentID = this.xmlImportData.categories.category[i]["@attributes"]?.parentId && this.categoriesMap.has(this.xmlImportData.categories.category[i]["@attributes"].parentId)
           ? Number(this.categoriesMap.get(this.xmlImportData.categories.category[i]["@attributes"].parentId))
           : 0
-        const res: any = await this.categoryService.uploadCategory(this.xmlImportData.categories.category[i]).toPromise()
+        const res: any = await this.adminCategoryService.uploadCategory(this.xmlImportData.categories.category[i]).toPromise()
         this.categoriesMap.set(this.xmlImportData.categories.category[i]["@attributes"].id, res.category.id)
         this.loaderValue += loadItemsPart
       }
@@ -95,7 +95,7 @@ export class XmlImportComponent implements OnInit {
           parentOffer.vendor = this.xmlImportData.offers.offer[i].vendor?.["#text"]
           parentOffer.currency = this.xmlImportData.offers.offer[i].currencyId?.["#text"]
           parentOffer.country = this.xmlImportData.offers.offer[i].country?.["#text"]
-          const res: any = await this.itemService.uploadOffer(parentOffer).toPromise()
+          const res: any = await this.adminItemService.uploadOffer(parentOffer).toPromise()
           this.offersMap.set(parentKey, res.item.id)
           this.xmlImportData.offers.offer[i].parentID = Number(res.item.id)
         }
@@ -112,7 +112,7 @@ export class XmlImportComponent implements OnInit {
         } else if (this.xmlImportData.offers.offer[i].picture?.["#text"]) {
           this.xmlImportData.offers.offer[i].images = [this.xmlImportData.offers.offer[i].picture["#text"]]
         }
-        const res: any = await this.itemService.uploadOffer(this.xmlImportData.offers.offer[i]).toPromise()
+        const res: any = await this.adminItemService.uploadOffer(this.xmlImportData.offers.offer[i]).toPromise()
         this.offersMap.set(this.xmlImportData.offers.offer[i]["@attributes"].id, res.item.id)
         ///params
         if (this.xmlImportData.offers.offer[i].param?.length > 0) {
@@ -120,13 +120,13 @@ export class XmlImportComponent implements OnInit {
             this.xmlImportData.offers.offer[i].param[j].title = this.xmlImportData.offers.offer[i].param[j]["@attributes"].name
             this.xmlImportData.offers.offer[i].param[j].value = this.xmlImportData.offers.offer[i].param[j]["#text"]
             this.xmlImportData.offers.offer[i].param[j].itemID = res.item.id
-            await this.propertyService.uploadProperty(this.xmlImportData.offers.offer[i].param[j]).toPromise()
+            await this.adminPropertyService.uploadProperty(this.xmlImportData.offers.offer[i].param[j]).toPromise()
           }
         } else if (this.xmlImportData.offers.offer[i].param) {
           this.xmlImportData.offers.offer[i].param.title = this.xmlImportData.offers.offer[i].param["@attributes"].name
           this.xmlImportData.offers.offer[i].param.value = this.xmlImportData.offers.offer[i].param["#text"]
           this.xmlImportData.offers.offer[i].param.itemID = res.item.id
-          await this.propertyService.uploadProperty(this.xmlImportData.offers.offer[i].param).toPromise()
+          await this.adminPropertyService.uploadProperty(this.xmlImportData.offers.offer[i].param).toPromise()
         }
         this.loaderValue += loadItemsPart
       }

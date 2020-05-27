@@ -54,8 +54,8 @@ type PropertiesCategories struct {
 	CategoryID uint
 }
 
-func PropertyValueToResponse(propertyValue PropertyValue) *v1.PropertyValue {
-	return &v1.PropertyValue{
+func AdminPropertyValueToResponse(propertyValue PropertyValue) *v1.AdminPropertyValue {
+	return &v1.AdminPropertyValue{
 		Id:         uint32(propertyValue.ID),
 		UserId:     uint32(propertyValue.UserID),
 		PropertyId: uint32(propertyValue.PropertyID),
@@ -65,16 +65,16 @@ func PropertyValueToResponse(propertyValue PropertyValue) *v1.PropertyValue {
 	}
 }
 
-func PropertyValuesToResponse(propertyValues []PropertyValue) []*v1.PropertyValue {
-	respPropertyValues := []*v1.PropertyValue{}
+func AdminPropertyValuesToResponse(propertyValues []PropertyValue) []*v1.AdminPropertyValue {
+	respPropertyValues := []*v1.AdminPropertyValue{}
 	for _, propertyValue := range propertyValues {
-		respPropertyValues = append(respPropertyValues, PropertyValueToResponse(propertyValue))
+		respPropertyValues = append(respPropertyValues, AdminPropertyValueToResponse(propertyValue))
 	}
 	return respPropertyValues
 }
 
-func PropertyToResponse(property Property) *v1.Property {
-	return &v1.Property{
+func AdminPropertyToResponse(property Property) *v1.AdminProperty {
+	return &v1.AdminProperty{
 		Id:         strconv.Itoa(int(property.ID)),
 		UserId:     uint32(property.UserID),
 		Title:      property.Title,
@@ -84,15 +84,15 @@ func PropertyToResponse(property Property) *v1.Property {
 		Required:   property.Required,
 		Multiple:   property.Multiple,
 		Sort:       uint32(property.Sort),
-		Values:     PropertyValuesToResponse(property.Values),
+		Values:     AdminPropertyValuesToResponse(property.Values),
 		ItemValues: property.ItemValues,
 	}
 }
 
-func PropertiesToResponse(properties []Property) []*v1.Property {
-	respProperties := []*v1.Property{}
+func AdminPropertiesToResponse(properties []Property) []*v1.AdminProperty {
+	respProperties := []*v1.AdminProperty{}
 	for _, property := range properties {
-		respProperties = append(respProperties, PropertyToResponse(property))
+		respProperties = append(respProperties, AdminPropertyToResponse(property))
 	}
 	return respProperties
 }

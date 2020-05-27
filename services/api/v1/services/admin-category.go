@@ -19,7 +19,7 @@ import (
 	"../../../packages/utils"
 )
 
-type CategoryServiceImpl struct {
+type AdminCategoryServiceImpl struct {
 }
 
 type CategoryListItem struct {
@@ -43,39 +43,17 @@ func childCategoriesIDs(user_id uint32, categoryID uint) []uint {
 	return categoriesIDs
 }
 
-/*
-func addCategoryChildrenList(category models.Category, list CategoryListItem) []CategoryListItem {
-	level := list.Level
-
-	children := []models.Category{}
-	db.DB.Where("parent = ?", category.CategoryID).Order("sort").Find(&children)
-
-	for _, child := range children {
-		item := CategoryListItem{}
-		item.ID = child.ID
-		item.CategoryID = child.CategoryID
-		item.Level = level + 1
-		item.Image = child.Image
-		item.Title = child.Title
-		item.Alias = child.Alias
-		item.Options = addCategoryChildrenList(child, item)
-		list.Options = append(list.Options, item)
-	}
-	return list.Options
-}
-*/
-
-func (u *CategoryServiceImpl) Category(ctx context.Context, req *v1.CategoryRequest) (*v1.CategoryResponse, error) {
+func (s *AdminCategoryServiceImpl) AdminCategory(ctx context.Context, req *v1.AdminCategoryRequest) (*v1.AdminCategoryResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	category := models.Category{}
 	if db.DB.Where("user_id = ? AND alias = ?", user_id, req.Alias).First(&category).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Category not found")
 	}
-	return &v1.CategoryResponse{Category: models.CategoryToResponse(category)}, nil
+	return &v1.AdminCategoryResponse{Category: models.AdminCategoryToResponse(category)}, nil
 }
 
-func (u *CategoryServiceImpl) EditCategory(ctx context.Context, req *v1.EditCategoryRequest) (*v1.CategoryResponse, error) {
+func (s *AdminCategoryServiceImpl) AdminEditCategory(ctx context.Context, req *v1.AdminEditCategoryRequest) (*v1.AdminCategoryResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 	category := models.Category{}
 	if db.DB.Where("user_id = ? AND alias = ?", user_id, req.OldAlias).First(&category).RecordNotFound() {
@@ -97,10 +75,10 @@ func (u *CategoryServiceImpl) EditCategory(ctx context.Context, req *v1.EditCate
 			db.DB.Save(&category)
 		}
 	}
-	return &v1.CategoryResponse{Category: models.CategoryToResponse(category)}, nil
+	return &v1.AdminCategoryResponse{Category: models.AdminCategoryToResponse(category)}, nil
 }
 
-func (u *CategoryServiceImpl) UploadCategory(ctx context.Context, req *v1.UploadCategoryRequest) (*v1.CategoryResponse, error) {
+func (s *AdminCategoryServiceImpl) AdminUploadCategory(ctx context.Context, req *v1.AdminUploadCategoryRequest) (*v1.AdminCategoryResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	parentCategory := models.Category{}
@@ -128,10 +106,10 @@ func (u *CategoryServiceImpl) UploadCategory(ctx context.Context, req *v1.Upload
 	if db.DB.Save(&category).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error save category")
 	}
-	return &v1.CategoryResponse{Category: models.CategoryToResponse(category)}, nil
+	return &v1.AdminCategoryResponse{Category: models.AdminCategoryToResponse(category)}, nil
 }
 
-func (u *CategoryServiceImpl) Categories(ctx context.Context, req *empty.Empty) (*v1.CategoriesResponse, error) {
+func (s *AdminCategoryServiceImpl) AdminCategories(ctx context.Context, req *empty.Empty) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	parentCategory := models.Category{}
@@ -146,10 +124,10 @@ func (u *CategoryServiceImpl) Categories(ctx context.Context, req *empty.Empty) 
 
 	categories := []models.Category{}
 	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *CategoryServiceImpl) AddCategory(ctx context.Context, req *v1.AddCategoryRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminCategoryServiceImpl) AdminAddCategory(ctx context.Context, req *v1.AdminAddCategoryRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	parent := models.Category{}
@@ -177,10 +155,10 @@ func (u *CategoryServiceImpl) AddCategory(ctx context.Context, req *v1.AddCatego
 
 	categories := []models.Category{}
 	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *CategoryServiceImpl) AddCategoryBefore(ctx context.Context, req *v1.AddCategoryRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminCategoryServiceImpl) AdminAddCategoryBefore(ctx context.Context, req *v1.AdminAddCategoryRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	before := models.Category{}
@@ -209,10 +187,10 @@ func (u *CategoryServiceImpl) AddCategoryBefore(ctx context.Context, req *v1.Add
 
 	categories := []models.Category{}
 	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *CategoryServiceImpl) AddCategoryAfter(ctx context.Context, req *v1.AddCategoryRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminCategoryServiceImpl) AdminAddCategoryAfter(ctx context.Context, req *v1.AdminAddCategoryRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	after := models.Category{}
@@ -241,10 +219,10 @@ func (u *CategoryServiceImpl) AddCategoryAfter(ctx context.Context, req *v1.AddC
 
 	categories := []models.Category{}
 	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *CategoryServiceImpl) MoveCategory(ctx context.Context, req *v1.MoveCategoryRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminCategoryServiceImpl) AdminMoveCategory(ctx context.Context, req *v1.AdminMoveCategoryRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	parent := models.Category{}
@@ -277,7 +255,7 @@ func (u *CategoryServiceImpl) MoveCategory(ctx context.Context, req *v1.MoveCate
 	}
 	categories := []models.Category{}
 	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
 func deleteCategory(user_id uint32, category models.Category) {
@@ -288,14 +266,20 @@ func deleteCategory(user_id uint32, category models.Category) {
 		deleteCategory(user_id, child)
 	}
 	if db.DB.Unscoped().Delete(category).Error == nil {
-		//properties_categories := []models.PropertiesCategories{}
-		//	db.DB.Where("category_id =", id).Find(&properties_categories)
-		//for _, properties_category := range properties_categories {
-		//db.DB.Unscoped().Delete(&properties_category)
+		items_categories := []models.ItemsCategories{}
+		db.DB.Where("category_id =", category.ID).Find(&items_categories)
+		for _, items_category := range items_categories {
+			db.DB.Unscoped().Delete(&items_category)
+		}
+		properties_categories := []models.PropertiesCategories{}
+		db.DB.Where("category_id =", category.ID).Find(&properties_categories)
+		for _, properties_category := range properties_categories {
+			db.DB.Unscoped().Delete(&properties_category)
+		}
 	}
 }
 
-func (u *CategoryServiceImpl) DeleteCategory(ctx context.Context, req *v1.DeleteCategoryRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminCategoryServiceImpl) AdminDeleteCategory(ctx context.Context, req *v1.AdminDeleteCategoryRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	category := models.Category{}
@@ -306,70 +290,9 @@ func (u *CategoryServiceImpl) DeleteCategory(ctx context.Context, req *v1.Delete
 
 	categories := []models.Category{}
 	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
-
-/*
-func (u *CategoryServiceImpl) CategoriesList(ctx context.Context) (*types.CategoriesList, error) {
-	categories := []models.Category{}
-	var list []CategoryListItem
-	db.DB.Where("parent = 1").Order("sort").Find(&categories)
-	for _, category := range categories {
-		item := CategoryListItem{}
-		item.ID = category.ID
-		item.CategoryID = category.CategoryID
-		item.Title = category.Title
-		item.Alias = category.Alias
-		item.Level = 0
-		item.Image = category.Image
-		item.Options = addCategoryChildrenList(category, item)
-		list = append(list, item)
-	}
-
-	data, err := json.Marshal(list)
-	if err != nil {
-		return nil, errors.New("Categories_list_error")
-	}
-
-	return types.GetCategoriesList(string(data)), nil
-}
-
-func (u *CategoryServiceImpl) PropertyCategories(ctx context.Context, args struct {
-	ID int32
-}) (*[]*types.Category, error) {
-
-	id := args.ID
-
-	property := models.Property{}
-	db.DB.First(&property, id)
-
-	categories := []models.Category{}
-	db.DB.Model(&property).Related(&categories, "Categories")
-	var cat []uint
-	for _, category := range categories {
-		cat = append(cat, category.ID)
-	}
-
-	categories = []models.Category{}
-	db.DB.Order("sort").Find(&categories)
-
-	for i, category := range categories {
-		if utils.HasElement(cat, category.ID) {
-			categories[i].Selected = true
-		} else {
-			categories[i].Selected = false
-		}
-
-		if category.ID == 1 {
-			categories[i].Opened = true
-		} else {
-			categories[i].Opened = false
-		}
-	}
-	return types.GetCategories(categories), nil
-}
-*/
 
 // compile-type check that our new type provides the
 // correct server interface
-var _ v1.CategoryServiceServer = (*CategoryServiceImpl)(nil)
+var _ v1.AdminCategoryServiceServer = (*AdminCategoryServiceImpl)(nil)

@@ -14,7 +14,7 @@ import (
 type VendorServiceImpl struct {
 }
 
-func (u *VendorServiceImpl) Vendor(ctx context.Context, req *v1.VendorRequest) (*v1.VendorResponse, error) {
+func (s *VendorServiceImpl) Vendor(ctx context.Context, req *v1.VendorRequest) (*v1.VendorResponse, error) {
 	vendor := models.Vendor{}
 	if db.DB.First(&vendor, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Vendor not found")
@@ -22,7 +22,7 @@ func (u *VendorServiceImpl) Vendor(ctx context.Context, req *v1.VendorRequest) (
 	return &v1.VendorResponse{Vendor: models.VendorToResponse(vendor)}, nil
 }
 
-func (u *VendorServiceImpl) Vendors(ctx context.Context, req *v1.VendorsRequest) (*v1.VendorsResponse, error) {
+func (s *VendorServiceImpl) Vendors(ctx context.Context, req *v1.VendorsRequest) (*v1.VendorsResponse, error) {
 	vendors := []models.Vendor{}
 	var total uint32
 	order := "sort"

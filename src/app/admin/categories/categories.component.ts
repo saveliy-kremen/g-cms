@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewChild, NgZone } from '@angular/core';
 
-import { CategoryGrpcService } from 'src/app/shared/services/grpc/category.service';
+import { AdminCategoryGrpcService } from 'src/app/shared/services/grpc/admin-category.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { LoaderService } from 'src/app/shared/services/loader.service';
@@ -30,7 +30,7 @@ export class CategoriesComponent implements OnInit {
   modalCategoryDeleteButtons: any = [{ title: "Delete", handler: this.deleteCategory.bind(this) }]
 
   constructor(
-    private categoryService: CategoryGrpcService,
+    private adminCategoryService: AdminCategoryGrpcService,
     private translateService: TranslateService,
     private modalService: ModalService,
     private loaderService: LoaderService,
@@ -45,7 +45,7 @@ export class CategoriesComponent implements OnInit {
     this.loaderService.showLoader()
     if (this.isBrowser) {
       try {
-        let res = await this.categoryService.categories().toPromise()
+        let res = await this.adminCategoryService.categories().toPromise()
         this.categoriesData = res.categoriesList
         await this.categoriesTranslate();
         this.translates = {
@@ -102,7 +102,7 @@ export class CategoriesComponent implements OnInit {
   async addCategory(data) {
     this.loaderService.showLoader()
     try {
-      let res = await this.categoryService.addCategory(data).toPromise()
+      let res = await this.adminCategoryService.addCategory(data).toPromise()
       this.categoriesData = res.categoriesList
       await this.categoriesTranslate();
       $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
@@ -117,7 +117,7 @@ export class CategoriesComponent implements OnInit {
   async addCategoryBefore(data) {
     this.loaderService.showLoader()
     try {
-      let res = await this.categoryService.addCategoryBefore(data).toPromise()
+      let res = await this.adminCategoryService.addCategoryBefore(data).toPromise()
       this.categoriesData = res.categoriesList
       await this.categoriesTranslate();
       $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
@@ -132,7 +132,7 @@ export class CategoriesComponent implements OnInit {
   async addCategoryAfter(data) {
     this.loaderService.showLoader()
     try {
-      let res = await this.categoryService.addCategoryAfter(data).toPromise()
+      let res = await this.adminCategoryService.addCategoryAfter(data).toPromise()
       this.categoriesData = res.categoriesList
       await this.categoriesTranslate();
       $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;
@@ -159,7 +159,7 @@ export class CategoriesComponent implements OnInit {
     this.loaderService.showLoader()
     try {
       if (confirm) {
-        let res = await this.categoryService.deleteCategory(this.categoryID).toPromise()
+        let res = await this.adminCategoryService.deleteCategory(this.categoryID).toPromise()
         this.categoriesData = res.categoriesList
         await this.categoriesTranslate();
         $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;

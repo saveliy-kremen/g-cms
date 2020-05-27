@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/empty.proto";
+//import "google/protobuf/wrappers.proto";
+
+message AdminCategoryState {
+  bool disabled = 1;
+  bool opened = 2;
+  bool selected = 3;
+}
+
+message AdminCategory{
+  string id = 1;
+  uint32 user_id = 2;
+  string text = 3;
+  string alias = 4;
+  string description = 5;
+  string image = 6;
+  string parent = 7;
+  uint32 sort = 8;
+  AdminCategoryState state = 9;
+  string seo_title = 10;
+  string seo_description = 11;
+  string seo_keywords = 12;
+}
+
+message AdminAddCategoryRequest {
+  string id = 1;
+  string parent = 2;
+  string text = 3;
+}
+
+message AdminDeleteCategoryRequest {
+  string id = 1;
+}
+
+message AdminMoveCategoryRequest {
+  string id = 1;
+  string parent = 2;
+  uint32 position = 3;
+}
+
+message AdminCategoryRequest {
+  string alias = 1;
+}
+
+message AdminEditCategoryRequest {
+  string title = 1;
+  string old_alias = 2;
+  string alias = 3;
+  string description = 4;
+  string image = 5;
+}
+
+message AdminUploadCategoryRequest {
+  string title = 1;
+  uint32 parent_id = 2;
+}
+
+message AdminCategoryResponse {
+  AdminCategory category = 1;
+}
+
+message AdminCategoriesResponse {
+  repeated AdminCategory categories = 1;
+}
+
+service AdminCategoryService {
+  rpc AdminCategory(AdminCategoryRequest) returns (AdminCategoryResponse);
+  rpc AdminCategories(google.protobuf.Empty) returns (AdminCategoriesResponse);
+  rpc AdminAddCategory(AdminAddCategoryRequest) returns (AdminCategoriesResponse);
+  rpc AdminAddCategoryBefore(AdminAddCategoryRequest) returns (AdminCategoriesResponse);
+  rpc AdminAddCategoryAfter(AdminAddCategoryRequest) returns (AdminCategoriesResponse);
+  rpc AdminDeleteCategory(AdminDeleteCategoryRequest) returns (AdminCategoriesResponse);
+  rpc AdminMoveCategory(AdminMoveCategoryRequest) returns (AdminCategoriesResponse);
+  rpc AdminEditCategory(AdminEditCategoryRequest) returns (AdminCategoryResponse);
+  rpc AdminUploadCategory(AdminUploadCategoryRequest) returns (AdminCategoryResponse);
+}

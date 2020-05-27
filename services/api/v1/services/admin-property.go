@@ -20,20 +20,20 @@ import (
 	"../../../packages/utils"
 )
 
-type PropertyServiceImpl struct {
+type AdminPropertyServiceImpl struct {
 }
 
-func (u *PropertyServiceImpl) Property(ctx context.Context, req *v1.PropertyRequest) (*v1.PropertyResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminProperty(ctx context.Context, req *v1.AdminPropertyRequest) (*v1.AdminPropertyResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	property := models.Property{}
 	if db.DB.Preload("Values").Where("user_id = ?", user_id).First(&property, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Property not found")
 	}
-	return &v1.PropertyResponse{Property: models.PropertyToResponse(property)}, nil
+	return &v1.AdminPropertyResponse{Property: models.AdminPropertyToResponse(property)}, nil
 }
 
-func (u *PropertyServiceImpl) Properties(ctx context.Context, req *v1.PropertiesRequest) (*v1.PropertiesResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminProperties(ctx context.Context, req *v1.AdminPropertiesRequest) (*v1.AdminPropertiesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	properties := []models.Property{}
@@ -44,10 +44,10 @@ func (u *PropertyServiceImpl) Properties(ctx context.Context, req *v1.Properties
 	}
 	db.DB.Where("user_id = ?", user_id).Order("sort").Find(&properties).Count(&total)
 	db.DB.Where("user_id = ?", user_id).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&properties)
-	return &v1.PropertiesResponse{Properties: models.PropertiesToResponse(properties), Position: (req.Page * req.PageSize) + 1, Total: total}, nil
+	return &v1.AdminPropertiesResponse{Properties: models.AdminPropertiesToResponse(properties), Position: (req.Page * req.PageSize) + 1, Total: total}, nil
 }
 
-func (u *PropertyServiceImpl) EditProperty(ctx context.Context, req *v1.EditPropertyRequest) (*v1.PropertyResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminEditProperty(ctx context.Context, req *v1.AdminEditPropertyRequest) (*v1.AdminPropertyResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	property := models.Property{}
@@ -75,10 +75,10 @@ func (u *PropertyServiceImpl) EditProperty(ctx context.Context, req *v1.EditProp
 	if db.DB.Save(&property).Error != nil {
 		return nil, status.Errorf(codes.Aborted, "Error create property")
 	}
-	return &v1.PropertyResponse{Property: models.PropertyToResponse(property)}, nil
+	return &v1.AdminPropertyResponse{Property: models.AdminPropertyToResponse(property)}, nil
 }
 
-func (u *PropertyServiceImpl) DeleteProperty(ctx context.Context, req *v1.DeletePropertyRequest) (*v1.PropertiesResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminDeleteProperty(ctx context.Context, req *v1.AdminDeletePropertyRequest) (*v1.AdminPropertiesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	if db.DB.Unscoped().Where("user_id=? AND id = ?", user_id, req.Id).Delete(&models.Property{}).Error != nil {
@@ -92,10 +92,10 @@ func (u *PropertyServiceImpl) DeleteProperty(ctx context.Context, req *v1.Delete
 		directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(req.Id))
 		os.RemoveAll(directory)
 	}
-	return u.Properties(ctx, &v1.PropertiesRequest{Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
+	return s.AdminProperties(ctx, &v1.AdminPropertiesRequest{Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
 }
 
-func (u *PropertyServiceImpl) PropertyCategories(ctx context.Context, req *v1.PropertyRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminPropertyCategories(ctx context.Context, req *v1.AdminPropertyRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	property := models.Property{}
@@ -128,10 +128,10 @@ func (u *PropertyServiceImpl) PropertyCategories(ctx context.Context, req *v1.Pr
 		}
 	}
 
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *PropertyServiceImpl) PropertyBindCategory(ctx context.Context, req *v1.PropertyBindRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminPropertyBindCategory(ctx context.Context, req *v1.AdminPropertyBindRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	property := models.Property{}
@@ -176,10 +176,10 @@ func (u *PropertyServiceImpl) PropertyBindCategory(ctx context.Context, req *v1.
 			categories[i].Opened = false
 		}
 	}
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *PropertyServiceImpl) PropertyUnbindCategory(ctx context.Context, req *v1.PropertyBindRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminPropertyUnbindCategory(ctx context.Context, req *v1.AdminPropertyBindRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	property := models.Property{}
@@ -219,10 +219,10 @@ func (u *PropertyServiceImpl) PropertyUnbindCategory(ctx context.Context, req *v
 			categories[i].Opened = false
 		}
 	}
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *PropertyServiceImpl) EditPropertyValue(ctx context.Context, req *v1.EditPropertyValueRequest) (*v1.PropertyResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminEditPropertyValue(ctx context.Context, req *v1.AdminEditPropertyValueRequest) (*v1.AdminPropertyResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	propertyValue := models.PropertyValue{}
@@ -248,10 +248,10 @@ func (u *PropertyServiceImpl) EditPropertyValue(ctx context.Context, req *v1.Edi
 			db.DB.Save(&propertyValue)
 		}
 	}
-	return u.Property(ctx, &v1.PropertyRequest{Id: req.PropertyId})
+	return s.AdminProperty(ctx, &v1.AdminPropertyRequest{Id: req.PropertyId})
 }
 
-func (u *PropertyServiceImpl) DeletePropertyValue(ctx context.Context, req *v1.PropertyValueRequest) (*v1.PropertyResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminDeletePropertyValue(ctx context.Context, req *v1.AdminPropertyValueRequest) (*v1.AdminPropertyResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 	propertyValue := models.PropertyValue{}
 	if db.DB.Where("user_id = ?", user_id).First(&propertyValue, req.Id).RecordNotFound() {
@@ -266,10 +266,10 @@ func (u *PropertyServiceImpl) DeletePropertyValue(ctx context.Context, req *v1.P
 		directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(propertyValue.PropertyID)) + "/thumb-" + strconv.Itoa(int(propertyValue.ID)) + ".jpeg"
 		os.RemoveAll(directory)
 	}
-	return u.Property(ctx, &v1.PropertyRequest{Id: uint32(propertyValue.PropertyID)})
+	return s.AdminProperty(ctx, &v1.AdminPropertyRequest{Id: uint32(propertyValue.PropertyID)})
 }
 
-func (u *PropertyServiceImpl) UploadProperty(ctx context.Context, req *v1.UploadPropertyRequest) (*v1.PropertyResponse, error) {
+func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req *v1.AdminUploadPropertyRequest) (*v1.AdminPropertyResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	code := utils.Translit(strings.ToLower(req.Title))
@@ -331,9 +331,9 @@ func (u *PropertyServiceImpl) UploadProperty(ctx context.Context, req *v1.Upload
 		}
 	}
 
-	return u.Property(ctx, &v1.PropertyRequest{Id: uint32(propertyValue.PropertyID)})
+	return s.AdminProperty(ctx, &v1.AdminPropertyRequest{Id: uint32(propertyValue.PropertyID)})
 }
 
 // compile-type check that our new type provides the
 // correct server interface
-var _ v1.PropertyServiceServer = (*PropertyServiceImpl)(nil)
+var _ v1.AdminPropertyServiceServer = (*AdminPropertyServiceImpl)(nil)

@@ -4,7 +4,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { Message } from 'src/app/shared/models/message.model';
 import { environment } from 'src/environments/environment';
-import { CategoryGrpcService } from 'src/app/shared/services/grpc/category.service';
+import { AdminCategoryGrpcService } from 'src/app/shared/services/grpc/admin-category.service';
 import { LoaderService } from 'src/app/shared/services/loader.service';
 
 @Component({
@@ -24,7 +24,7 @@ export class CategoryEditComponent implements OnInit {
   constructor(
     private router: Router,
     private loaderService: LoaderService,
-    private categoryService: CategoryGrpcService,
+    private adminCategoryService: AdminCategoryGrpcService,
     private activeRoute: ActivatedRoute
   ) { }
 
@@ -36,7 +36,7 @@ export class CategoryEditComponent implements OnInit {
     })
     this.loaderService.showLoader()
     try {
-      let res = await this.categoryService.category(this.activeRoute.snapshot.params["alias"]).toPromise()
+      let res = await this.adminCategoryService.category(this.activeRoute.snapshot.params["alias"]).toPromise()
       this.category = res.category;
       this.categoryForm.patchValue({ ...this.category, title: this.category.text });
       this.image = this.category.image !== "" ? this.uploadUrl + this.category.id + "/" + this.category.image : "";
@@ -54,7 +54,7 @@ export class CategoryEditComponent implements OnInit {
       try {
         this.categoryForm.value.oldAlias = this.activeRoute.snapshot.params["alias"]
         this.categoryForm.value.image = this.image
-        await this.categoryService.editCategory(this.categoryForm.value).toPromise()
+        await this.adminCategoryService.editCategory(this.categoryForm.value).toPromise()
         this.categoryFormSubmitted = false;
         this.image = null;
         this.categoryMessage = new Message("success", "");

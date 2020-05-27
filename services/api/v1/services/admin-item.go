@@ -24,10 +24,10 @@ import (
 	"../../../packages/utils"
 )
 
-type ItemServiceImpl struct {
+type AdminItemServiceImpl struct {
 }
 
-func (u *ItemServiceImpl) Item(ctx context.Context, req *v1.ItemRequest) (*v1.ItemResponse, error) {
+func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminItemResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
@@ -39,10 +39,10 @@ func (u *ItemServiceImpl) Item(ctx context.Context, req *v1.ItemRequest) (*v1.It
 	item.Properties = itemProperties(user_id, &item)
 	item.Offers = itemOffers(user_id, &item, nil, nil, nil, nil)
 
-	return &v1.ItemResponse{Item: models.ItemToResponse(item)}, nil
+	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
 }
 
-func (u *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.ItemsResponse, error) {
+func (s *AdminItemServiceImpl) AdminItems(ctx context.Context, req *v1.AdminItemsRequest) (*v1.AdminItemsResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	items := []models.Item{}
@@ -60,10 +60,10 @@ func (u *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.
 			return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
 		}).Where("user_id = ? AND parent_id = ?", user_id, item.ID).Order(order).Find(&items[i].Offers)
 	}
-	return &v1.ItemsResponse{Items: models.ItemsToResponse(items), Total: total}, nil
+	return &v1.AdminItemsResponse{Items: models.AdminItemsToResponse(items), Total: total}, nil
 }
 
-func (u *ItemServiceImpl) CreateDraftItem(ctx context.Context, req *v1.DraftRequest) (*v1.ItemResponse, error) {
+func (s *AdminItemServiceImpl) AdminCreateDraftItem(ctx context.Context, req *v1.AdminDraftRequest) (*v1.AdminItemResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	draft := models.Item{}
@@ -91,10 +91,10 @@ func (u *ItemServiceImpl) CreateDraftItem(ctx context.Context, req *v1.DraftRequ
 		draft.Article = parent.Article
 	}
 	db.DB.Save(&draft)
-	return &v1.ItemResponse{Item: models.ItemToResponse(draft)}, nil
+	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(draft)}, nil
 }
 
-func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest) (*v1.ItemResponse, error) {
+func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminEditItemRequest) (*v1.AdminItemResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
@@ -198,38 +198,38 @@ func (u *ItemServiceImpl) EditItem(ctx context.Context, req *v1.EditItemRequest)
 		}
 		db.DB.Unscoped().Delete(&deleteImage)
 	}
-	return &v1.ItemResponse{Item: models.ItemToResponse(item)}, nil
+	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
 }
 
-func (u *ItemServiceImpl) DeleteItem(ctx context.Context, req *v1.DeleteItemRequest) (*v1.ItemsResponse, error) {
+func (s *AdminItemServiceImpl) AdminDeleteItem(ctx context.Context, req *v1.AdminDeleteItemRequest) (*v1.AdminItemsResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	err := deleteItem(user_id, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Aborted, "Error delete item")
 	}
-	return u.Items(ctx, &v1.ItemsRequest{Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
+	return s.AdminItems(ctx, &v1.AdminItemsRequest{Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
 }
 
-func (u *ItemServiceImpl) DeleteOffer(ctx context.Context, req *v1.DeleteOfferRequest) (*v1.OffersResponse, error) {
+func (s *AdminItemServiceImpl) AdminDeleteOffer(ctx context.Context, req *v1.AdminDeleteOfferRequest) (*v1.AdminOffersResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	err := deleteItem(user_id, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Aborted, "Error delete offer")
 	}
-	return u.ItemOffers(ctx, &v1.OffersRequest{ItemId: req.ParentId, Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
+	return s.AdminItemOffers(ctx, &v1.AdminOffersRequest{ItemId: req.ParentId, Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
 }
 
-func (u *ItemServiceImpl) GetUploadImages(ctx context.Context, req *empty.Empty) (*v1.ItemImagesResponse, error) {
+func (s *AdminItemServiceImpl) AdminGetUploadImages(ctx context.Context, req *empty.Empty) (*v1.AdminItemImagesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	images := []models.ItemImage{}
 	db.DB.Where("user_id = ? AND item_id = ?", user_id, 0).Order("sort").Find(&images)
-	return &v1.ItemImagesResponse{Images: models.ItemImagesToResponse(images)}, nil
+	return &v1.AdminItemImagesResponse{Images: models.AdminItemImagesToResponse(images)}, nil
 }
 
-func (u *ItemServiceImpl) ItemCategories(ctx context.Context, req *v1.ItemRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
@@ -261,10 +261,10 @@ func (u *ItemServiceImpl) ItemCategories(ctx context.Context, req *v1.ItemReques
 			categories[i].Opened = false
 		}
 	}
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *ItemServiceImpl) ItemBindCategory(ctx context.Context, req *v1.ItemBindRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminItemServiceImpl) AdminItemBindCategory(ctx context.Context, req *v1.AdminItemBindRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
@@ -309,10 +309,10 @@ func (u *ItemServiceImpl) ItemBindCategory(ctx context.Context, req *v1.ItemBind
 			categories[i].Opened = false
 		}
 	}
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *ItemServiceImpl) ItemUnbindCategory(ctx context.Context, req *v1.ItemBindRequest) (*v1.CategoriesResponse, error) {
+func (s *AdminItemServiceImpl) AdminItemUnbindCategory(ctx context.Context, req *v1.AdminItemBindRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
@@ -352,10 +352,10 @@ func (u *ItemServiceImpl) ItemUnbindCategory(ctx context.Context, req *v1.ItemBi
 			categories[i].Opened = false
 		}
 	}
-	return &v1.CategoriesResponse{Categories: models.CategoriesToResponse(categories)}, nil
+	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
-func (u *ItemServiceImpl) ItemProperties(ctx context.Context, req *v1.ItemRequest) (*v1.PropertiesResponse, error) {
+func (s *AdminItemServiceImpl) AdminItemProperties(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminPropertiesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
@@ -365,10 +365,10 @@ func (u *ItemServiceImpl) ItemProperties(ctx context.Context, req *v1.ItemReques
 		}
 	}
 	properties := itemProperties(user_id, &item)
-	return &v1.PropertiesResponse{Properties: models.PropertiesToResponse(properties)}, nil
+	return &v1.AdminPropertiesResponse{Properties: models.AdminPropertiesToResponse(properties)}, nil
 }
 
-func (u *ItemServiceImpl) ItemOffers(ctx context.Context, req *v1.OffersRequest) (*v1.OffersResponse, error) {
+func (s *AdminItemServiceImpl) AdminItemOffers(ctx context.Context, req *v1.AdminOffersRequest) (*v1.AdminOffersResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
@@ -382,10 +382,10 @@ func (u *ItemServiceImpl) ItemOffers(ctx context.Context, req *v1.OffersRequest)
 	var total uint32
 	db.DB.Where("user_id = ? AND parent_id = ? AND draft <> ? ", user_id, item.ID, false).Find(&offers).Count(&total)
 	offers = itemOffers(user_id, &item, &req.Page, &req.PageSize, &req.Sort, &req.Direction)
-	return &v1.OffersResponse{Offers: models.ItemsToResponse(offers), Total: total}, nil
+	return &v1.AdminOffersResponse{Offers: models.AdminItemsToResponse(offers), Total: total}, nil
 }
 
-func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRequest) (*v1.ItemResponse, error) {
+func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.AdminUploadOfferRequest) (*v1.AdminItemResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	vendor := models.Vendor{}
@@ -478,9 +478,9 @@ func (u *ItemServiceImpl) UploadOffer(ctx context.Context, req *v1.UploadOfferRe
 			}
 		}
 	}
-	return &v1.ItemResponse{Item: models.ItemToResponse(item)}, nil
+	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
 }
 
 // compile-type check that our new type provides the
 // correct server interface
-var _ v1.ItemServiceServer = (*ItemServiceImpl)(nil)
+var _ v1.AdminItemServiceServer = (*AdminItemServiceImpl)(nil)

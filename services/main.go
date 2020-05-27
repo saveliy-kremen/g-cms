@@ -28,9 +28,9 @@ func main() {
 
 	// register our service implementation
 	v1.RegisterUserServiceServer(svr, &services.UserServiceImpl{})
-	v1.RegisterCategoryServiceServer(svr, &services.CategoryServiceImpl{})
-	v1.RegisterPropertyServiceServer(svr, &services.PropertyServiceImpl{})
-	v1.RegisterItemServiceServer(svr, &services.ItemServiceImpl{})
+	v1.RegisterAdminCategoryServiceServer(svr, &services.AdminCategoryServiceImpl{})
+	v1.RegisterAdminPropertyServiceServer(svr, &services.AdminPropertyServiceImpl{})
+	v1.RegisterAdminItemServiceServer(svr, &services.AdminItemServiceImpl{})
 	v1.RegisterVendorServiceServer(svr, &services.VendorServiceImpl{})
 	v1.RegisterCurrencyServiceServer(svr, &services.CurrencyServiceImpl{})
 	v1.RegisterEsp8266ServiceServer(svr, &services.Esp8266ServiceImpl{})

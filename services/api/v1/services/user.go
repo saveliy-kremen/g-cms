@@ -32,7 +32,7 @@ type UserServiceImpl struct {
 }
 
 // Get User profile or create if not found.
-func (u *UserServiceImpl) Auth(ctx context.Context, req *v1.AuthRequest) (*v1.UserResponse, error) {
+func (s *UserServiceImpl) Auth(ctx context.Context, req *v1.AuthRequest) (*v1.UserResponse, error) {
 	user := models.User{}
 	if db.DB.Where("email = ?", req.Login).First(&user).RecordNotFound() {
 		return nil, status.Errorf(codes.PermissionDenied, "User not exist")
@@ -49,7 +49,7 @@ func (u *UserServiceImpl) Auth(ctx context.Context, req *v1.AuthRequest) (*v1.Us
 }
 
 // Get User profile or create if not found.
-func (u *UserServiceImpl) Me(ctx context.Context, req *empty.Empty) (*v1.UserResponse, error) {
+func (s *UserServiceImpl) Me(ctx context.Context, req *empty.Empty) (*v1.UserResponse, error) {
 	user := auth.GetUser(ctx)
 	token := auth.CreateToken(user.ID)
 	resp := &v1.UserResponse{User: models.UserToResponse(user),
@@ -59,7 +59,7 @@ func (u *UserServiceImpl) Me(ctx context.Context, req *empty.Empty) (*v1.UserRes
 }
 
 // Get User profile or create if not found.
-func (u *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest) (*v1.UserResponse, error) {
+func (s *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest) (*v1.UserResponse, error) {
 	user := models.User{}
 
 	if !db.DB.Where("email = ?", req.Email).First(&user).RecordNotFound() {

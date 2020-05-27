@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { PropertyGrpcService } from 'src/app/shared/services/grpc/property.service';
+import { AdminPropertyGrpcService } from 'src/app/shared/services/grpc/admin-property.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { LoaderService } from 'src/app/shared/services/loader.service';
@@ -31,7 +31,7 @@ export class PropertiesComponent implements OnInit {
   total: number
 
   constructor(
-    private propertyService: PropertyGrpcService,
+    private adminPropertyService: AdminPropertyGrpcService,
     private loaderService: LoaderService,
     private modalService: ModalService,
     private translateService: TranslateService,
@@ -42,7 +42,7 @@ export class PropertiesComponent implements OnInit {
     this.loaderService.showLoader()
     this.propertyPage = 0
     this.propertyPageSize = environment.pageSizeOptions[0]
-    let res = await this.propertyService.properties(this.propertyPage, this.propertyPageSize, this.propertySort, this.propertyDirection).toPromise()
+    let res = await this.adminPropertyService.properties(this.propertyPage, this.propertyPageSize, this.propertySort, this.propertyDirection).toPromise()
     this.updatePropertiesData(res)
     this.loaderService.hideLoader()
   }
@@ -52,7 +52,7 @@ export class PropertiesComponent implements OnInit {
     this.propertyPageSize = event.pageSize
     this.propertySort = event.sort
     this.propertyDirection = event.direction
-    let res = await this.propertyService.properties(this.propertyPage, this.propertyPageSize, this.propertySort, this.propertyDirection).toPromise()
+    let res = await this.adminPropertyService.properties(this.propertyPage, this.propertyPageSize, this.propertySort, this.propertyDirection).toPromise()
     this.updatePropertiesData(res)
   }
 
@@ -89,7 +89,7 @@ export class PropertiesComponent implements OnInit {
     this.loaderService.showLoader()
     try {
       if (confirm) {
-        const res = await this.propertyService.deleteProperty(this.propertyID, this.propertyPage, this.propertyPageSize, this.propertySort, this.propertyDirection).toPromise()
+        const res = await this.adminPropertyService.deleteProperty(this.propertyID, this.propertyPage, this.propertyPageSize, this.propertySort, this.propertyDirection).toPromise()
         this.updatePropertiesData(res)
       }
     } catch (err) {

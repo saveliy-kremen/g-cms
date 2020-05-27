@@ -4,7 +4,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms'
 
 import { Message } from 'src/app/shared/models/message.model'
 import { environment } from 'src/environments/environment'
-import { PropertyGrpcService } from 'src/app/shared/services/grpc/property.service'
+import { AdminPropertyGrpcService } from 'src/app/shared/services/grpc/admin-property.service'
 import { LoaderService } from 'src/app/shared/services/loader.service'
 
 import { PropertyValueComponent } from '../property-value/property-value.component';
@@ -49,7 +49,7 @@ export class PropertyEditComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private propertyService: PropertyGrpcService,
+    private adminPropertyService: AdminPropertyGrpcService,
     private loaderService: LoaderService,
     private modalService: ModalService,
     public dialog: MatDialog,
@@ -72,7 +72,7 @@ export class PropertyEditComponent implements OnInit {
     this.loaderService.showLoader()
     this.editing = this.activeRoute.snapshot.params["mode"] == "edit"
     if (this.editing) {
-      let res: any = await this.propertyService.property(Number(this.activeRoute.snapshot.params["id"])).toPromise()
+      let res: any = await this.adminPropertyService.property(Number(this.activeRoute.snapshot.params["id"])).toPromise()
       this.property = res.property
       if (this.property.type == environment.propertyTypes.findIndex(item => item === "Изображение")) {
         this.displayedColumns = ['position', 'value', 'imageElement', 'sort', 'actions']
@@ -87,7 +87,7 @@ export class PropertyEditComponent implements OnInit {
       this.updatePropertyValues()
       this.propertyForm.patchValue(this.property)
       this.propertyMessage = new Message("success", "")
-      res = await this.propertyService.propertyCategories(Number(this.activeRoute.snapshot.params["id"])).toPromise()
+      res = await this.adminPropertyService.propertyCategories(Number(this.activeRoute.snapshot.params["id"])).toPromise()
       this.categoriesData = res.categoriesList
     }
     this.loaderService.hideLoader()
@@ -129,7 +129,7 @@ export class PropertyEditComponent implements OnInit {
   async bindProperty(evt, data) {
     this.loaderService.showLoader()
     try {
-      await this.propertyService.propertyBindCategory(
+      await this.adminPropertyService.propertyBindCategory(
         Number(this.activeRoute.snapshot.params["id"]),
         data.node.id
       );
@@ -142,7 +142,7 @@ export class PropertyEditComponent implements OnInit {
   async unbindProperty(evt, data) {
     this.loaderService.showLoader()
     try {
-      await this.propertyService.propertyUnbindCategory(
+      await this.adminPropertyService.propertyUnbindCategory(
         Number(this.activeRoute.snapshot.params["id"]),
         data.node.id
       );
@@ -158,7 +158,7 @@ export class PropertyEditComponent implements OnInit {
     if (this.propertyForm.valid) {
       try {
         this.propertyForm.value.id = this.editing ? Number(this.activeRoute.snapshot.params["id"]) : null
-        await this.propertyService.editProperty(this.propertyForm.value).toPromise()
+        await this.adminPropertyService.editProperty(this.propertyForm.value).toPromise()
         this.propertyFormSubmitted = false;
         this.propertyMessage = new Message("success", "");
         this.propertyForm.reset();
@@ -233,7 +233,7 @@ export class PropertyEditComponent implements OnInit {
     this.loaderService.showLoader()
     try {
       if (confirm) {
-        const res = await this.propertyService.deletePropertyValue(this.propertyValueID).toPromise()
+        const res = await this.adminPropertyService.deletePropertyValue(this.propertyValueID).toPromise()
         this.property = res.property
         this.updatePropertyValues()
       }

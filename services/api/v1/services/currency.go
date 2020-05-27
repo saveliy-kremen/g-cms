@@ -14,7 +14,7 @@ import (
 type CurrencyServiceImpl struct {
 }
 
-func (u *CurrencyServiceImpl) Currency(ctx context.Context, req *v1.CurrencyRequest) (*v1.CurrencyResponse, error) {
+func (s *CurrencyServiceImpl) Currency(ctx context.Context, req *v1.CurrencyRequest) (*v1.CurrencyResponse, error) {
 	Currency := models.Currency{}
 	if db.DB.First(&Currency, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Currency not found")
@@ -22,7 +22,7 @@ func (u *CurrencyServiceImpl) Currency(ctx context.Context, req *v1.CurrencyRequ
 	return &v1.CurrencyResponse{Currency: models.CurrencyToResponse(Currency)}, nil
 }
 
-func (u *CurrencyServiceImpl) Currencies(ctx context.Context, req *v1.CurrenciesRequest) (*v1.CurrenciesResponse, error) {
+func (s *CurrencyServiceImpl) Currencies(ctx context.Context, req *v1.CurrenciesRequest) (*v1.CurrenciesResponse, error) {
 	currencies := []models.Currency{}
 	var total uint32
 	order := "sort"

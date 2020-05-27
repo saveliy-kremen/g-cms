@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Message } from 'src/app/shared/models/message.model';
 import { LoaderService } from 'src/app/shared/services/loader.service';
 import { environment } from 'src/environments/environment';
-import { ItemGrpcService } from 'src/app/shared/services/grpc/item.service';
+import { AdminItemGrpcService } from 'src/app/shared/services/grpc/admin-item.service';
 import { UploadService } from 'src/app/shared/services/upload.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { ModalService } from 'src/app/shared/modal/modal.service';
@@ -86,7 +86,7 @@ export class ItemEditComponent implements OnInit {
   constructor(
     private router: Router,
     private loaderService: LoaderService,
-    private itemService: ItemGrpcService,
+    private adminItemService: AdminItemGrpcService,
     private vendorService: VendorGrpcService,
     private currencyService: CurrencyGrpcService,
     private activeRoute: ActivatedRoute,
@@ -128,11 +128,11 @@ export class ItemEditComponent implements OnInit {
       if (this.mode == "edit") {
         let res: any = await this.authService.getUser()
         this.uploadUrl = `${environment.siteUrl}/uploads/users/${res.id}/items/`
-        res = await this.itemService.item(Number(this.itemID)).toPromise()
+        res = await this.adminItemService.item(Number(this.itemID)).toPromise()
         this.item = res.item
         this.updateOffersData(res.item)
       } else {
-        const res: any = await this.itemService.createDraftItem(this.parentID).toPromise()
+        const res: any = await this.adminItemService.createDraftItem(this.parentID).toPromise()
         this.item = res.item
         this.mode = "draft"
       }
@@ -144,9 +144,9 @@ export class ItemEditComponent implements OnInit {
         this.itemForm.controls['alias'].disable()
       }
       this.itemImages = this.item.imagesList
-      let res: any = await this.itemService.getUploadImages().toPromise()
+      let res: any = await this.adminItemService.getUploadImages().toPromise()
       this.uploadImages = res.imagesList
-      res = await this.itemService.itemCategories(this.item.id).toPromise()
+      res = await this.adminItemService.itemCategories(this.item.id).toPromise()
       this.categoriesData = res.categoriesList
       await this.categoriesTranslate();
       await this.updateProperties();
@@ -178,7 +178,7 @@ export class ItemEditComponent implements OnInit {
 
   async updateProperties() {
     try {
-      const res: any = await this.itemService.itemProperties(this.item.id).toPromise()
+      const res: any = await this.adminItemService.itemProperties(this.item.id).toPromise()
       let formArray = <FormArray>this.itemForm.get("properties")
       while (formArray.length !== 0) {
         formArray.removeAt(0)
@@ -228,7 +228,7 @@ export class ItemEditComponent implements OnInit {
   async bindProperty(evt, data) {
     this.loaderService.showLoader()
     try {
-      await this.itemService.itemBindCategory(
+      await this.adminItemService.itemBindCategory(
         this.item.id,
         data.node.id
       );
@@ -241,7 +241,7 @@ export class ItemEditComponent implements OnInit {
   async unbindProperty(evt, data) {
     this.loaderService.showLoader()
     try {
-      await this.itemService.itemUnbindCategory(
+      await this.adminItemService.itemUnbindCategory(
         this.item.id,
         data.node.id
       );
@@ -256,7 +256,7 @@ export class ItemEditComponent implements OnInit {
     this.offersPageSize = event.pageSize
     this.offersSort = event.sort
     this.offersDirection = event.direction
-    let res = await this.itemService.itemOffers(this.itemID, this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
+    let res = await this.adminItemService.itemOffers(this.itemID, this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
     this.updateOffersData(res)
   }
 
@@ -293,7 +293,7 @@ export class ItemEditComponent implements OnInit {
     this.loaderService.showLoader()
     try {
       if (confirm) {
-        const res = await this.itemService.deleteOffer(this.offerID, this.itemID, this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
+        const res = await this.adminItemService.deleteOffer(this.offerID, this.itemID, this.offersPage, this.offersPageSize, this.offersSort, this.offersDirection).toPromise()
         this.updateOffersData(res)
       }
     } catch (err) {
@@ -321,7 +321,7 @@ export class ItemEditComponent implements OnInit {
         this.itemForm.value.itemImages = this.itemImages.map(item => item.id)
         this.itemForm.value.uploadImages = this.uploadImages.map(item => item.id)
         this.itemForm.value.parentID = this.parentID
-        await this.itemService.editItem(this.itemForm.value)
+        await this.adminItemService.editItem(this.itemForm.value)
         this.itemFormSubmitted = false;
         this.matcher.changeFormState(false)
         this.itemMessage = new Message("success", "");
@@ -349,7 +349,7 @@ export class ItemEditComponent implements OnInit {
           console.log(res.body);
         }
       }
-      const res: any = await this.itemService.getUploadImages().toPromise()
+      const res: any = await this.adminItemService.getUploadImages().toPromise()
       this.uploadImages = res.imagesList
       this.loaderService.hideLoader()
     }

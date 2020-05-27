@@ -32,18 +32,14 @@ export class RegisterPageComponent implements OnInit {
   }
 
   submitRegisterForm() {
-    this.registerFormSubmitted = true
-    this.registerMessage = null;
     if (this.registerForm.valid) {
       try {
-        this.registerFormSubmitted = false
+        this.registerFormSubmitted = true
+        this.registerMessage = null;
         this.authService.register(this.registerForm.value).subscribe(() => {
           this.registerForm.reset()
-          this.registerMessage = null
           this.router.navigate(['/admin'])
-          this.registerFormSubmitted = false
         }, (err) => {
-          this.registerFormSubmitted = false
           this.registerMessage = new Message("danger", err.message)
         })
       } catch (err) {

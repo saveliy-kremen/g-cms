@@ -28,16 +28,13 @@ export class LoginPageComponent implements OnInit {
   }
 
   submitLoginForm() {
-    this.loginFormSubmitted = true
-    this.loginMessage = null;
     if (this.loginForm.valid) {
-      this.loginFormSubmitted = false
-
+      this.loginFormSubmitted = true
+      this.loginMessage = null;
       this.authService.login(this.loginForm.value).subscribe(() => {
         this.loginForm.reset()
-        this.loginMessage = null
-        this.router.navigate(['/admin'])
         this.loginFormSubmitted = false
+        this.router.navigate(['/admin'])
       }, (err) => {
         console.log(err)
         this.loginFormSubmitted = false

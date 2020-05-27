@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { grpcUnary } from './helpers/grpc-unary';
+import { GrpcHelper } from './helpers/grpc-helper';
 
 import * as GRPC from 'src/app/shared/api/v1/admin-item_pb';
 import * as CategoryGRPC from 'src/app/shared/api/v1/admin-category_pb';
@@ -13,16 +13,15 @@ import { AdminItemServiceClient } from 'src/app/shared/api/v1/Admin-itemServiceC
 import { environment } from 'src/environments/environment';
 import { SessionService } from 'src/app/shared/services/session.service';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class AdminItemGrpcService {
-    client: AdminItemServiceClient;
+    client: AdminItemServiceClient
 
     constructor(
-        private session: SessionService
+        private session: SessionService,
+        private grpcHelper: GrpcHelper
     ) {
-        this.client = new AdminItemServiceClient(environment.grpcUrl);
+        this.client = new AdminItemServiceClient(environment.grpcUrl)
     }
 
     public items(page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.AdminItemsResponse.AsObject> {
@@ -43,7 +42,7 @@ export class AdminItemGrpcService {
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.AdminItemsResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminItemsResponse.AsObject>(promise);
     }
 
     public item(id: number): Observable<GRPC.AdminItemResponse.AsObject> {
@@ -61,7 +60,7 @@ export class AdminItemGrpcService {
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
     }
 
     public createDraftItem(parentID: number): Observable<GRPC.AdminItemResponse.AsObject> {
@@ -79,7 +78,7 @@ export class AdminItemGrpcService {
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
     }
 
     public editItem(data): Observable<GRPC.AdminItemResponse.AsObject> {
@@ -127,7 +126,7 @@ export class AdminItemGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
     }
 
     public deleteItem(id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.AdminItemsResponse.AsObject> {
@@ -149,7 +148,7 @@ export class AdminItemGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminItemsResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminItemsResponse.AsObject>(promise);
     }
 
     public getUploadImages(): Observable<GRPC.AdminItemImagesResponse.AsObject> {
@@ -166,7 +165,7 @@ export class AdminItemGrpcService {
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.AdminItemImagesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminItemImagesResponse.AsObject>(promise);
     }
 
     public itemCategories(id: number): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {
@@ -184,7 +183,7 @@ export class AdminItemGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public itemBindCategory(id: number, categoryID: string): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {
@@ -203,7 +202,7 @@ export class AdminItemGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public itemUnbindCategory(id: number, categoryID: string): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {
@@ -222,7 +221,7 @@ export class AdminItemGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public itemProperties(id: number): Observable<PropertyGRPC.AdminPropertiesResponse.AsObject> {
@@ -240,7 +239,7 @@ export class AdminItemGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<PropertyGRPC.AdminPropertiesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<PropertyGRPC.AdminPropertiesResponse.AsObject>(promise);
     }
 
     public itemOffers(item_id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.AdminOffersResponse.AsObject> {
@@ -262,7 +261,7 @@ export class AdminItemGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminOffersResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminOffersResponse.AsObject>(promise);
     }
 
     public deleteOffer(id: number, parent_id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.AdminOffersResponse.AsObject> {
@@ -285,7 +284,7 @@ export class AdminItemGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminOffersResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminOffersResponse.AsObject>(promise);
     }
 
     public uploadOffer(data): Observable<GRPC.AdminItemResponse.AsObject> {
@@ -312,6 +311,6 @@ export class AdminItemGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
     }
 }

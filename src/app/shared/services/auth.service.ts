@@ -16,8 +16,7 @@ export class AuthService {
   constructor(
     private session: SessionService,
     private userService: UserGrpcService,
-  ) {
-  }
+  ) { }
 
   login(data) {
     return Observable.create((observer: Observer<User.AsObject>) => {

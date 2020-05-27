@@ -29,7 +29,8 @@
       </div>
       <div>
         <div class="login-fields">
-          <button type="submit" mat-raised-button color="primary" class="w-100">Login</button>
+          <button type="submit" mat-raised-button color="primary" class="w-100"
+            [disabled]="loginForm.invalid || loginFormSubmitted">Login</button>
           <button type="button" mat-button color="primary" class="w-100" routerLink="/register">Sign Up</button>
         </div>
       </div>

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { grpcUnary } from './helpers/grpc-unary';
+import { GrpcHelper } from './helpers/grpc-helper';
 
 import * as GRPC from 'src/app/shared/api/v1/admin-property_pb';
 import * as CategoryGRPC from 'src/app/shared/api/v1/admin-category_pb';
@@ -11,14 +11,13 @@ import { AdminPropertyServiceClient } from 'src/app/shared/api/v1/Admin-property
 import { environment } from 'src/environments/environment';
 import { SessionService } from 'src/app/shared/services/session.service';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class AdminPropertyGrpcService {
-    client: AdminPropertyServiceClient;
+    client: AdminPropertyServiceClient
 
     constructor(
-        private session: SessionService
+        private session: SessionService,
+        private grpcHelper: GrpcHelper
     ) {
         this.client = new AdminPropertyServiceClient(environment.grpcUrl);
     }
@@ -41,7 +40,7 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminPropertiesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminPropertiesResponse.AsObject>(promise);
     }
 
     public property(id: number): Observable<GRPC.AdminPropertyResponse.AsObject> {
@@ -59,7 +58,7 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
     }
 
     public editProperty(data): Observable<GRPC.AdminPropertyResponse.AsObject> {
@@ -84,7 +83,7 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
     }
 
     public deleteProperty(id: number, page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.AdminPropertiesResponse.AsObject> {
@@ -106,7 +105,7 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminPropertiesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminPropertiesResponse.AsObject>(promise);
     }
 
     public propertyCategories(id: number): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {
@@ -124,7 +123,7 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public propertyBindCategory(id: number, categoryID: string): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {
@@ -143,7 +142,7 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public propertyUnbindCategory(id: number, categoryID: string): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {
@@ -162,7 +161,7 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<CategoryGRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public editPropertyValue(data, propertyValue): Observable<GRPC.AdminPropertyResponse.AsObject> {
@@ -184,7 +183,7 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
     }
 
     public deletePropertyValue(id: number): Observable<GRPC.AdminPropertyResponse.AsObject> {
@@ -202,7 +201,7 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
     }
 
     public uploadProperty(data): Observable<GRPC.AdminPropertyResponse.AsObject> {
@@ -222,6 +221,6 @@ export class AdminPropertyGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminPropertyResponse.AsObject>(promise);
     }
 }

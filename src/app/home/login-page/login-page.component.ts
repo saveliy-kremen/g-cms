@@ -12,7 +12,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 })
 export class LoginPageComponent implements OnInit {
   loginForm: FormGroup
-  loginFormSubmitted: boolean = false;
+  loginFormSubmitted = false;
   loginMessage: Message;
 
   constructor(
@@ -35,7 +35,7 @@ export class LoginPageComponent implements OnInit {
 
       this.authService.login(this.loginForm.value).subscribe(() => {
         this.loginForm.reset()
-        this.loginMessage = new Message("success", "")
+        this.loginMessage = null
         this.router.navigate(['/admin'])
         this.loginFormSubmitted = false
       }, (err) => {

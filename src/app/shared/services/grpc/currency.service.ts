@@ -3,23 +3,22 @@ import { Observable, from } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { grpcUnary } from './helpers/grpc-unary';
+import { GrpcHelper } from './helpers/grpc-helper';
 
 import * as GRPC from 'src/app/shared/api/v1/currency_pb';
 import { CurrencyServiceClient } from 'src/app/shared/api/v1/CurrencyServiceClientPb';
 import { environment } from 'src/environments/environment';
 import { SessionService } from 'src/app/shared/services/session.service';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class CurrencyGrpcService {
-    client: CurrencyServiceClient;
+    client: CurrencyServiceClient
 
     constructor(
-        private session: SessionService
+        private session: SessionService,
+        private grpcHelper: GrpcHelper
     ) {
-        this.client = new CurrencyServiceClient(environment.grpcUrl);
+        this.client = new CurrencyServiceClient(environment.grpcUrl)
     }
 
     public currencies(page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.CurrenciesResponse.AsObject> {
@@ -40,7 +39,7 @@ export class CurrencyGrpcService {
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.CurrenciesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.CurrenciesResponse.AsObject>(promise);
     }
 
     public currency(id: number): Observable<GRPC.CurrencyResponse.AsObject> {
@@ -58,6 +57,6 @@ export class CurrencyGrpcService {
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.CurrencyResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.CurrencyResponse.AsObject>(promise);
     }
 }

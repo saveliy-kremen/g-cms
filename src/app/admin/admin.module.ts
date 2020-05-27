@@ -27,6 +27,12 @@ import { XmlImportComponent } from './xml-import/xml-import.component'
 import { FileInputModule } from '../shared/file-input/file-input.module'
 import { AdminAuthGuard } from '../shared/guards/guards'
 import { OrdersPageComponent } from './orders-page/orders-page.component'
+import { VendorGrpcService } from '../shared/services/grpc/vendor.service'
+import { AdminCategoryGrpcService } from '../shared/services/grpc/admin-category.service'
+import { AdminItemGrpcService } from '../shared/services/grpc/admin-item.service'
+import { AdminPropertyGrpcService } from '../shared/services/grpc/admin-property.service'
+import { CurrencyGrpcService } from '../shared/services/grpc/currency.service'
+import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper'
 
 @NgModule({
   declarations: [
@@ -57,6 +63,16 @@ import { OrdersPageComponent } from './orders-page/orders-page.component'
     NgDragDropModule.forRoot(),
     RouterModule.forChild(AdminRoutes),
   ],
-  providers: [LoaderService, UploadService, AdminAuthGuard],
+  providers: [
+    LoaderService,
+    UploadService,
+    AdminAuthGuard,
+    GrpcHelper,
+    AdminCategoryGrpcService,
+    AdminItemGrpcService,
+    AdminPropertyGrpcService,
+    CurrencyGrpcService,
+    VendorGrpcService
+  ],
 })
 export class AdminModule { }

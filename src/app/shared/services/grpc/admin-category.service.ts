@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { grpcUnary } from './helpers/grpc-unary';
+import { GrpcHelper } from './helpers/grpc-helper';
 
 import { Empty } from 'src/app/shared/api/v1/google/protobuf/empty_pb';
 import * as GRPC from 'src/app/shared/api/v1/admin-category_pb';
@@ -11,16 +11,15 @@ import { AdminCategoryServiceClient } from 'src/app/shared/api/v1/Admin-category
 import { environment } from 'src/environments/environment';
 import { SessionService } from 'src/app/shared/services/session.service';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class AdminCategoryGrpcService {
     client: AdminCategoryServiceClient;
 
     constructor(
-        private session: SessionService
+        private session: SessionService,
+        private grpcHelper: GrpcHelper
     ) {
-        this.client = new AdminCategoryServiceClient(environment.grpcUrl);
+        this.client = new AdminCategoryServiceClient(environment.grpcUrl)
     }
 
     public categories(): Observable<GRPC.AdminCategoriesResponse.AsObject> {
@@ -37,7 +36,7 @@ export class AdminCategoryGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public addCategory(data): Observable<GRPC.AdminCategoriesResponse.AsObject> {
@@ -56,7 +55,7 @@ export class AdminCategoryGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public addCategoryBefore(data): Observable<GRPC.AdminCategoriesResponse.AsObject> {
@@ -75,7 +74,7 @@ export class AdminCategoryGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public addCategoryAfter(data): Observable<GRPC.AdminCategoriesResponse.AsObject> {
@@ -94,7 +93,7 @@ export class AdminCategoryGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public deleteCategory(id): Observable<GRPC.AdminCategoriesResponse.AsObject> {
@@ -111,7 +110,7 @@ export class AdminCategoryGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public moveCategory(data): Observable<GRPC.AdminCategoriesResponse.AsObject> {
@@ -130,7 +129,7 @@ export class AdminCategoryGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminCategoriesResponse.AsObject>(promise);
     }
 
     public category(alias: string): Observable<GRPC.AdminCategoryResponse.AsObject> {
@@ -147,7 +146,7 @@ export class AdminCategoryGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminCategoryResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminCategoryResponse.AsObject>(promise);
     }
 
     public editCategory(data): Observable<GRPC.AdminCategoryResponse.AsObject> {
@@ -168,7 +167,7 @@ export class AdminCategoryGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminCategoryResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminCategoryResponse.AsObject>(promise);
     }
 
     public uploadCategory(data): Observable<GRPC.AdminCategoryResponse.AsObject> {
@@ -186,6 +185,6 @@ export class AdminCategoryGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.AdminCategoryResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminCategoryResponse.AsObject>(promise);
     }
 }

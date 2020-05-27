@@ -3,23 +3,22 @@ import { Observable, from } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { grpcUnary } from './helpers/grpc-unary';
+import { GrpcHelper } from './helpers/grpc-helper';
 
 import * as GRPC from 'src/app/shared/api/v1/vendor_pb';
 import { VendorServiceClient } from 'src/app/shared/api/v1/VendorServiceClientPb';
 import { environment } from 'src/environments/environment';
 import { SessionService } from 'src/app/shared/services/session.service';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class VendorGrpcService {
-    client: VendorServiceClient;
+    client: VendorServiceClient
 
     constructor(
-        private session: SessionService
+        private session: SessionService,
+        private grpcHelper: GrpcHelper
     ) {
-        this.client = new VendorServiceClient(environment.grpcUrl);
+        this.client = new VendorServiceClient(environment.grpcUrl)
     }
 
     public vendors(page: number, pageSize: number, sort: string, direction: string): Observable<GRPC.VendorsResponse.AsObject> {
@@ -40,7 +39,7 @@ export class VendorGrpcService {
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.VendorsResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.VendorsResponse.AsObject>(promise);
     }
 
     public vendor(id: number): Observable<GRPC.VendorResponse.AsObject> {
@@ -58,6 +57,6 @@ export class VendorGrpcService {
                 resolve(response)
             });
         });
-        return grpcUnary<GRPC.VendorResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.VendorResponse.AsObject>(promise);
     }
 }

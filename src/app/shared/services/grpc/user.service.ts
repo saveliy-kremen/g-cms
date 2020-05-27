@@ -3,7 +3,7 @@ import { Observable, from } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { grpcUnary } from './helpers/grpc-unary';
+import { GrpcUserHelper } from './helpers/grpc-user-helper';
 
 import { Empty } from 'src/app/shared/api/v1/google/protobuf/empty_pb';
 import * as GRPC from 'src/app/shared/api/v1/user_pb';
@@ -11,16 +11,15 @@ import { UserServiceClient } from 'src/app/shared/api/v1/UserServiceClientPb';
 import { environment } from 'src/environments/environment';
 import { SessionService } from 'src/app/shared/services/session.service';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class UserGrpcService {
-    client: UserServiceClient;
+    client: UserServiceClient
 
     constructor(
-        private session: SessionService
+        private session: SessionService,
+        private grpcHelper: GrpcUserHelper
     ) {
-        this.client = new UserServiceClient(environment.grpcUrl);
+        this.client = new UserServiceClient(environment.grpcUrl)
     }
 
     public register(values: any): Observable<GRPC.UserResponse.AsObject> {
@@ -40,7 +39,7 @@ export class UserGrpcService {
                 //    console.log(status);
             });
         });
-        return grpcUnary<GRPC.UserResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.UserResponse.AsObject>(promise);
     }
 
     public auth(values: any): Observable<GRPC.UserResponse.AsObject> {
@@ -55,7 +54,7 @@ export class UserGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.UserResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.UserResponse.AsObject>(promise);
     }
 
     public me(): Observable<GRPC.UserResponse.AsObject> {
@@ -72,6 +71,6 @@ export class UserGrpcService {
                 resolve(response);
             });
         });
-        return grpcUnary<GRPC.UserResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.UserResponse.AsObject>(promise);
     }
 }

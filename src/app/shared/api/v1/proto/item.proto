@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/empty.proto";
+import "category.proto";
+import "property.proto";
+import "vendor.proto";
+import "currency.proto";
+//import "google/protobuf/wrappers.proto";
+
+message Item {
+  string id = 1;
+  uint32 user_id = 2;
+  uint32 parent_id = 4;
+  uint32 category_id = 5;
+  string title = 6;
+  string article = 7;
+  string alias = 8;
+  string description = 9;
+  float price = 10;
+  float old_price = 11;
+  int32 count = 13;
+  bool in_stock = 14;
+  bool disable = 15;
+  uint32 sort = 16;
+  string seo_title = 17;
+  string seo_description = 18;
+  string seo_keywords = 19;
+
+  Property properties = 20;
+  Vendor vendor = 21;
+  Currency currency = 22;
+  repeated ItemImage images = 23;
+  repeated Item offers = 24;
+}
+
+message ItemImage {
+  uint32 id = 1;
+  uint32 user_id = 2;
+  uint32 item_id = 3;
+  string filename = 4;
+  uint32 sort = 5;
+  uint32 property_value_id = 6;
+  bool main = 7;
+}
+
+message ItemRequest {
+  uint32 id = 1;
+}
+
+message ItemsRequest {
+  uint32 page = 1;
+  uint32 page_size = 2;
+  string sort = 3;
+  string direction = 4;
+}
+
+message ItemResponse {
+  Item item = 1;
+}
+
+message ItemsResponse {
+  repeated Item items = 1;
+  uint32 total = 2;
+}
+
+service ItemService {
+  rpc Item(ItemRequest) returns (ItemResponse);
+  rpc Items(ItemsRequest) returns (ItemsResponse);
+}

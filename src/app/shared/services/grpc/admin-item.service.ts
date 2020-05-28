@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { GrpcHelper } from './helpers/grpc-helper';
+import { GrpcHelper } from './helpers/grpc-auth-helper';
 
 import * as GRPC from 'src/app/shared/api/v1/admin-item_pb';
 import * as CategoryGRPC from 'src/app/shared/api/v1/admin-category_pb';

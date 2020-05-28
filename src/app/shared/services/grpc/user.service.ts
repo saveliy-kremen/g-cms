@@ -3,7 +3,7 @@ import { Observable, from } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { GrpcUserHelper } from './helpers/grpc-user-helper';
+import { GrpcUserHelper } from './helpers/grpc-helper';
 
 import { Empty } from 'src/app/shared/api/v1/google/protobuf/empty_pb';
 import * as GRPC from 'src/app/shared/api/v1/user_pb';

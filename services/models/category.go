@@ -60,3 +60,37 @@ func AdminCategoriesToResponse(categories []Category) []*v1.AdminCategory {
 	}
 	return respCategories
 }
+
+func CategoryToResponse(category Category) *v1.Category {
+	return &v1.Category{
+		Id:          strconv.Itoa(int(category.ID)),
+		UserId:      uint32(category.UserID),
+		Text:        category.Title,
+		Alias:       category.Alias,
+		Description: category.Description,
+		Image:       category.Image,
+		Parent:      category.Parent,
+		Sort:        uint32(category.Sort),
+		State: &v1.AdminCategoryState{
+			Disabled: category.Disabled,
+			Opened:   category.Opened,
+			Selected: category.Selected,
+		},
+		SeoTitle:       category.SeoTitle,
+		SeoDescription: category.SeoDescription,
+		SeoKeywords:    category.SeoKeywords,
+	}
+}
+
+func CategoriesToResponse(categories []Category) []*v1.Category {
+	respCategories := []*v1.Category{}
+	for _, category := range categories {
+		if category.Parent == "#" {
+			category.Opened = true
+		} else {
+			category.Opened = false
+		}
+		respCategories = append(respCategories, CategoryToResponse(category))
+	}
+	return respCategories
+}

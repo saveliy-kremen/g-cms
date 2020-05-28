@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/empty.proto";
+//import "google/protobuf/wrappers.proto";
+
+message Category{
+  string id = 1;
+  uint32 user_id = 2;
+  string text = 3;
+  string alias = 4;
+  string description = 5;
+  string image = 6;
+  string parent = 7;
+  uint32 sort = 8;
+
+  string seo_title = 10;
+  string seo_description = 11;
+  string seo_keywords = 12;
+}
+
+message CategoryRequest {
+  string alias = 1;
+}
+
+message CategoryResponse {
+  Category category = 1;
+}
+
+message CategoriesResponse {
+  repeated Category categories = 1;
+}
+
+service CategoryService {
+  rpc Category(CategoryRequest) returns (CategoryResponse);
+  rpc Categories(google.protobuf.Empty) returns (CategoriesResponse);
+}

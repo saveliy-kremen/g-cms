@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/empty.proto";
+import "category.proto";
+//import "google/protobuf/wrappers.proto";
+
+message Property{
+  string id = 1;
+  uint32 user_id = 2;
+  string title = 3;
+  string code = 4;
+  uint32 type = 5;
+  uint32 display = 6;
+  bool required = 7;
+  bool multiple = 8;
+  uint32 sort = 9;
+  repeated PropertyValue values = 10;
+  repeated uint32 item_values = 11;
+}
+
+message PropertyValue{
+  uint32 id = 1;
+  uint32 user_id = 2;
+  uint32 property_id = 3;
+  string value = 4;
+  string image = 5;
+  uint32 sort = 6;
+}
+
+message PropertyRequest {
+  uint32 id = 1;
+}
+
+message PropertiesRequest {
+  uint32 page = 1;
+  uint32 page_size = 2;
+  string sort = 3;
+  string direction = 4;
+}
+
+message PropertyResponse {
+  Property property = 1;
+}
+
+message PropertiesResponse {
+  repeated Property properties = 1;
+  uint32 position = 2;
+  uint32 total = 3;
+}
+
+service PropertyService {
+  rpc Property(PropertyRequest) returns (PropertyResponse);
+  rpc Properties(PropertiesRequest) returns (PropertiesResponse);
+}

@@ -32,7 +32,7 @@ import { AdminCategoryGrpcService } from '../shared/services/grpc/admin-category
 import { AdminItemGrpcService } from '../shared/services/grpc/admin-item.service'
 import { AdminPropertyGrpcService } from '../shared/services/grpc/admin-property.service'
 import { CurrencyGrpcService } from '../shared/services/grpc/currency.service'
-import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper'
+import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-auth-helper'
 
 @NgModule({
   declarations: [

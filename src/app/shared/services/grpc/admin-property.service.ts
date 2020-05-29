@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { GrpcHelper } from './helpers/grpc-auth-helper';
+import { GrpcAuthHelper } from './helpers/grpc-auth-helper';
 
 import * as GRPC from 'src/app/shared/api/v1/admin-property_pb';
 import * as CategoryGRPC from 'src/app/shared/api/v1/admin-category_pb';
@@ -17,7 +17,7 @@ export class AdminPropertyGrpcService {
 
     constructor(
         private session: SessionService,
-        private grpcHelper: GrpcHelper
+        private grpcHelper: GrpcAuthHelper
     ) {
         this.client = new AdminPropertyServiceClient(environment.grpcUrl);
     }

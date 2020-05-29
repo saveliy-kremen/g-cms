@@ -10,7 +10,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthService } from './shared/services/auth.service';
 import { SessionService } from './shared/services/session.service';
 import { UserGrpcService } from './shared/services/grpc/user.service';
-import { GrpcUserHelper } from './shared/services/grpc/helpers/grpc-helper';
+import { GrpcAuthHelper } from './shared/services/grpc/helpers/grpc-auth-helper';
+import { GrpcHelper } from './shared/services/grpc/helpers/grpc-helper';
+import { ItemGrpcService } from './shared/services/item.service';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -35,6 +37,12 @@ export function HttpLoaderFactory(http: HttpClient) {
   ],
   exports: [TranslateModule],
   bootstrap: [AppComponent],
-  providers: [AuthService, SessionService, UserGrpcService, GrpcUserHelper]
+  providers: [AuthService,
+    SessionService,
+    UserGrpcService,
+    GrpcAuthHelper,
+    GrpcHelper,
+    ItemGrpcService
+  ]
 })
 export class AppModule { }

@@ -39,7 +39,7 @@ func Interceptors() grpc.UnaryServerInterceptor {
 // context that is passed to the handler
 func AuthenticationInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (out interface{}, err error) {
 	methodParts := strings.Split(info.FullMethod, "/")
-	exceptions := []string{"Auth", "Register"}
+	exceptions := []string{"Auth", "Register", "Items"}
 	_, found := utils.Find(exceptions, methodParts[len(methodParts)-1])
 	if found {
 		return handler(ctx, req)

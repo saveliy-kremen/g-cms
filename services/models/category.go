@@ -63,19 +63,14 @@ func AdminCategoriesToResponse(categories []Category) []*v1.AdminCategory {
 
 func CategoryToResponse(category Category) *v1.Category {
 	return &v1.Category{
-		Id:          strconv.Itoa(int(category.ID)),
-		UserId:      uint32(category.UserID),
-		Text:        category.Title,
-		Alias:       category.Alias,
-		Description: category.Description,
-		Image:       category.Image,
-		Parent:      category.Parent,
-		Sort:        uint32(category.Sort),
-		State: &v1.AdminCategoryState{
-			Disabled: category.Disabled,
-			Opened:   category.Opened,
-			Selected: category.Selected,
-		},
+		Id:             strconv.Itoa(int(category.ID)),
+		UserId:         uint32(category.UserID),
+		Text:           category.Title,
+		Alias:          category.Alias,
+		Description:    category.Description,
+		Image:          category.Image,
+		Parent:         category.Parent,
+		Sort:           uint32(category.Sort),
 		SeoTitle:       category.SeoTitle,
 		SeoDescription: category.SeoDescription,
 		SeoKeywords:    category.SeoKeywords,

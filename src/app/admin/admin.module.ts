@@ -6,6 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgxDropzoneModule } from 'ngx-dropzone'
 import { NgsgModule } from 'ng-sortgrid'
 import { NgDragDropModule } from 'ng-drag-drop';
+import { QuillModule } from 'ngx-quill'
 
 import { AdminRoutes } from './admin.routing'
 import { AdminLayoutComponent } from './admin-layout/admin-layout.component'
@@ -32,7 +33,7 @@ import { AdminCategoryGrpcService } from '../shared/services/grpc/admin-category
 import { AdminItemGrpcService } from '../shared/services/grpc/admin-item.service'
 import { AdminPropertyGrpcService } from '../shared/services/grpc/admin-property.service'
 import { CurrencyGrpcService } from '../shared/services/grpc/currency.service'
-import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-auth-helper'
+import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper'
 
 @NgModule({
   declarations: [
@@ -61,6 +62,7 @@ import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-auth-helper'
     NgsgModule,
     FileInputModule,
     NgDragDropModule.forRoot(),
+    QuillModule.forRoot(),
     RouterModule.forChild(AdminRoutes),
   ],
   providers: [

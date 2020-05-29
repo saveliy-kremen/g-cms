@@ -7,7 +7,7 @@ import * as jspb from 'google-protobuf';
 const jwtAuthError$ = new Subject<void>();
 
 @Injectable()
-export class GrpcUserHelper {
+export class GrpcHelper {
 
   grpcUnary<T>(promise): Observable<T> {
     return from(promise).pipe(

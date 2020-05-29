@@ -116,3 +116,57 @@ func AdminItemImageToResponse(image ItemImage) *v1.AdminItemImage {
 		Main:            image.Main,
 	}
 }
+
+func ItemsToResponse(items []Item) []*v1.Item {
+	respItems := []*v1.Item{}
+	for _, item := range items {
+		respItems = append(respItems, ItemToResponse(item))
+	}
+	return respItems
+}
+
+func ItemToResponse(item Item) *v1.Item {
+	return &v1.Item{
+		Id:             strconv.Itoa(int(item.ID)),
+		UserId:         item.UserID,
+		ParentId:       item.ParentID,
+		Title:          item.Title,
+		Article:        item.Article,
+		Alias:          item.Alias,
+		Description:    item.Description,
+		Price:          item.Price,
+		OldPrice:       item.OldPrice,
+		Count:          item.Count,
+		InStock:        item.InStock,
+		Disable:        item.Disable,
+		Sort:           item.Sort,
+		SeoTitle:       item.SeoTitle,
+		SeoDescription: item.SeoDescription,
+		SeoKeywords:    item.SeoKeywords,
+
+		Images:   ItemImagesToResponse(item.Images),
+		Offers:   ItemsToResponse(item.Offers),
+		Vendor:   VendorToResponse(item.Vendor),
+		Currency: CurrencyToResponse(item.Currency),
+	}
+}
+
+func ItemImagesToResponse(images []ItemImage) []*v1.ItemImage {
+	respImages := []*v1.ItemImage{}
+	for _, image := range images {
+		respImages = append(respImages, ItemImageToResponse(image))
+	}
+	return respImages
+}
+
+func ItemImageToResponse(image ItemImage) *v1.ItemImage {
+	return &v1.ItemImage{
+		Id:              uint32(image.ID),
+		UserId:          image.UserID,
+		ItemId:          image.ItemID,
+		Filename:        image.Filename,
+		Sort:            image.Sort,
+		PropertyValueId: image.PropertyValueID,
+		Main:            image.Main,
+	}
+}

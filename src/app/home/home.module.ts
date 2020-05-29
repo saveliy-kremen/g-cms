@@ -13,6 +13,9 @@ import { LoginPageComponent } from './login-page/login-page.component';
 import { ForgotPasswordPageComponent } from './forgot-password-page/forgot-password-page.component';
 import { ErrorPageComponent } from './error-page/error-page.component';
 import { CartPageComponent } from './cart-page/cart-page.component';
+import { ItemGrpcService } from '../shared/services/grpc/item.service'
+import { ProductPageComponent } from './product-page/product-page.component';
+import { ProductComponent } from './product/product.component';
 
 @NgModule({
   declarations: [HomeLayoutComponent,
@@ -21,6 +24,8 @@ import { CartPageComponent } from './cart-page/cart-page.component';
     LoginPageComponent,
     ForgotPasswordPageComponent,
     CartPageComponent,
+    ProductPageComponent,
+    ProductComponent,
     ErrorPageComponent
   ],
   imports: [
@@ -29,7 +34,9 @@ import { CartPageComponent } from './cart-page/cart-page.component';
     FormsModule,
     ReactiveFormsModule,
     ValidationModule,
+
     RouterModule.forChild(HomeRoutes),
   ],
+  providers: [ItemGrpcService]
 })
 export class HomeModule { }

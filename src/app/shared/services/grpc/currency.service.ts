@@ -3,7 +3,7 @@ import { Observable, from } from 'rxjs';
 import { Metadata } from 'grpc-web';
 import * as grpcWeb from 'grpc-web';
 
-import { GrpcHelper } from './helpers/grpc-auth-helper';
+import { GrpcAuthHelper } from './helpers/grpc-auth-helper';
 
 import * as GRPC from 'src/app/shared/api/v1/currency_pb';
 import { CurrencyServiceClient } from 'src/app/shared/api/v1/CurrencyServiceClientPb';
@@ -16,7 +16,7 @@ export class CurrencyGrpcService {
 
     constructor(
         private session: SessionService,
-        private grpcHelper: GrpcHelper
+        private grpcHelper: GrpcAuthHelper
     ) {
         this.client = new CurrencyServiceClient(environment.grpcUrl)
     }

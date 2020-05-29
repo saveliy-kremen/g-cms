@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LoaderService } from 'src/app/shared/services/loader.service';
 import { environment } from 'src/environments/environment';
+import { ItemGrpcService } from 'src/app/shared/services/item.service';
 
 @Component({
   selector: 'app-index-page',
@@ -27,8 +28,9 @@ export class IndexPageComponent implements OnInit {
   async ngOnInit() {
     this.loaderService.showLoader()
     this.itemsPage = 0
-    this.itemsPageSize = environment.pageSizeOptions[0]
+    this.itemsPageSize = 10
     this.products$ = this.itemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection)
+    console.log(this.products$)
     this.loaderService.hideLoader()
   }
 }

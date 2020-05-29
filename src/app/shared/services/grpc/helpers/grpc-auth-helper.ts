@@ -11,7 +11,7 @@ import { AuthService } from '../../auth.service';
 const jwtAuthError$ = new Subject<void>();
 
 @Injectable()
-export class GrpcHelper {
+export class GrpcAuthHelper {
   constructor(
     private authService: AuthService,
     private router: Router

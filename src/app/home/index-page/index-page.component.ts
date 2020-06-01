@@ -28,9 +28,8 @@ export class IndexPageComponent implements OnInit {
   async ngOnInit() {
     this.loaderService.showLoader()
     this.itemsPage = 0
-    this.itemsPageSize = 10
+    this.itemsPageSize = 12
     this.products$ = this.itemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection)
-    console.log(this.products$)
     this.loaderService.hideLoader()
   }
 }

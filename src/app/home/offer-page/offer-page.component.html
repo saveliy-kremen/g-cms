@@ -1,4 +1,4 @@
-<div *ngIf="offer$ | async as offer">
+<div *ngIf="offer$ | async as offer; else loading">
     <div class="offer">
         <div class="header right">
             <button routerLink="/" class="btn btn-dark">Back</button>
@@ -23,10 +23,14 @@
                 <h2>Information:</h2>
 
                 <div>
-                    <quill-view-html [content]="offer.info"></quill-view-html>
+                    <quill-view-html [content]="offer.description"></quill-view-html>
                 </div>
 
             </div>
         </div>
     </div>
 </div>
+
+<ng-template #loading>
+    <p class="text-center">Loading...</p>
+</ng-template>

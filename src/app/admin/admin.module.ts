@@ -6,6 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgxDropzoneModule } from 'ngx-dropzone'
 import { NgsgModule } from 'ng-sortgrid'
 import { NgDragDropModule } from 'ng-drag-drop';
+import { QuillModule } from 'ngx-quill'
 
 import { AdminRoutes } from './admin.routing'
 import { AdminLayoutComponent } from './admin-layout/admin-layout.component'
@@ -32,7 +33,8 @@ import { AdminCategoryGrpcService } from '../shared/services/grpc/admin-category
 import { AdminItemGrpcService } from '../shared/services/grpc/admin-item.service'
 import { AdminPropertyGrpcService } from '../shared/services/grpc/admin-property.service'
 import { CurrencyGrpcService } from '../shared/services/grpc/currency.service'
-import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper'
+import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper';
+import { QuillMaterialComponent } from './components/quill-material/quill-material.component'
 
 @NgModule({
   declarations: [
@@ -46,7 +48,8 @@ import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper'
     ItemsComponent,
     ItemEditComponent,
     XmlImportComponent,
-    OrdersPageComponent
+    OrdersPageComponent,
+    QuillMaterialComponent
   ],
   imports: [
     CommonModule,
@@ -60,6 +63,7 @@ import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper'
     TableModule,
     NgsgModule,
     FileInputModule,
+    QuillModule.forRoot(),
     NgDragDropModule.forRoot(),
     RouterModule.forChild(AdminRoutes),
   ],

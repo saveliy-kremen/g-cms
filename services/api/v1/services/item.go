@@ -23,7 +23,7 @@ func (s *ItemServiceImpl) Item(ctx context.Context, req *v1.ItemRequest) (*v1.It
 	}).First(&item, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
-
+	item.Offers = itemOffers(&item, nil, nil, nil, nil)
 	return &v1.ItemResponse{Item: models.ItemToResponse(item)}, nil
 }
 

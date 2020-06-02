@@ -6,7 +6,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgxDropzoneModule } from 'ngx-dropzone'
 import { NgsgModule } from 'ng-sortgrid'
 import { NgDragDropModule } from 'ng-drag-drop';
-import { QuillModule } from 'ngx-quill'
 
 import { AdminRoutes } from './admin.routing'
 import { AdminLayoutComponent } from './admin-layout/admin-layout.component'
@@ -62,7 +61,6 @@ import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper'
     NgsgModule,
     FileInputModule,
     NgDragDropModule.forRoot(),
-    QuillModule.forRoot(),
     RouterModule.forChild(AdminRoutes),
   ],
   providers: [

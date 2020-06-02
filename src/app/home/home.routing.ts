@@ -8,6 +8,7 @@ import { ForgotPasswordPageComponent } from './forgot-password-page/forgot-passw
 import { ErrorPageComponent } from './error-page/error-page.component';
 import { ProductPageComponent } from './product-page/product-page.component';
 import { CartPageComponent } from './cart-page/cart-page.component';
+import { OfferPageComponent } from './offer-page/offer-page.component';
 
 export const HomeRoutes: Routes = [
   {
@@ -17,6 +18,7 @@ export const HomeRoutes: Routes = [
       { path: 'register', component: RegisterPageComponent },
       { path: 'forgot', component: ForgotPasswordPageComponent },
       { path: 'product/:id', component: ProductPageComponent },
+      { path: 'offer/:id', component: OfferPageComponent },
       { path: 'cart', component: CartPageComponent },
       { path: 'error', component: ErrorPageComponent },
     ]

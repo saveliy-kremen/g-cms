@@ -1,1 +1,4 @@
-<p>product-page works!</p>
+<div *ngIf="product$ | async as product" class="dashboard">
+    <app-offer *ngFor="let offer of product.offersList" class="box" [offer]="offer">
+    </app-offer>
+</div>

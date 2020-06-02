@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { QuillModule } from 'ngx-quill';
 
 import { HomeRoutes } from './home.routing';
 import { HomeLayoutComponent } from './home-layout/home-layout.component';
@@ -15,7 +16,9 @@ import { ErrorPageComponent } from './error-page/error-page.component';
 import { CartPageComponent } from './cart-page/cart-page.component';
 import { ItemGrpcService } from '../shared/services/grpc/item.service'
 import { ProductPageComponent } from './product-page/product-page.component';
-import { ProductComponent } from './product/product.component';
+import { ProductComponent } from './components/product/product.component';
+import { OfferPageComponent } from './offer-page/offer-page.component';
+import { OfferComponent } from './components/offer/offer.component';
 
 @NgModule({
   declarations: [HomeLayoutComponent,
@@ -25,7 +28,9 @@ import { ProductComponent } from './product/product.component';
     ForgotPasswordPageComponent,
     CartPageComponent,
     ProductPageComponent,
+    OfferPageComponent,
     ProductComponent,
+    OfferComponent,
     ErrorPageComponent
   ],
   imports: [
@@ -34,7 +39,7 @@ import { ProductComponent } from './product/product.component';
     FormsModule,
     ReactiveFormsModule,
     ValidationModule,
-
+    QuillModule.forRoot(),
     RouterModule.forChild(HomeRoutes),
   ],
   providers: [ItemGrpcService]

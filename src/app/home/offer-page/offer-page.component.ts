@@ -1,18 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
-import { LoaderService } from 'src/app/shared/services/loader.service';
-import { environment } from 'src/environments/environment';
-import { ItemGrpcService } from 'src/app/shared/services/item.service';
 import { switchMap, map } from 'rxjs/operators';
+import { LoaderService } from 'src/app/shared/services/loader.service';
+import { ItemGrpcService } from 'src/app/shared/services/item.service';
 
 @Component({
-  selector: 'app-product-page',
-  templateUrl: './product-page.component.html',
-  styleUrls: ['./product-page.component.scss']
+  selector: 'app-offer-page',
+  templateUrl: './offer-page.component.html',
+  styleUrls: ['./offer-page.component.scss']
 })
-export class ProductPageComponent implements OnInit {
-  product$
+export class OfferPageComponent implements OnInit {
+  offer$
 
   constructor(
     private loaderService: LoaderService,
@@ -22,7 +20,7 @@ export class ProductPageComponent implements OnInit {
 
   async ngOnInit() {
     this.loaderService.showLoader()
-    this.product$ = this.route.params
+    this.offer$ = this.route.params
       .pipe(switchMap(params => {
         return this.itemService.item(params['id']).pipe(map((res) => {
           return {

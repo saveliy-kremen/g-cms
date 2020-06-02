@@ -11,10 +11,9 @@ import { ItemGrpcService } from 'src/app/shared/services/item.service';
 export class IndexPageComponent implements OnInit {
   itemsData: any
   itemsPage: number = 0
-  itemsPageSize: number
+  itemsPageSize: number = 12
   itemsSort: string
   itemsDirection: string
-  itemID: number
   total: number
   uploadUrl: string
 
@@ -27,8 +26,6 @@ export class IndexPageComponent implements OnInit {
 
   async ngOnInit() {
     this.loaderService.showLoader()
-    this.itemsPage = 0
-    this.itemsPageSize = 12
     this.products$ = this.itemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection)
     this.loaderService.hideLoader()
   }

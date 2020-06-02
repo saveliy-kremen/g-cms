@@ -2,41 +2,42 @@ package services
 
 import (
 	//"github.com/davecgh/go-spew/spew"
-	"github.com/jinzhu/gorm"
 	"os"
 	"strconv"
+
+	"github.com/jinzhu/gorm"
 
 	"../../../config"
 	"../../../db"
 	"../../../models"
 )
 
-func itemProperties(user_id uint32, item *models.Item) []models.Property {
+func itemProperties(item *models.Item) []models.Property {
 	itemCategories := []models.ItemsCategories{}
 	if item.ParentID == 0 {
-		db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ID).Find(&itemCategories)
+		db.DB.Where("user_id = ? AND item_id = ?", item.UserID, item.ID).Find(&itemCategories)
 	} else {
-		db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ParentID).Find(&itemCategories)
+		db.DB.Where("user_id = ? AND item_id = ?", item.UserID, item.ParentID).Find(&itemCategories)
 	}
 	var cats []uint
 	for _, itemCategory := range itemCategories {
 		cats = append(cats, itemCategory.CategoryID)
-		childCategoriesIDs := childCategoriesIDs(user_id, itemCategory.CategoryID)
+		childCategoriesIDs := childCategoriesIDs(item.UserID, itemCategory.CategoryID)
 		cats = append(cats, childCategoriesIDs...)
 	}
 
 	propertiesCategories := []models.PropertiesCategories{}
-	db.DB.Where("user_id = ? AND category_id IN (?)", user_id, cats).Find(&propertiesCategories)
+	db.DB.Where("user_id = ? AND category_id IN (?)", item.UserID, cats).Find(&propertiesCategories)
 	var props []uint
 	for _, propertiesCategory := range propertiesCategories {
 		props = append(props, propertiesCategory.PropertyID)
 	}
 	properties := []models.Property{}
-	db.DB.Preload("Values").Where("user_id = ? AND id IN(?)", user_id, props).Order("sort").Find(&properties)
+	db.DB.Preload("Values").Where("user_id = ? AND id IN(?)", item.UserID, props).Order("sort").Find(&properties)
 	for propertyIndex, property := range properties {
 		item_values_ids := []uint32{}
 		item_property_values := []models.ItemProperty{}
-		db.DB.Where("user_id = ? AND item_id = ? AND property_id = ?", user_id, item.ID, property.ID).Find(&item_property_values)
+		db.DB.Where("user_id = ? AND item_id = ? AND property_id = ?", item.UserID, item.ID, property.ID).Find(&item_property_values)
 		for _, item_property_value := range item_property_values {
 			item_values_ids = append(item_values_ids, item_property_value.PropertyValueID)
 		}
@@ -45,11 +46,11 @@ func itemProperties(user_id uint32, item *models.Item) []models.Property {
 	return properties
 }
 
-func itemOffers(user_id uint32, item *models.Item, page *uint32, pageSize *uint32, sort *string, direction *string) []models.Item {
+func itemOffers(item *models.Item, page *uint32, pageSize *uint32, sort *string, direction *string) []models.Item {
 	offers := []models.Item{}
 	req := db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
 		return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
-	}).Where("user_id = ? AND parent_id = ? AND draft = ?", user_id, item.ID, false)
+	}).Where("user_id = ? AND parent_id = ? AND draft = ?", item.UserID, item.ID, false)
 	if sort != nil && *sort != "" {
 		req = req.Order(*sort + " " + *direction)
 	}
@@ -58,7 +59,7 @@ func itemOffers(user_id uint32, item *models.Item, page *uint32, pageSize *uint3
 	}
 	req.Find(&offers)
 	for i, _ := range offers {
-		offers[i].Properties = itemProperties(user_id, item)
+		offers[i].Properties = itemProperties(item)
 	}
 	return offers
 }

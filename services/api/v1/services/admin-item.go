@@ -36,8 +36,8 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 	}).Where("user_id = ?", user_id).First(&item, req.Id).RecordNotFound() {
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
-	item.Properties = itemProperties(user_id, &item)
-	item.Offers = itemOffers(user_id, &item, nil, nil, nil, nil)
+	item.Properties = itemProperties(&item)
+	item.Offers = itemOffers(&item, nil, nil, nil, nil)
 
 	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
 }
@@ -364,7 +364,7 @@ func (s *AdminItemServiceImpl) AdminItemProperties(ctx context.Context, req *v1.
 			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
 	}
-	properties := itemProperties(user_id, &item)
+	properties := itemProperties(&item)
 	return &v1.AdminPropertiesResponse{Properties: models.AdminPropertiesToResponse(properties)}, nil
 }
 
@@ -381,7 +381,7 @@ func (s *AdminItemServiceImpl) AdminItemOffers(ctx context.Context, req *v1.Admi
 	offers := []models.Item{}
 	var total uint32
 	db.DB.Where("user_id = ? AND parent_id = ? AND draft <> ? ", user_id, item.ID, false).Find(&offers).Count(&total)
-	offers = itemOffers(user_id, &item, &req.Page, &req.PageSize, &req.Sort, &req.Direction)
+	offers = itemOffers(&item, &req.Page, &req.PageSize, &req.Sort, &req.Direction)
 	return &v1.AdminOffersResponse{Offers: models.AdminItemsToResponse(offers), Total: total}, nil
 }
 

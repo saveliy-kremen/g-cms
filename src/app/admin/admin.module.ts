@@ -34,7 +34,6 @@ import { AdminItemGrpcService } from '../shared/services/grpc/admin-item.service
 import { AdminPropertyGrpcService } from '../shared/services/grpc/admin-property.service'
 import { CurrencyGrpcService } from '../shared/services/grpc/currency.service'
 import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper';
-import { QuillMaterialComponent } from './components/quill-material/quill-material.component'
 import { QuillFormFieldDirective } from '../shared/directives/quill.form.field.directive'
 
 @NgModule({
@@ -50,7 +49,6 @@ import { QuillFormFieldDirective } from '../shared/directives/quill.form.field.d
     ItemEditComponent,
     XmlImportComponent,
     OrdersPageComponent,
-    QuillMaterialComponent,
     QuillFormFieldDirective
   ],
   imports: [

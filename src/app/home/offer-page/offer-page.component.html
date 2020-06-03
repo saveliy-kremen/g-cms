@@ -15,7 +15,8 @@
                 <div>
                     <h2>Price: {{offer.price}} $</h2>
 
-                    <button class="btn btn-dark" [routerLink]="['/cart']">Add to cart</button>
+                    <button class="btn btn-dark" [routerLink]="['/cart']" (click)="addProduct(offer)">Add to
+                        cart</button>
                 </div>
             </div>
 

@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { switchMap, map } from 'rxjs/operators';
 import { LoaderService } from 'src/app/shared/services/loader.service';
 import { ItemGrpcService } from 'src/app/shared/services/item.service';
+import { CartService } from 'src/app/shared/services/cart.service';
 
 @Component({
   selector: 'app-offer-page',
@@ -15,7 +16,8 @@ export class OfferPageComponent implements OnInit {
   constructor(
     private loaderService: LoaderService,
     private itemService: ItemGrpcService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cartService: CartService
   ) { }
 
   async ngOnInit() {
@@ -29,5 +31,9 @@ export class OfferPageComponent implements OnInit {
         }))
       }))
     this.loaderService.hideLoader()
+  }
+
+  addProduct(offer) {
+    this.cartService.addProduct(offer)
   }
 }

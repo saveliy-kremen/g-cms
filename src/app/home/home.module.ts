@@ -20,6 +20,7 @@ import { ProductComponent } from './components/product/product.component';
 import { OfferPageComponent } from './offer-page/offer-page.component';
 import { OfferComponent } from './components/offer/offer.component';
 import { CartService } from '../shared/services/cart.service';
+import { OrderGrpcService } from '../shared/services/grpc/order.service';
 
 @NgModule({
   declarations: [HomeLayoutComponent,
@@ -43,6 +44,6 @@ import { CartService } from '../shared/services/cart.service';
     QuillModule.forRoot(),
     RouterModule.forChild(HomeRoutes),
   ],
-  providers: [ItemGrpcService, CartService]
+  providers: [ItemGrpcService, CartService, OrderGrpcService]
 })
 export class HomeModule { }

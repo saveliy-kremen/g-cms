@@ -45,3 +45,7 @@ func (s *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.
 	}
 	return &v1.ItemsResponse{Items: models.ItemsToResponse(items), Total: total}, nil
 }
+
+// compile-type check that our new type provides the
+// correct server interface
+var _ v1.ItemServiceServer = (*ItemServiceImpl)(nil)

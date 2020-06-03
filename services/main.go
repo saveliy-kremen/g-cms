@@ -36,6 +36,7 @@ func main() {
 	v1.RegisterItemServiceServer(svr, &services.ItemServiceImpl{})
 	v1.RegisterVendorServiceServer(svr, &services.VendorServiceImpl{})
 	v1.RegisterCurrencyServiceServer(svr, &services.CurrencyServiceImpl{})
+	v1.RegisterOrderServiceServer(svr, &services.OrderServiceImpl{})
 	v1.RegisterEsp8266ServiceServer(svr, &services.Esp8266ServiceImpl{})
 
 	// trap SIGINT / SIGTERM to exit cleanly

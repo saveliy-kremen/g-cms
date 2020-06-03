@@ -84,7 +84,9 @@ export class QuillFormFieldDirective extends CustomErrorStateMixin implements On
 
   @Input()
   get placeholder() {
-
+    if (this.empty) {
+      return "";
+    }
     return this._placeholder;
   }
   set placeholder(plh) {

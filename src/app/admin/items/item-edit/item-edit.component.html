@@ -46,12 +46,9 @@
             </mat-error>
           </mat-form-field>
           <mat-form-field class="full-width">
-            <mat-label>Описание</mat-label>
             <quill-editor matInput customRichEditor formControlName="description"
               placeholder="{{'Description' | translate}}">
             </quill-editor>
-            <!--textarea matInput formControlName="description" rows="5"
-              ></textarea-->
             <mat-error>
               <validator-message [field]="itemForm.get('description')" [submitted]="itemFormSubmitted"
                 title="Description">

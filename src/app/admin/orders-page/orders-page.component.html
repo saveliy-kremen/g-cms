@@ -1,1 +1,10 @@
-<p>orders-page works!</p>
+<mat-card>
+    <mat-card-title>{{"Orders" | translate}}</mat-card-title>
+    <mat-card-subtitle>Управление заказами</mat-card-subtitle>
+
+    <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
+        <app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns" [dataSource]="ordersData"
+            [length]="total" (changePageHandler)="changePage($event)" actions="actions">
+        </app-table>
+    </mat-card-content>
+</mat-card>

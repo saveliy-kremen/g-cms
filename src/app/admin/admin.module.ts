@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
+import { CommonModule, DatePipe } from '@angular/common'
 import { RouterModule } from '@angular/router'
 import { TranslateModule } from "@ngx-translate/core"
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
@@ -35,6 +35,7 @@ import { AdminPropertyGrpcService } from '../shared/services/grpc/admin-property
 import { CurrencyGrpcService } from '../shared/services/grpc/currency.service'
 import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper';
 import { QuillFormFieldDirective } from '../shared/directives/quill.form.field.directive'
+import { AdminOrderGrpcService } from '../shared/services/grpc/admin-order.service'
 
 @NgModule({
   declarations: [
@@ -75,8 +76,10 @@ import { QuillFormFieldDirective } from '../shared/directives/quill.form.field.d
     AdminCategoryGrpcService,
     AdminItemGrpcService,
     AdminPropertyGrpcService,
+    AdminOrderGrpcService,
     CurrencyGrpcService,
-    VendorGrpcService
+    VendorGrpcService,
+    DatePipe,
   ],
 })
 export class AdminModule { }

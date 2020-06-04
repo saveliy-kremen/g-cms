@@ -98,10 +98,10 @@ export class ItemsComponent implements OnInit {
 
   async deleteItemConfirm(id) {
     this.itemID = id;
-    const property = this.itemsData.filter(item => item.id == id)[0];
+    const item = this.itemsData.filter(item => item.id == id)[0];
     const modalData = {
       title: await this.translateService.get("Delete item").toPromise(),
-      text: await this.translateService.get("Delete item").toPromise() + ` "${property.title}"?`,
+      text: await this.translateService.get("Delete item").toPromise() + ` "${item.title}"?`,
       callBackFunction: this.deleteItem.bind(this)
     };
     this.modalService.showModal(modalData);

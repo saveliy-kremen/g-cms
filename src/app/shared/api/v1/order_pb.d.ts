@@ -1,6 +1,7 @@
 import * as jspb from "google-protobuf"
 
 import * as item_pb from './item_pb';
+import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
 
 export class Order extends jspb.Message {
   getId(): string;
@@ -17,6 +18,11 @@ export class Order extends jspb.Message {
 
   getPayment(): string;
   setPayment(value: string): void;
+
+  getDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setDate(value?: google_protobuf_timestamp_pb.Timestamp): void;
+  hasDate(): boolean;
+  clearDate(): void;
 
   getItemsList(): Array<item_pb.Item>;
   setItemsList(value: Array<item_pb.Item>): void;
@@ -38,6 +44,7 @@ export namespace Order {
     phone: string,
     address: string,
     payment: string,
+    date?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     itemsList: Array<item_pb.Item.AsObject>,
   }
 }

@@ -3,6 +3,7 @@ syntax = "proto3";
 package v1;
 
 import "item.proto";
+import "google/protobuf/timestamp.proto";
 //import "google/protobuf/wrappers.proto";
 
 message Order {
@@ -11,8 +12,9 @@ message Order {
   string phone = 3;
   string address = 4;
   string payment = 5;
+  google.protobuf.Timestamp date = 6;
 
-  repeated Item items = 6;
+  repeated Item items = 7;
 }
 
 message AddOrderRequest {

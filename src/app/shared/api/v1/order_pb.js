@@ -14,6 +14,8 @@ var global = Function('return this')();
 
 var item_pb = require('./item_pb.js');
 goog.object.extend(proto, item_pb);
+var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
+goog.object.extend(proto, google_protobuf_timestamp_pb);
 goog.exportSymbol('proto.v1.AddOrderRequest', null, global);
 goog.exportSymbol('proto.v1.Order', null, global);
 goog.exportSymbol('proto.v1.OrderResponse', null, global);
@@ -86,7 +88,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.v1.Order.repeatedFields_ = [6];
+proto.v1.Order.repeatedFields_ = [7];
 
 
 
@@ -124,6 +126,7 @@ proto.v1.Order.toObject = function(includeInstance, msg) {
     phone: jspb.Message.getFieldWithDefault(msg, 3, ""),
     address: jspb.Message.getFieldWithDefault(msg, 4, ""),
     payment: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    date: (f = msg.getDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     itemsList: jspb.Message.toObjectList(msg.getItemsList(),
     item_pb.Item.toObject, includeInstance)
   };
@@ -183,6 +186,11 @@ proto.v1.Order.deserializeBinaryFromReader = function(msg, reader) {
       msg.setPayment(value);
       break;
     case 6:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setDate(value);
+      break;
+    case 7:
       var value = new item_pb.Item;
       reader.readMessage(value,item_pb.Item.deserializeBinaryFromReader);
       msg.addItems(value);
@@ -251,10 +259,18 @@ proto.v1.Order.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getDate();
+  if (f != null) {
+    writer.writeMessage(
+      6,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
   f = message.getItemsList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      6,
+      7,
       f,
       item_pb.Item.serializeBinaryToWriter
     );
@@ -353,12 +369,49 @@ proto.v1.Order.prototype.setPayment = function(value) {
 
 
 /**
- * repeated Item items = 6;
+ * optional google.protobuf.Timestamp date = 6;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.v1.Order.prototype.getDate = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.Timestamp|undefined} value
+ * @return {!proto.v1.Order} returns this
+*/
+proto.v1.Order.prototype.setDate = function(value) {
+  return jspb.Message.setWrapperField(this, 6, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.v1.Order} returns this
+ */
+proto.v1.Order.prototype.clearDate = function() {
+  return this.setDate(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.v1.Order.prototype.hasDate = function() {
+  return jspb.Message.getField(this, 6) != null;
+};
+
+
+/**
+ * repeated Item items = 7;
  * @return {!Array<!proto.v1.Item>}
  */
 proto.v1.Order.prototype.getItemsList = function() {
   return /** @type{!Array<!proto.v1.Item>} */ (
-    jspb.Message.getRepeatedWrapperField(this, item_pb.Item, 6));
+    jspb.Message.getRepeatedWrapperField(this, item_pb.Item, 7));
 };
 
 
@@ -367,7 +420,7 @@ proto.v1.Order.prototype.getItemsList = function() {
  * @return {!proto.v1.Order} returns this
 */
 proto.v1.Order.prototype.setItemsList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 6, value);
+  return jspb.Message.setRepeatedWrapperField(this, 7, value);
 };
 
 
@@ -377,7 +430,7 @@ proto.v1.Order.prototype.setItemsList = function(value) {
  * @return {!proto.v1.Item}
  */
 proto.v1.Order.prototype.addItems = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 6, opt_value, proto.v1.Item, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 7, opt_value, proto.v1.Item, opt_index);
 };
 
 

@@ -7,7 +7,7 @@
                 <td>{{ cartProduct.type }}</td>
                 <td>{{ cartProduct.title }}</td>
                 <td>
-                    <button class="btn btn-danger" (click)="delete(cartProduct)">Delete</button>
+                    <button class="btn btn-danger" (click)="showModal(cartProduct)">Delete</button>
                 </td>
                 <td>{{ cartProduct.price }} $</td>
             </tr>
@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        
+
         <div class="form-control">
             <label for="phone">Phone number</label>
             <input id="phone" type="phone" formControlName="phone">
@@ -46,7 +46,7 @@
                 <small *ngIf="form.get('address').errors.required">Enter your address</small>
             </div>
         </div>
-    
+
         <div class="form-control">
             <label for="payment">Payment method:</label>
             <select formControlName="payment">
@@ -56,8 +56,8 @@
         </div>
 
         <button type="submit" class="btn btn-primary btn-block" [disabled]="form.invalid || submitted">Add</button>
-        
-    
+
+
     </form>
 </div>
 
@@ -65,3 +65,4 @@
     <h2 class="text-center">Cart is empty, select product</h2>
 </ng-template>
 
+<ng-template appRef></ng-template>

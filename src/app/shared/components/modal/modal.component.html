@@ -1,0 +1,13 @@
+<div class="backdrop"></div>
+
+<div class="modal">
+  <nav class="navbar">
+    <h1>{{ title }}</h1>
+  </nav>
+
+  <p>{{ text }}</p>
+
+  <br>
+  <button class="btn btn-danger" (click)="close.emit(true)">Ok</button>
+  <button class="btn btn-info" (click)="close.emit(false)">Cancel</button>
+</div>

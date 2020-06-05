@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChild } from '@angular/core';
 import { CartService } from 'src/app/shared/services/cart.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { OrderGrpcService } from 'src/app/shared/services/grpc/order.service';
+import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { RefDirective } from 'src/app/shared/directives/ref.directive';
 
 @Component({
   selector: 'app-cart-page',
@@ -9,8 +11,10 @@ import { OrderGrpcService } from 'src/app/shared/services/grpc/order.service';
   styleUrls: ['./cart-page.component.scss']
 })
 export class CartPageComponent implements OnInit {
+  @ViewChild(RefDirective) refDir: RefDirective
 
   cartProducts = []
+  currentCardProduct: any
   totalPrice = 0
   added = ''
 
@@ -19,7 +23,8 @@ export class CartPageComponent implements OnInit {
 
   constructor(
     private cartService: CartService,
-    private orderService: OrderGrpcService
+    private orderService: OrderGrpcService,
+    private resolver: ComponentFactoryResolver
   ) { }
 
   ngOnInit() {
@@ -33,6 +38,22 @@ export class CartPageComponent implements OnInit {
       phone: new FormControl(null, Validators.required),
       address: new FormControl(null, Validators.required),
       payment: new FormControl('Cash'),
+    })
+  }
+
+  showModal(cartProduct) {
+    this.currentCardProduct = cartProduct
+    const modalFactory = this.resolver.resolveComponentFactory(ModalComponent)
+    this.refDir.containerRef.clear()
+
+    const component = this.refDir.containerRef.createComponent(modalFactory)
+
+    component.instance.title = 'Dynamic title'
+    component.instance.close.subscribe((confirm) => {
+      this.refDir.containerRef.clear()
+      if (confirm) {
+        this.delete(this.currentCardProduct)
+      }
     })
   }
 

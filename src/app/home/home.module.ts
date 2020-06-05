@@ -21,6 +21,8 @@ import { OfferPageComponent } from './offer-page/offer-page.component';
 import { OfferComponent } from './components/offer/offer.component';
 import { CartService } from '../shared/services/cart.service';
 import { OrderGrpcService } from '../shared/services/grpc/order.service';
+import { ModalComponent } from '../shared/components/modal/modal.component';
+import { RefDirective } from '../shared/directives/ref.directive';
 
 @NgModule({
   declarations: [HomeLayoutComponent,
@@ -33,7 +35,9 @@ import { OrderGrpcService } from '../shared/services/grpc/order.service';
     OfferPageComponent,
     ProductComponent,
     OfferComponent,
-    ErrorPageComponent
+    ErrorPageComponent,
+    ModalComponent,
+    RefDirective
   ],
   imports: [
     CommonModule,
@@ -44,6 +48,7 @@ import { OrderGrpcService } from '../shared/services/grpc/order.service';
     QuillModule.forRoot(),
     RouterModule.forChild(HomeRoutes),
   ],
-  providers: [ItemGrpcService, CartService, OrderGrpcService]
+  providers: [ItemGrpcService, CartService, OrderGrpcService],
+  entryComponents: [ModalComponent],
 })
 export class HomeModule { }

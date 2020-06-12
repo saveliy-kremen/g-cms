@@ -7,9 +7,9 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	"../../../config"
-	"../../../db"
-	"../../../models"
+	"gcms/config"
+	"gcms/db"
+	"gcms/models"
 )
 
 func itemProperties(item *models.Item) []models.Property {

@@ -16,7 +16,7 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/fogleman/gg"
 
-	"../../config"
+	"gcms/config"
 )
 
 type ThumbSize struct {
@@ -112,7 +112,7 @@ func SetWatermark(path string, text string) {
 	dc.SetRGB(1, 1, 1)
 	dc.DrawStringWrapped(text, float64(dc.Width()-30), float64(lableHeight+9), 1, 0.5, lableWidth-50, 1, gg.AlignRight)
 	dc.Clip()
-	dc.SaveJPG(path, 100)
+	//dc.SaveJPG(path, 100)
 }
 
 func InstagramResize(filePath string) (io.Reader, error) {

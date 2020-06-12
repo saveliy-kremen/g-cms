@@ -6,17 +6,18 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	v1 "../../../api/v1"
-	"../../../config"
-	"../../../db"
-	"../../../models"
-	"../../../packages/auth"
-	"../../../packages/upload"
-	"../../../packages/utils"
+	v1 "gcms/api/v1"
+	"gcms/config"
+	"gcms/db"
+	"gcms/models"
+	"gcms/packages/auth"
+	"gcms/packages/upload"
+	"gcms/packages/utils"
 )
 
 type AdminCategoryServiceImpl struct {
@@ -34,6 +35,7 @@ type CategoryListItem struct {
 func childCategoriesIDs(user_id uint32, categoryID uint) []uint {
 	categoriesIDs := []uint{}
 	categories := []models.Category{}
+	spew.Dump(db.DB)
 	db.DB.Where("user_id = ? AND parent = ?", user_id, categoryID).Find(&categories)
 	for _, category := range categories {
 		categoriesIDs = append(categoriesIDs, category.ID)

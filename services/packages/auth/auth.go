@@ -12,9 +12,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 
-	"../../config"
-	"../../db"
-	"../../models"
+	"gcms/config"
+	"gcms/db"
+	"gcms/models"
 )
 
 const UserAuthKey contextKey = "UserData"
@@ -76,7 +76,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func CreateToken(user_id uint) string {
+func CreateToken(user_id uint32) string {
 	// Declare the expiration time of the token here
 	expirationTime := time.Now().Add(time.Duration(config.AppConfig.JWTExpire) * time.Hour)
 	// Create the JWT claims, which includes the username and expiry time
@@ -157,7 +157,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 func GetUser(ctx context.Context) models.User {
 	userData, _ := ctx.Value(UserAuthKey).(AuthContext)
 	user := models.User{}
-	db.DB.First(&user, userData.UserID)
+	db.DB.GetContext(ctx, &user, "SELECT * FROM users WHERE id = $1", userData.UserID)
 	return user
 }
 

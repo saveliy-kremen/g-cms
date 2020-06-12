@@ -13,9 +13,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 
-	"../../../config"
-	"../../../packages/auth"
-	"../../../packages/utils"
+	"gcms/config"
+	"gcms/packages/auth"
+	"gcms/packages/utils"
 )
 
 // AuthTokenKey is the key used within our metadata to store a JWT

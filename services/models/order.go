@@ -3,7 +3,8 @@ package models
 import (
 	"strconv"
 
-	v1 "../api/v1"
+	v1 "gcms/api/v1"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
 )

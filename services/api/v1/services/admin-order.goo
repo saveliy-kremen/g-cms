@@ -7,10 +7,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	v1 "../../../api/v1"
-	"../../../config"
-	"../../../db"
-	"../../../models"
+	v1 "gcms/api/v1"
+	"gcms/config"
+	"gcms/db"
+	"gcms/models"
 )
 
 type AdminOrderServiceImpl struct {

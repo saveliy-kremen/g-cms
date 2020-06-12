@@ -3,31 +3,70 @@ package db
 import (
 	"fmt"
 	"log"
+	"net"
+	"os"
+	"time"
 
-	"../config"
-	"../models"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/jackc/pgx/v4/log/logrusadapter"
+	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v4/stdlib"
+	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
+
+	"gcms/config"
 )
 
+type simpleFormater struct {
+	pathMatch string
+	logrus.TextFormatter
+}
+
 var (
-	DB *gorm.DB
+	//DB pool
+	DB *sqlx.DB
+	//Logger to system.log
+	Logger *logrus.Logger
 )
 
 func init() {
 	var err error
 
-	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return config.AppConfig.Prefix + "_" + defaultTableName
+	// use current directory to match stack frame
+	// only for this package
+	wd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
+	Logger := logrus.New()
+	Logger.SetLevel(logrus.ErrorLevel)
+	Logger.SetFormatter(&simpleFormater{pathMatch: wd})
+	Logger.SetReportCaller(true)
+	file, err := os.OpenFile("services.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	Logger.SetOutput(file)
 
-	DB, err = gorm.Open("mysql", fmt.Sprintf("%v:%v@/%v?parseTime=True&loc=Local", config.AppConfig.User, config.AppConfig.Password, config.AppConfig.Dbname))
+	cfg, err := pgxpool.ParseConfig("postgres://" + config.AppConfig.User + ":" + config.AppConfig.Password + "@localhost:5432/" + config.AppConfig.Dbname + "?sslmode=disable&search_path=" + config.AppConfig.Prefix)
 	if err != nil {
 		log.Fatal("Could not connecto to database ", err)
 	}
-	DB.DB().SetMaxIdleConns(0)
-	DB.AutoMigrate(&models.User{}, &models.Category{}, &models.Property{}, &models.PropertyValue{},
-		&models.PropertiesCategories{}, &models.Item{}, &models.ItemImage{}, &models.ItemsCategories{},
-		&models.ItemProperty{}, &models.Vendor{}, &models.Currency{}, &models.Order{}, &models.OrderItem{})
-	//DB.LogMode(true)
+
+	cfg.MaxConns = 8
+	cfg.ConnConfig.TLSConfig = nil
+	cfg.ConnConfig.PreferSimpleProtocol = true
+	cfg.ConnConfig.RuntimeParams["standard_conforming_strings"] = "on"
+	cfg.ConnConfig.Logger = logrusadapter.NewLogger(Logger)
+	cfg.ConnConfig.DialFunc = (&net.Dialer{
+		KeepAlive: 5 * time.Minute,
+		Timeout:   1 * time.Second,
+	}).DialContext
+
+	pgxConfig := stdlib.RegisterConnConfig(cfg.ConnConfig)
+	DB, err = sqlx.Connect("pgx", pgxConfig)
+	if err != nil {
+		log.Fatal("Could not connecto to database ", err)
+	}
+	//DB.MustExec(schema)
 }

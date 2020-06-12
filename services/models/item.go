@@ -1,14 +1,18 @@
 package models
 
 import (
+	"encoding/json"
 	"strconv"
+	"time"
 
-	v1 "../api/v1"
+	v1 "gcms/api/v1"
+
 	"github.com/jinzhu/gorm"
 )
 
 type Item struct {
-	gorm.Model
+	ID        uint64
+	CreatedAt time.Time `db:"created_at"`
 
 	UserID         uint32
 	VendorID       uint32
@@ -17,6 +21,7 @@ type Item struct {
 	Title          string `sql:"type:text"`
 	Article        string
 	Alias          string
+	Images         string
 	Description    string  `sql:"type:text"`
 	Price          float32 `sql:"type:decimal(10,2)"`
 	OldPrice       float32 `sql:"type:decimal(10,2)"`
@@ -31,21 +36,15 @@ type Item struct {
 
 	Categories []Category `gorm:"many2many:items_categories;"`
 	Properties []Property
-	Images     []ItemImage
-	Offers     []Item
-	Vendor     Vendor
-	Currency   Currency
+
+	Offers   []Item
+	Vendor   Vendor
+	Currency Currency
 }
 
 type ItemImage struct {
-	gorm.Model
-
-	UserID          uint32
-	ItemID          uint32
 	Filename        string
-	Sort            uint32
 	PropertyValueID uint32
-	Main            bool
 }
 
 type ItemProperty struct {
@@ -97,23 +96,20 @@ func AdminItemToResponse(item Item) *v1.AdminItem {
 	}
 }
 
-func AdminItemImagesToResponse(images []ItemImage) []*v1.AdminItemImage {
+func AdminItemImagesToResponse(images string) []*v1.AdminItemImage {
+	var itemImages []ItemImage
+	json.Unmarshal([]byte(images), &itemImages)
 	respImages := []*v1.AdminItemImage{}
-	for _, image := range images {
-		respImages = append(respImages, AdminItemImageToResponse(image))
+	for _, itemImage := range itemImages {
+		respImages = append(respImages, AdminItemImageToResponse(itemImage))
 	}
 	return respImages
 }
 
 func AdminItemImageToResponse(image ItemImage) *v1.AdminItemImage {
 	return &v1.AdminItemImage{
-		Id:              uint32(image.ID),
-		UserId:          image.UserID,
-		ItemId:          image.ItemID,
 		Filename:        image.Filename,
-		Sort:            image.Sort,
 		PropertyValueId: image.PropertyValueID,
-		Main:            image.Main,
 	}
 }
 
@@ -151,22 +147,19 @@ func ItemToResponse(item Item) *v1.Item {
 	}
 }
 
-func ItemImagesToResponse(images []ItemImage) []*v1.ItemImage {
+func ItemImagesToResponse(images string) []*v1.ItemImage {
+	var itemImages []ItemImage
+	json.Unmarshal([]byte(images), &itemImages)
 	respImages := []*v1.ItemImage{}
-	for _, image := range images {
-		respImages = append(respImages, ItemImageToResponse(image))
+	for _, itemImage := range itemImages {
+		respImages = append(respImages, ItemImageToResponse(itemImage))
 	}
 	return respImages
 }
 
 func ItemImageToResponse(image ItemImage) *v1.ItemImage {
 	return &v1.ItemImage{
-		Id:              uint32(image.ID),
-		UserId:          image.UserID,
-		ItemId:          image.ItemID,
 		Filename:        image.Filename,
-		Sort:            image.Sort,
 		PropertyValueId: image.PropertyValueID,
-		Main:            image.Main,
 	}
 }

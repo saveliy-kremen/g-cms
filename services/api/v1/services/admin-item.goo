@@ -15,13 +15,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	v1 "../../../api/v1"
-	"../../../config"
-	"../../../db"
-	"../../../models"
-	"../../../packages/auth"
-	"../../../packages/thumbs"
-	"../../../packages/utils"
+	v1 "gcms/api/v1"
+	"gcms/config"
+	"gcms/db"
+	"gcms/models"
+	"gcms/packages/auth"
+	"gcms/packages/utils"
+
+	"gcms/packages/thumbs"
 )
 
 type AdminItemServiceImpl struct {

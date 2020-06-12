@@ -3,9 +3,9 @@ package services
 import (
 	"context"
 
-	v1 "../../../api/v1"
-	"../../../db"
-	"../../../models"
+	v1 "gcms/api/v1"
+	"gcms/db"
+	"gcms/models"
 )
 
 type OrderServiceImpl struct {

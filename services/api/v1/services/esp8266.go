@@ -4,7 +4,7 @@ import (
 	"context"
 	//"github.com/davecgh/go-spew/spew"
 
-	v1 "../../../api/v1"
+	v1 "gcms/api/v1"
 )
 
 type Esp8266ServiceImpl struct {

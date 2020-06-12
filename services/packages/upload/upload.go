@@ -15,11 +15,10 @@ import (
 	"strings"
 	"time"
 
-	"../../config"
-	"../../db"
-	"../../models"
-	"../../packages/auth"
-	"../../packages/thumbs"
+	"gcms/config"
+	"gcms/db"
+	"gcms/packages/auth"
+	"gcms/packages/thumbs"
 )
 
 func UploadFileHandler() http.HandlerFunc {
@@ -69,18 +68,16 @@ func UploadFileHandler() http.HandlerFunc {
 			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		image := models.ItemImage{}
-		db.DB.Where("user_id = ? AND filename = ?", userID, handler.Filename).First(&image)
-		image.UserID = userID
-		image.Filename = handler.Filename
-		db.DB.Save(&image)
-		thumb, err := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.Thumbs.Item, directory, strconv.Itoa(int(image.ID)))
+		res, err := db.DB.ExecContext(ctx, "INSERT INTO user_images (user_id, filename) VALUES($1, $2)", userID, handler.Filename)
+		if err != nil {
+			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
+		}
+		imageID, err := res.LastInsertId()
+		thumb, err := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.Thumbs.Item, directory, strconv.Itoa(int(imageID)))
 		if err != nil {
 			http.Error(w, "Error create thumb file: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		image.Filename = *thumb
-		db.DB.Save(&image)
 		if handler.Filename != *thumb {
 			os.Remove(directory + handler.Filename)
 		}

@@ -6,6 +6,7 @@ import (
 
 	_ "image/png"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -13,10 +14,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	v1 "../../../api/v1"
-	"../../../db"
-	"../../../models"
-	"../../../packages/auth"
+	v1 "gcms/api/v1"
+	"gcms/db"
+	"gcms/models"
+	"gcms/packages/auth"
 )
 
 func toProto(year, month, day int) *timestamp.Timestamp {
@@ -34,9 +35,12 @@ type UserServiceImpl struct {
 // Get User profile or create if not found.
 func (s *UserServiceImpl) Auth(ctx context.Context, req *v1.AuthRequest) (*v1.UserResponse, error) {
 	user := models.User{}
-	if db.DB.Where("email = ?", req.Login).First(&user).RecordNotFound() {
+
+	err := db.DB.GetContext(ctx, &user, "SELECT * FROM user WHERE email=$1", req.Login)
+	if err != nil {
 		return nil, status.Errorf(codes.PermissionDenied, "User not exist")
 	}
+
 	if !auth.ComparePasswords(user.Password, []byte(req.Password)) {
 		log.Println("err")
 		return nil, status.Errorf(codes.PermissionDenied, "Wrong password")
@@ -62,16 +66,27 @@ func (s *UserServiceImpl) Me(ctx context.Context, req *empty.Empty) (*v1.UserRes
 func (s *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest) (*v1.UserResponse, error) {
 	user := models.User{}
 
-	if !db.DB.Where("email = ?", req.Email).First(&user).RecordNotFound() {
+	spew.Dump(req)
+	err := db.DB.GetContext(ctx, &user, "SELECT * FROM user WHERE 'email'=$1", req.Email)
+	if err == nil {
 		return nil, status.Errorf(codes.AlreadyExists, "User already exist")
 	}
 	user.Fullname = req.Fullname
 	user.Phone = req.Phone
 	user.Email = req.Email
 	user.Password = auth.HashAndSalt([]byte(req.Password))
-	if err := db.DB.Create(&user).Error; err != nil {
+
+	res, err := db.DB.NamedExec(`
+	INSERT INTO users (fullname, phone , email, password) 
+	VALUES (:fullname, :phone, :email, :password)
+	`, user)
+
+	spew.Dump(err)
+	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
+	userID, err := res.LastInsertId()
+	user.ID = uint32(userID)
 	token := auth.CreateToken(user.ID)
 	resp := &v1.UserResponse{
 		User:  models.UserToResponse(user),

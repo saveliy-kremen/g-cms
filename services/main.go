@@ -9,11 +9,12 @@ import (
 
 	"google.golang.org/grpc"
 
-	v1 "./api/v1"
-	"./api/v1/services"
-	"./config"
-	"./packages/auth"
-	"./packages/upload"
+	v1 "gcms/api/v1"
+
+	"gcms/api/v1/services"
+	"gcms/config"
+	"gcms/packages/auth"
+	"gcms/packages/upload"
 )
 
 func main() {
@@ -28,17 +29,17 @@ func main() {
 
 	// register our service implementation
 	v1.RegisterUserServiceServer(svr, &services.UserServiceImpl{})
-	v1.RegisterAdminCategoryServiceServer(svr, &services.AdminCategoryServiceImpl{})
-	v1.RegisterAdminPropertyServiceServer(svr, &services.AdminPropertyServiceImpl{})
-	v1.RegisterAdminItemServiceServer(svr, &services.AdminItemServiceImpl{})
-	v1.RegisterAdminOrderServiceServer(svr, &services.AdminOrderServiceImpl{})
-	v1.RegisterCategoryServiceServer(svr, &services.CategoryServiceImpl{})
-	v1.RegisterPropertyServiceServer(svr, &services.PropertyServiceImpl{})
+	//v1.RegisterAdminCategoryServiceServer(svr, &services.AdminCategoryServiceImpl{})
+	//v1.RegisterAdminPropertyServiceServer(svr, &services.AdminPropertyServiceImpl{})
+	//v1.RegisterAdminItemServiceServer(svr, &services.AdminItemServiceImpl{})
+	//v1.RegisterAdminOrderServiceServer(svr, &services.AdminOrderServiceImpl{})
+	//v1.RegisterCategoryServiceServer(svr, &services.CategoryServiceImpl{})
+	//v1.RegisterPropertyServiceServer(svr, &services.PropertyServiceImpl{})
 	v1.RegisterItemServiceServer(svr, &services.ItemServiceImpl{})
-	v1.RegisterVendorServiceServer(svr, &services.VendorServiceImpl{})
-	v1.RegisterCurrencyServiceServer(svr, &services.CurrencyServiceImpl{})
-	v1.RegisterOrderServiceServer(svr, &services.OrderServiceImpl{})
-	v1.RegisterEsp8266ServiceServer(svr, &services.Esp8266ServiceImpl{})
+	//v1.RegisterVendorServiceServer(svr, &services.VendorServiceImpl{})
+	//v1.RegisterCurrencyServiceServer(svr, &services.CurrencyServiceImpl{})
+	//v1.RegisterOrderServiceServer(svr, &services.OrderServiceImpl{})
+	//v1.RegisterEsp8266ServiceServer(svr, &services.Esp8266ServiceImpl{})
 
 	// trap SIGINT / SIGTERM to exit cleanly
 	//c := make(chan os.Signal, 1)

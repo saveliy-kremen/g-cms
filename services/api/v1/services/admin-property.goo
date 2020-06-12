@@ -11,13 +11,13 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	v1 "../../../api/v1"
-	"../../../config"
-	"../../../db"
-	"../../../models"
-	"../../../packages/auth"
-	"../../../packages/upload"
-	"../../../packages/utils"
+	v1 "gcms/api/v1"
+	"gcms/config"
+	"gcms/db"
+	"gcms/models"
+	"gcms/packages/auth"
+	"gcms/packages/upload"
+	"gcms/packages/utils"
 )
 
 type AdminPropertyServiceImpl struct {

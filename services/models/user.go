@@ -1,8 +1,8 @@
 package models
 
 import (
-	v1 "../api/v1"
-	"github.com/jinzhu/gorm"
+	v1 "gcms/api/v1"
+	"time"
 )
 
 const (
@@ -13,18 +13,25 @@ const (
 )
 
 type User struct {
-	gorm.Model
+	ID        uint32
+	CreatedAt time.Time `db:"created_at"`
 
 	Fullname  string
 	Phone     string
 	Email     string
 	Password  string
 	Photo     string
-	Role      uint
+	Role      uint32
 	Trademark string
-	Tariff    uint
+	Tariff    uint32
 	Amount    float32 `sql:"type:decimal(10,2)"`
 	About     string
+}
+
+type UserImage struct {
+	ID       uint32
+	UserID   uint32
+	Filename string
 }
 
 func UserToResponse(user User) *v1.User {

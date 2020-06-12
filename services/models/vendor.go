@@ -1,7 +1,8 @@
 package models
 
 import (
-	v1 "../api/v1"
+	v1 "gcms/api/v1"
+
 	"github.com/jinzhu/gorm"
 )
 

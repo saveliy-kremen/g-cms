@@ -1,0 +1,6 @@
+CREATE DATABASE dbname;
+CREATE USER username WITH password 'password';
+GRANT ALL ON DATABASE dbname TO user;
+psql -h localhost dbname username
+create schema schemaname
+SET search_path TO schemaname;

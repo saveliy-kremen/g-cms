@@ -68,5 +68,5 @@ func init() {
 	if err != nil {
 		log.Fatal("Could not connecto to database ", err)
 	}
-	//DB.MustExec(schema)
+	DB.MustExec(schema)
 }

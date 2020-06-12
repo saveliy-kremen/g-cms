@@ -6,7 +6,6 @@ import (
 
 	_ "image/png"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -36,7 +35,7 @@ type UserServiceImpl struct {
 func (s *UserServiceImpl) Auth(ctx context.Context, req *v1.AuthRequest) (*v1.UserResponse, error) {
 	user := models.User{}
 
-	err := db.DB.GetContext(ctx, &user, "SELECT * FROM user WHERE email=$1", req.Login)
+	err := db.DB.GetContext(ctx, &user, "SELECT * FROM users WHERE email=$1", req.Login)
 	if err != nil {
 		return nil, status.Errorf(codes.PermissionDenied, "User not exist")
 	}
@@ -66,8 +65,7 @@ func (s *UserServiceImpl) Me(ctx context.Context, req *empty.Empty) (*v1.UserRes
 func (s *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest) (*v1.UserResponse, error) {
 	user := models.User{}
 
-	spew.Dump(req)
-	err := db.DB.GetContext(ctx, &user, "SELECT * FROM user WHERE 'email'=$1", req.Email)
+	err := db.DB.GetContext(ctx, &user, "SELECT * FROM users WHERE email=$1", req.Email)
 	if err == nil {
 		return nil, status.Errorf(codes.AlreadyExists, "User already exist")
 	}
@@ -81,7 +79,6 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest)
 	VALUES (:fullname, :phone, :email, :password)
 	`, user)
 
-	spew.Dump(err)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}

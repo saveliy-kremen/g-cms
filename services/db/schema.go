@@ -1,38 +1,55 @@
 package db
 
 var schema = `
+DROP TABLE IF EXISTS currencies;
+
+CREATE TABLE currencies (
+	id serial PRIMARY KEY,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+
+	name varchar(256) NOT NULL,
+	short_name varchar(256) DEFAULT '',
+	code varchar(4) NOT NULL,
+	rate numeric(5,4) NOT NULL
+   );
+`
+
+/*
+var schema = `
+DROP TABLE IF EXISTS user_images;
+DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS vendors;
+
 CREATE TABLE users (
 	id serial PRIMARY KEY,
-	created_at timestamp,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 
 	fullname varchar(256) NOT NULL,
-	phone varchar(13),
+	phone varchar(13) DEFAULT '',
 	email varchar(256) NOT NULL UNIQUE,
 	password varchar(256) NOT NULL,
-	photo varchar(256),
-	role int,
-	trademark varchar(256),
-	tariff int,
+	photo varchar(256) DEFAULT '',
+	role int DEFAULT 0,
+	trademark varchar(256) DEFAULT '',
+	tariff int DEFAULT 0,
 	amount numeric(10,2) DEFAULT 0,
-	about text 
+	about text DEFAULT ''
    );
 CREATE INDEX fullname ON users (fullname);
 
-DROP TABLE IF EXISTS user_images;
 CREATE TABLE user_images (
 	id serial PRIMARY KEY,
 
-	user_id int,
-	filename text ,
+	user_id int NOT NULL,
+	filename text NOT NULL ,
 
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
    );
 
-DROP TABLE IF EXISTS items;
 CREATE TABLE items (
 	id bigserial PRIMARY KEY,
-	created_at timestamp,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 
 	user_id int,
 	vendor_id int,
@@ -52,9 +69,22 @@ CREATE TABLE items (
 	sort int,
 	seo_title text,
 	seo_description text,
-	seo_keywords text
+	seo_keywords text,
+
+	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+	FOREIGN KEY (parent_id) REFERENCES items (id) ON DELETE CASCADE
    );
 CREATE INDEX created_at ON items (created_at);
 CREATE INDEX title ON items (title);
 CREATE INDEX alias ON items (alias);
+
+CREATE TABLE vendors (
+	id serial PRIMARY KEY,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+
+	name varchar(256) NOT NULL,
+	country varchar(256) DEFAULT ''
+   );
+CREATE INDEX name ON vendors (name);
 `
+*/

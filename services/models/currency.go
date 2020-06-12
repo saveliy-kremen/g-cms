@@ -2,15 +2,15 @@ package models
 
 import (
 	v1 "gcms/api/v1"
-
-	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type Currency struct {
-	gorm.Model
+	ID        uint32
+	CreatedAt time.Time `db:"created_at"`
 
 	Name      string
-	ShortName string
+	ShortName string `db:"short_name"`
 	Code      string
 	Rate      float32
 }

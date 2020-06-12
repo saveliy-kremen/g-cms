@@ -15,11 +15,12 @@ type CurrencyServiceImpl struct {
 }
 
 func (s *CurrencyServiceImpl) Currency(ctx context.Context, req *v1.CurrencyRequest) (*v1.CurrencyResponse, error) {
-	Currency := models.Currency{}
-	if db.DB.First(&Currency, req.Id).RecordNotFound() {
+	currency := models.Currency{}
+	err := db.DB.GetContext(ctx, &currency, "SELECT * FROM currencies WHERE id=$1", req.Id)
+	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Currency not found")
 	}
-	return &v1.CurrencyResponse{Currency: models.CurrencyToResponse(Currency)}, nil
+	return &v1.CurrencyResponse{Currency: models.CurrencyToResponse(currency)}, nil
 }
 
 func (s *CurrencyServiceImpl) Currencies(ctx context.Context, req *v1.CurrenciesRequest) (*v1.CurrenciesResponse, error) {
@@ -33,8 +34,8 @@ func (s *CurrencyServiceImpl) Currencies(ctx context.Context, req *v1.Currencies
 	if limit == 0 {
 		limit = ^uint32(0)
 	}
-	db.DB.Find(&currencies).Count(&total)
-	db.DB.Order(order).Offset(req.Page * req.PageSize).Limit(limit).Find(&currencies)
+	db.DB.GetContext(ctx, &total, "SELECT count(*) FROM currencies")
+	db.DB.SelectContext(ctx, &currencies, "SELECT * FROM currencies ORDER BY $1 OFFSET $2 LIMIT $3", order, req.Page*req.PageSize, limit)
 	return &v1.CurrenciesResponse{Currencies: models.CurrenciesToResponse(currencies), Total: total}, nil
 }
 

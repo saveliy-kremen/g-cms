@@ -481,7 +481,7 @@ proto.v1.AdminItem.deserializeBinaryFromReader = function(msg, reader) {
       msg.setUserId(value);
       break;
     case 4:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setParentId(value);
       break;
     case 5:
@@ -605,7 +605,7 @@ proto.v1.AdminItem.serializeBinaryToWriter = function(message, writer) {
   }
   f = message.getParentId();
   if (f !== 0) {
-    writer.writeUint32(
+    writer.writeUint64(
       4,
       f
     );
@@ -780,7 +780,7 @@ proto.v1.AdminItem.prototype.setUserId = function(value) {
 
 
 /**
- * optional uint32 parent_id = 4;
+ * optional uint64 parent_id = 4;
  * @return {number}
  */
 proto.v1.AdminItem.prototype.getParentId = function() {
@@ -1283,7 +1283,7 @@ proto.v1.AdminItemImage.deserializeBinaryFromReader = function(msg, reader) {
       msg.setUserId(value);
       break;
     case 3:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setItemId(value);
       break;
     case 4:
@@ -1347,7 +1347,7 @@ proto.v1.AdminItemImage.serializeBinaryToWriter = function(message, writer) {
   }
   f = message.getItemId();
   if (f !== 0) {
-    writer.writeUint32(
+    writer.writeUint64(
       3,
       f
     );
@@ -1420,7 +1420,7 @@ proto.v1.AdminItemImage.prototype.setUserId = function(value) {
 
 
 /**
- * optional uint32 item_id = 3;
+ * optional uint64 item_id = 3;
  * @return {number}
  */
 proto.v1.AdminItemImage.prototype.getItemId = function() {
@@ -1895,7 +1895,7 @@ proto.v1.AdminDraftRequest.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setParentId(value);
       break;
     default:
@@ -1929,7 +1929,7 @@ proto.v1.AdminDraftRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getParentId();
   if (f !== 0) {
-    writer.writeUint32(
+    writer.writeUint64(
       1,
       f
     );
@@ -1938,7 +1938,7 @@ proto.v1.AdminDraftRequest.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional uint32 parent_id = 1;
+ * optional uint64 parent_id = 1;
  * @return {number}
  */
 proto.v1.AdminDraftRequest.prototype.getParentId = function() {
@@ -2249,7 +2249,7 @@ proto.v1.AdminOffersRequest.deserializeBinaryFromReader = function(msg, reader) 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setItemId(value);
       break;
     case 2:
@@ -2299,7 +2299,7 @@ proto.v1.AdminOffersRequest.serializeBinaryToWriter = function(message, writer) 
   var f = undefined;
   f = message.getItemId();
   if (f !== 0) {
-    writer.writeUint32(
+    writer.writeUint64(
       1,
       f
     );
@@ -2336,7 +2336,7 @@ proto.v1.AdminOffersRequest.serializeBinaryToWriter = function(message, writer) 
 
 
 /**
- * optional uint32 item_id = 1;
+ * optional uint64 item_id = 1;
  * @return {number}
  */
 proto.v1.AdminOffersRequest.prototype.getItemId = function() {
@@ -2523,7 +2523,7 @@ proto.v1.AdminEditItemRequest.deserializeBinaryFromReader = function(msg, reader
       msg.setId(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setParentId(value);
       break;
     case 3:
@@ -2625,7 +2625,7 @@ proto.v1.AdminEditItemRequest.serializeBinaryToWriter = function(message, writer
   }
   f = message.getParentId();
   if (f !== 0) {
-    writer.writeUint32(
+    writer.writeUint64(
       2,
       f
     );
@@ -2758,7 +2758,7 @@ proto.v1.AdminEditItemRequest.prototype.setId = function(value) {
 
 
 /**
- * optional uint32 parent_id = 2;
+ * optional uint64 parent_id = 2;
  * @return {number}
  */
 proto.v1.AdminEditItemRequest.prototype.getParentId = function() {
@@ -3432,7 +3432,7 @@ proto.v1.AdminDeleteOfferRequest.deserializeBinaryFromReader = function(msg, rea
       msg.setId(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setParentId(value);
       break;
     case 3:
@@ -3489,7 +3489,7 @@ proto.v1.AdminDeleteOfferRequest.serializeBinaryToWriter = function(message, wri
   }
   f = message.getParentId();
   if (f !== 0) {
-    writer.writeUint32(
+    writer.writeUint64(
       2,
       f
     );
@@ -3544,7 +3544,7 @@ proto.v1.AdminDeleteOfferRequest.prototype.setId = function(value) {
 
 
 /**
- * optional uint32 parent_id = 2;
+ * optional uint64 parent_id = 2;
  * @return {number}
  */
 proto.v1.AdminDeleteOfferRequest.prototype.getParentId = function() {
@@ -3890,7 +3890,7 @@ proto.v1.AdminUploadOfferRequest.deserializeBinaryFromReader = function(msg, rea
       msg.setArticle(value);
       break;
     case 3:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setParentId(value);
       break;
     case 4:
@@ -3978,7 +3978,7 @@ proto.v1.AdminUploadOfferRequest.serializeBinaryToWriter = function(message, wri
   }
   f = message.getParentId();
   if (f !== 0) {
-    writer.writeUint32(
+    writer.writeUint64(
       3,
       f
     );
@@ -4093,7 +4093,7 @@ proto.v1.AdminUploadOfferRequest.prototype.setArticle = function(value) {
 
 
 /**
- * optional uint32 parent_id = 3;
+ * optional uint64 parent_id = 3;
  * @return {number}
  */
 proto.v1.AdminUploadOfferRequest.prototype.getParentId = function() {

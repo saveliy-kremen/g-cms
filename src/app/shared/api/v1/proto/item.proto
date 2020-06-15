@@ -12,7 +12,7 @@ import "currency.proto";
 message Item {
   string id = 1;
   uint32 user_id = 2;
-  uint32 parent_id = 4;
+  uint64 parent_id = 4;
   uint32 category_id = 5;
   string title = 6;
   string article = 7;
@@ -38,7 +38,7 @@ message Item {
 message ItemImage {
   uint32 id = 1;
   uint32 user_id = 2;
-  uint32 item_id = 3;
+  uint64 item_id = 3;
   string filename = 4;
   uint32 sort = 5;
   uint32 property_value_id = 6;

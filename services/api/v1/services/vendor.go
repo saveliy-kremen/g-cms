@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -35,7 +36,8 @@ func (s *VendorServiceImpl) Vendors(ctx context.Context, req *v1.VendorsRequest)
 		limit = ^uint32(0)
 	}
 	db.DB.GetContext(ctx, &total, "SELECT count(*) FROM vendors")
-	db.DB.SelectContext(ctx, &vendors, "SELECT * FROM vendors ORDER BY $1 OFFSET $2 LIMIT $3", order, req.Page*req.PageSize, limit)
+	query := fmt.Sprintf("SELECT * FROM vendors ORDER BY %s OFFSET $1 LIMIT $2", order)
+	db.DB.SelectContext(ctx, &vendors, query, req.Page*req.PageSize, limit)
 	return &v1.VendorsResponse{Vendors: models.VendorsToResponse(vendors), Total: total}, nil
 }
 

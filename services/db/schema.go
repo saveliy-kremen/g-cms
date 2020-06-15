@@ -1,25 +1,11 @@
 package db
 
 var schema = `
-DROP TABLE IF EXISTS currencies;
-
-CREATE TABLE currencies (
-	id serial PRIMARY KEY,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-
-	name varchar(256) NOT NULL,
-	short_name varchar(256) DEFAULT '',
-	code varchar(4) NOT NULL,
-	rate numeric(5,4) NOT NULL
-   );
-`
-
-/*
-var schema = `
 DROP TABLE IF EXISTS user_images;
 DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS vendors;
+DROP TABLE IF EXISTS currencies;
 
 CREATE TABLE users (
 	id serial PRIMARY KEY,
@@ -52,24 +38,24 @@ CREATE TABLE items (
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 
 	user_id int,
-	vendor_id int,
-	parent_id bigint,
+	vendor_id int DEFAULT 0,
+	parent_id bigint DEFAULT NULL,
 	draft bool,
 	title text NOT NULL,
-	article varchar(256),
+	article varchar(256) DEFAULT '',
 	alias varchar(256) NOT NULL,
-	images json,
-	description text,
-	price numeric(11,2),
-	old_price numeric(11,2),
-	currency_id smallint,
-	count int,
-	in_stock bool,
-	disable bool,
-	sort int,
-	seo_title text,
-	seo_description text,
-	seo_keywords text,
+	images json DEFAULT '[]'::JSON,
+	description text DEFAULT '',
+	price numeric(11,2) DEFAULT 0,
+	old_price numeric(11,2) DEFAULT 0,
+	currency_id smallint DEFAULT 0,
+	count int DEFAULT 0,
+	in_stock bool DEFAULT false,
+	disable bool DEFAULT false,
+	sort int DEFAULT 0,
+	seo_title text DEFAULT '',
+	seo_description text DEFAULT '',
+	seo_keywords text DEFAULT '',
 
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
 	FOREIGN KEY (parent_id) REFERENCES items (id) ON DELETE CASCADE
@@ -86,5 +72,14 @@ CREATE TABLE vendors (
 	country varchar(256) DEFAULT ''
    );
 CREATE INDEX name ON vendors (name);
+
+CREATE TABLE currencies (
+	id serial PRIMARY KEY,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+
+	name varchar(256) NOT NULL,
+	short_name varchar(256) DEFAULT '',
+	code varchar(4) NOT NULL,
+	rate numeric(5,4) NOT NULL
+   );
 `
-*/

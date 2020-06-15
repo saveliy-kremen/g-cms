@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -35,7 +36,8 @@ func (s *CurrencyServiceImpl) Currencies(ctx context.Context, req *v1.Currencies
 		limit = ^uint32(0)
 	}
 	db.DB.GetContext(ctx, &total, "SELECT count(*) FROM currencies")
-	db.DB.SelectContext(ctx, &currencies, "SELECT * FROM currencies ORDER BY $1 OFFSET $2 LIMIT $3", order, req.Page*req.PageSize, limit)
+	query := fmt.Sprintf("SELECT * FROM currencies ORDER BY %s OFFSET $1 LIMIT $2", order)
+	db.DB.SelectContext(ctx, &currencies, query, req.Page*req.PageSize, limit)
 	return &v1.CurrenciesResponse{Currencies: models.CurrenciesToResponse(currencies), Total: total}, nil
 }
 

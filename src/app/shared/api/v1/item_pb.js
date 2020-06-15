@@ -262,7 +262,7 @@ proto.v1.Item.deserializeBinaryFromReader = function(msg, reader) {
       msg.setUserId(value);
       break;
     case 4:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setParentId(value);
       break;
     case 5:
@@ -391,7 +391,7 @@ proto.v1.Item.serializeBinaryToWriter = function(message, writer) {
   }
   f = message.getParentId();
   if (f !== 0) {
-    writer.writeUint32(
+    writer.writeUint64(
       4,
       f
     );
@@ -574,7 +574,7 @@ proto.v1.Item.prototype.setUserId = function(value) {
 
 
 /**
- * optional uint32 parent_id = 4;
+ * optional uint64 parent_id = 4;
  * @return {number}
  */
 proto.v1.Item.prototype.getParentId = function() {
@@ -1114,7 +1114,7 @@ proto.v1.ItemImage.deserializeBinaryFromReader = function(msg, reader) {
       msg.setUserId(value);
       break;
     case 3:
-      var value = /** @type {number} */ (reader.readUint32());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setItemId(value);
       break;
     case 4:
@@ -1178,7 +1178,7 @@ proto.v1.ItemImage.serializeBinaryToWriter = function(message, writer) {
   }
   f = message.getItemId();
   if (f !== 0) {
-    writer.writeUint32(
+    writer.writeUint64(
       3,
       f
     );
@@ -1251,7 +1251,7 @@ proto.v1.ItemImage.prototype.setUserId = function(value) {
 
 
 /**
- * optional uint32 item_id = 3;
+ * optional uint64 item_id = 3;
  * @return {number}
  */
 proto.v1.ItemImage.prototype.getItemId = function() {

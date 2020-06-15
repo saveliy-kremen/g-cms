@@ -82,7 +82,7 @@ func (s *AdminItemServiceImpl) AdminCreateDraftItem(ctx context.Context, req *v1
 		user_id, true, draft.ID)
 	if req.ParentId == 0 {
 		//Item
-		draft.ParentID = 0
+		draft.ParentID = sql.NullInt64{0, false}
 		draft.Title = ""
 		draft.Alias = ""
 		draft.Article = ""
@@ -95,7 +95,7 @@ func (s *AdminItemServiceImpl) AdminCreateDraftItem(ctx context.Context, req *v1
 		if err != nil {
 			return nil, status.Errorf(codes.NotFound, "Parent item not found")
 		}
-		draft.ParentID = req.ParentId
+		draft.ParentID = sql.NullInt64{int64(req.ParentId), true}
 	}
 	db.DB.ExecContext(ctx, `
 		UPDATE items SET parent_id=$1, title=$2, alias=$3, article=$4
@@ -111,7 +111,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 
 	item.UserID = user_id
 	item.Title = req.Title
-	item.ParentID = req.ParentId
+	item.ParentID = sql.NullInt64{int64(req.ParentId), true}
 	item.Article = req.Article
 	item.Alias = req.Alias
 	if item.Alias == "" {
@@ -274,8 +274,7 @@ func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.
 
 	item := models.Item{}
 	if req.Id != 0 {
-		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1, id=$2", user_id, req.Id)
-		spew.Dump(err)
+		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
 		if err != nil {
 			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
@@ -367,13 +366,13 @@ func (s *AdminItemServiceImpl) AdminItemUnbindCategory(ctx context.Context, req 
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
-	err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1, id=$2", user_id, req.Id)
+	err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
 
 	category := models.Category{}
-	err = db.DB.GetContext(ctx, &category, "SELECT * FROM categories WHERE user_id=$1, id=$2", user_id, req.CategoryId)
+	err = db.DB.GetContext(ctx, &category, "SELECT * FROM categories WHERE user_id=$1 AND id=$2", user_id, req.CategoryId)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Category_not_found")
 	}
@@ -417,8 +416,9 @@ func (s *AdminItemServiceImpl) AdminItemProperties(ctx context.Context, req *v1.
 
 	item := models.Item{}
 	if req.Id != 0 {
-		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1, id=$2", user_id, req.Id)
+		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
 		if err != nil {
+			spew.Dump(err)
 			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
 	}
@@ -431,7 +431,7 @@ func (s *AdminItemServiceImpl) AdminItemOffers(ctx context.Context, req *v1.Admi
 
 	item := models.Item{}
 	if req.ItemId != 0 {
-		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1, id=$2", user_id, req.ItemId)
+		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.ItemId)
 		if err != nil {
 			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"encoding/json"
 	"strconv"
 	"time"
@@ -14,27 +15,27 @@ type Item struct {
 	ID        uint64
 	CreatedAt time.Time `db:"created_at"`
 
-	UserID         uint32
-	VendorID       uint32
-	ParentID       uint32
+	UserID         uint32        `db:"user_id"`
+	VendorID       uint32        `db:"vendor_id"`
+	ParentID       sql.NullInt64 `db:"parent_id"`
 	Draft          bool
-	Title          string `sql:"type:text"`
+	Title          string
 	Article        string
 	Alias          string
 	Images         string
-	Description    string  `sql:"type:text"`
-	Price          float32 `sql:"type:decimal(10,2)"`
-	OldPrice       float32 `sql:"type:decimal(10,2)"`
-	CurrencyID     uint32
+	Description    string
+	Price          float32
+	OldPrice       float32 `db:"old_price"`
+	CurrencyID     uint32  `db:"currency_id"`
 	Count          int32
-	InStock        bool
+	InStock        bool `db:"in_stock"`
 	Disable        bool
 	Sort           uint32
-	SeoTitle       string `sql:"type:text" json:"seo_title"`
-	SeoDescription string `sql:"type:text" json:"seo_description"`
-	SeoKeywords    string `sql:"type:text" json:"seo_keywords"`
+	SeoTitle       string `db:"seo_title"`
+	SeoDescription string `db:"seo_description"`
+	SeoKeywords    string `db:"seo_keywords"`
 
-	Categories []Category `gorm:"many2many:items_categories;"`
+	Categories []Category
 	Properties []Property
 
 	Offers   []Item
@@ -74,7 +75,7 @@ func AdminItemToResponse(item Item) *v1.AdminItem {
 	return &v1.AdminItem{
 		Id:             strconv.Itoa(int(item.ID)),
 		UserId:         item.UserID,
-		ParentId:       item.ParentID,
+		ParentId:       uint64(item.ParentID.Int64),
 		Title:          item.Title,
 		Article:        item.Article,
 		Alias:          item.Alias,
@@ -125,7 +126,7 @@ func ItemToResponse(item Item) *v1.Item {
 	return &v1.Item{
 		Id:             strconv.Itoa(int(item.ID)),
 		UserId:         item.UserID,
-		ParentId:       item.ParentID,
+		ParentId:       uint64(item.ParentID.Int64),
 		Title:          item.Title,
 		Article:        item.Article,
 		Alias:          item.Alias,

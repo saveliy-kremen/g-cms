@@ -194,7 +194,7 @@ export class ItemEditComponent implements OnInit {
         formArray.push(new FormGroup(formItem))
       }
     } catch (err) {
-      console.log(err)
+      console.log("updateProperties", err)
     }
   }
 

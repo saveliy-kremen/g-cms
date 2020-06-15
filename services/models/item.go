@@ -48,6 +48,13 @@ type ItemImage struct {
 	PropertyValueID uint32
 }
 
+type UploadImage struct {
+	ID       uint32
+	UserID   uint32
+	Filename string
+	Sort     uint32
+}
+
 type ItemProperty struct {
 	gorm.Model
 
@@ -111,6 +118,21 @@ func AdminItemImageToResponse(image ItemImage) *v1.AdminItemImage {
 	return &v1.AdminItemImage{
 		Filename:        image.Filename,
 		PropertyValueId: image.PropertyValueID,
+	}
+}
+
+func AdminUploadImagesToResponse(images []UploadImage) []*v1.AdminUploadImage {
+	respImages := []*v1.AdminUploadImage{}
+	for _, image := range images {
+		respImages = append(respImages, AdminUploadImageToResponse(image))
+	}
+	return respImages
+}
+
+func AdminUploadImageToResponse(image UploadImage) *v1.AdminUploadImage {
+	return &v1.AdminUploadImage{
+		Filename: image.Filename,
+		Sort:     image.Sort,
 	}
 }
 

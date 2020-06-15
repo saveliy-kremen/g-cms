@@ -113,26 +113,11 @@ export namespace AdminItem {
 }
 
 export class AdminItemImage extends jspb.Message {
-  getId(): number;
-  setId(value: number): void;
-
-  getUserId(): number;
-  setUserId(value: number): void;
-
-  getItemId(): number;
-  setItemId(value: number): void;
-
   getFilename(): string;
   setFilename(value: string): void;
 
-  getSort(): number;
-  setSort(value: number): void;
-
   getPropertyValueId(): number;
   setPropertyValueId(value: number): void;
-
-  getMain(): boolean;
-  setMain(value: boolean): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AdminItemImage.AsObject;
@@ -144,13 +129,38 @@ export class AdminItemImage extends jspb.Message {
 
 export namespace AdminItemImage {
   export type AsObject = {
+    filename: string,
+    propertyValueId: number,
+  }
+}
+
+export class AdminUploadImage extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  getUserId(): number;
+  setUserId(value: number): void;
+
+  getFilename(): string;
+  setFilename(value: string): void;
+
+  getSort(): number;
+  setSort(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): AdminUploadImage.AsObject;
+  static toObject(includeInstance: boolean, msg: AdminUploadImage): AdminUploadImage.AsObject;
+  static serializeBinaryToWriter(message: AdminUploadImage, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AdminUploadImage;
+  static deserializeBinaryFromReader(message: AdminUploadImage, reader: jspb.BinaryReader): AdminUploadImage;
+}
+
+export namespace AdminUploadImage {
+  export type AsObject = {
     id: number,
     userId: number,
-    itemId: number,
     filename: string,
     sort: number,
-    propertyValueId: number,
-    main: boolean,
   }
 }
 
@@ -598,23 +608,23 @@ export namespace AdminOffersResponse {
   }
 }
 
-export class AdminItemImagesResponse extends jspb.Message {
-  getImagesList(): Array<AdminItemImage>;
-  setImagesList(value: Array<AdminItemImage>): void;
+export class AdminUploadImagesResponse extends jspb.Message {
+  getImagesList(): Array<AdminUploadImage>;
+  setImagesList(value: Array<AdminUploadImage>): void;
   clearImagesList(): void;
-  addImages(value?: AdminItemImage, index?: number): AdminItemImage;
+  addImages(value?: AdminUploadImage, index?: number): AdminUploadImage;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): AdminItemImagesResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: AdminItemImagesResponse): AdminItemImagesResponse.AsObject;
-  static serializeBinaryToWriter(message: AdminItemImagesResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): AdminItemImagesResponse;
-  static deserializeBinaryFromReader(message: AdminItemImagesResponse, reader: jspb.BinaryReader): AdminItemImagesResponse;
+  toObject(includeInstance?: boolean): AdminUploadImagesResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: AdminUploadImagesResponse): AdminUploadImagesResponse.AsObject;
+  static serializeBinaryToWriter(message: AdminUploadImagesResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AdminUploadImagesResponse;
+  static deserializeBinaryFromReader(message: AdminUploadImagesResponse, reader: jspb.BinaryReader): AdminUploadImagesResponse;
 }
 
-export namespace AdminItemImagesResponse {
+export namespace AdminUploadImagesResponse {
   export type AsObject = {
-    imagesList: Array<AdminItemImage.AsObject>,
+    imagesList: Array<AdminUploadImage.AsObject>,
   }
 }
 

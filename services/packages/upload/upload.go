@@ -68,12 +68,13 @@ func UploadFileHandler() http.HandlerFunc {
 			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		res, err := db.DB.ExecContext(ctx, "INSERT INTO user_images (user_id, filename) VALUES($1, $2)", userID, handler.Filename)
+		var imageID int
+		row := db.DB.QueryRowContext(ctx, "INSERT INTO upload_images (user_id, filename) VALUES($1, $2) RETURNING (id)", userID, handler.Filename)
+		err = row.Scan(&imageID)
 		if err != nil {
 			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
 		}
-		imageID, err := res.LastInsertId()
-		thumb, err := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.Thumbs.Item, directory, strconv.Itoa(int(imageID)))
+		thumb, err := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.Thumbs.Item, directory, strconv.Itoa(imageID))
 		if err != nil {
 			http.Error(w, "Error create thumb file: "+err.Error(), http.StatusBadRequest)
 			return

@@ -35,13 +35,15 @@ message AdminItem {
 }
 
 message AdminItemImage {
+  string filename = 1;
+  uint32 property_value_id = 2;
+}
+
+message AdminUploadImage {
   uint32 id = 1;
   uint32 user_id = 2;
-  uint64 item_id = 3;
-  string filename = 4;
-  uint32 sort = 5;
-  uint32 property_value_id = 6;
-  bool main = 7;
+  string filename = 3;
+  uint32 sort = 4;
 }
 
 message AdminItemProperty {
@@ -144,8 +146,8 @@ message AdminOffersResponse {
   uint32 total = 2;
 }
 
-message AdminItemImagesResponse {
-  repeated AdminItemImage images = 1;
+message AdminUploadImagesResponse {
+  repeated AdminUploadImage images = 1;
 }
 
 service AdminItemService {
@@ -155,7 +157,7 @@ service AdminItemService {
   rpc AdminDeleteItem(AdminDeleteItemRequest) returns (AdminItemsResponse);
   rpc AdminDeleteOffer(AdminDeleteOfferRequest) returns (AdminOffersResponse);
   rpc AdminItems(AdminItemsRequest) returns (AdminItemsResponse);
-  rpc AdminGetUploadImages(google.protobuf.Empty) returns (AdminItemImagesResponse);
+  rpc AdminGetUploadImages(google.protobuf.Empty) returns (AdminUploadImagesResponse);
   rpc AdminItemCategories(AdminItemRequest) returns (AdminCategoriesResponse);
   rpc AdminItemBindCategory(AdminItemBindRequest) returns (AdminCategoriesResponse);
   rpc AdminItemUnbindCategory(AdminItemBindRequest) returns (AdminCategoriesResponse);

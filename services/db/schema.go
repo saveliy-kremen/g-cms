@@ -1,7 +1,7 @@
 package db
 
 var schema = `
-DROP TABLE IF EXISTS user_images;
+DROP TABLE IF EXISTS upload_images;
 DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS vendors;
@@ -24,11 +24,12 @@ CREATE TABLE users (
    );
 CREATE INDEX fullname ON users (fullname);
 
-CREATE TABLE user_images (
+CREATE TABLE upload_images (
 	id serial PRIMARY KEY,
 
 	user_id int NOT NULL,
 	filename text NOT NULL ,
+	sort int DEFAULT 0,
 
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
    );

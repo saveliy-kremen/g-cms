@@ -151,21 +151,21 @@ export class AdminItemGrpcService {
         return this.grpcHelper.grpcUnary<GRPC.AdminItemsResponse.AsObject>(promise);
     }
 
-    public getUploadImages(): Observable<GRPC.AdminItemImagesResponse.AsObject> {
+    public getUploadImages(): Observable<GRPC.AdminUploadImagesResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
 
         const promise = new Promise((resolve, reject) => {
             var request = new Empty();
-            this.client.adminGetUploadImages(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemImagesResponse) => {
+            this.client.adminGetUploadImages(request, meta, (err: grpcWeb.Error, response: GRPC.AdminUploadImagesResponse) => {
                 if (err) {
                     return reject(err)
                 }
                 resolve(response)
             });
         });
-        return this.grpcHelper.grpcUnary<GRPC.AdminItemImagesResponse.AsObject>(promise);
+        return this.grpcHelper.grpcUnary<GRPC.AdminUploadImagesResponse.AsObject>(promise);
     }
 
     public itemCategories(id: number): Observable<CategoryGRPC.AdminCategoriesResponse.AsObject> {

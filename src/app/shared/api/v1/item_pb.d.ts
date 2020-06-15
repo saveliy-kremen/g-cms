@@ -119,26 +119,11 @@ export namespace Item {
 }
 
 export class ItemImage extends jspb.Message {
-  getId(): number;
-  setId(value: number): void;
-
-  getUserId(): number;
-  setUserId(value: number): void;
-
-  getItemId(): number;
-  setItemId(value: number): void;
-
   getFilename(): string;
   setFilename(value: string): void;
 
-  getSort(): number;
-  setSort(value: number): void;
-
   getPropertyValueId(): number;
   setPropertyValueId(value: number): void;
-
-  getMain(): boolean;
-  setMain(value: boolean): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ItemImage.AsObject;
@@ -150,13 +135,8 @@ export class ItemImage extends jspb.Message {
 
 export namespace ItemImage {
   export type AsObject = {
-    id: number,
-    userId: number,
-    itemId: number,
     filename: string,
-    sort: number,
     propertyValueId: number,
-    main: boolean,
   }
 }
 

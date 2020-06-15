@@ -21,13 +21,13 @@ import {
   AdminDraftRequest,
   AdminEditItemRequest,
   AdminItemBindRequest,
-  AdminItemImagesResponse,
   AdminItemRequest,
   AdminItemResponse,
   AdminItemsRequest,
   AdminItemsResponse,
   AdminOffersRequest,
   AdminOffersResponse,
+  AdminUploadImagesResponse,
   AdminUploadOfferRequest} from './admin-item_pb';
 
 export class AdminItemServiceClient {
@@ -182,18 +182,18 @@ export class AdminItemServiceClient {
   }
 
   methodInfoAdminGetUploadImages = new grpcWeb.AbstractClientBase.MethodInfo(
-    AdminItemImagesResponse,
+    AdminUploadImagesResponse,
     (request: google_protobuf_empty_pb.Empty) => {
       return request.serializeBinary();
     },
-    AdminItemImagesResponse.deserializeBinary
+    AdminUploadImagesResponse.deserializeBinary
   );
 
   adminGetUploadImages(
     request: google_protobuf_empty_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: AdminItemImagesResponse) => void) {
+               response: AdminUploadImagesResponse) => void) {
     return this.client_.rpcCall(
       this.hostname_ +
         '/v1.AdminItemService/AdminGetUploadImages',

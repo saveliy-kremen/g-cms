@@ -261,12 +261,20 @@ func (s *AdminItemServiceImpl) AdminDeleteOffer(ctx context.Context, req *v1.Adm
 	return s.AdminItemOffers(ctx, &v1.AdminOffersRequest{ItemId: req.ParentId, Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
 }
 
-func (s *AdminItemServiceImpl) AdminGetUploadImages(ctx context.Context, req *empty.Empty) (*v1.AdminItemImagesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+func (s *AdminItemServiceImpl) AdminGetUploadImages(ctx context.Context, req *empty.Empty) (*v1.AdminUploadImagesResponse, error) {
+	user_id := auth.GetUserUID(ctx)
 
-	//images := []models.ItemImage{}
-	//db.DB.Where("user_id = ? AND item_id = ?", user_id, 0).Order("sort").Find(&images)
-	return &v1.AdminItemImagesResponse{Images: models.AdminItemImagesToResponse("")}, nil
+	images := []models.UploadImage{}
+	image := models.UploadImage{}
+	row := db.DB.QueryRowContext(ctx, "SELECT * FROM upload_images WHERE user_id = $1 LIMIT 1", user_id)
+	err := row.Scan(&image.ID, &image.UserID, &image.Filename, &image.Sort)
+	if err != nil {
+		spew.Dump(err)
+	}
+	db.DB.SelectContext(ctx, &images, "SELECT * FROM upload_images WHERE user_id = $1 ORDER BY sort ASC", user_id)
+	spew.Dump(images)
+	spew.Dump(image)
+	return &v1.AdminUploadImagesResponse{Images: models.AdminUploadImagesToResponse(images)}, nil
 }
 
 func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminCategoriesResponse, error) {

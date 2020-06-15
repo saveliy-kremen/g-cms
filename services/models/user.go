@@ -28,12 +28,6 @@ type User struct {
 	About     string
 }
 
-type UserImage struct {
-	ID       uint32
-	UserID   uint32
-	Filename string
-}
-
 func UserToResponse(user User) *v1.User {
 	return &v1.User{
 		Id:        uint32(user.ID),

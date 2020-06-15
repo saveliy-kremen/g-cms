@@ -346,7 +346,7 @@ export class ItemEditComponent implements OnInit {
         formData.append('file', $event.addedFiles[i]);
         const res: any = await this.uploadService.upload(formData).toPromise()
         if (typeof (res) === 'object') {
-          console.log(res.body);
+          console.log("upload", res.body);
         }
       }
       const res: any = await this.adminItemService.getUploadImages().toPromise()

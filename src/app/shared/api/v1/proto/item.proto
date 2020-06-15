@@ -36,13 +36,8 @@ message Item {
 }
 
 message ItemImage {
-  uint32 id = 1;
-  uint32 user_id = 2;
-  uint64 item_id = 3;
   string filename = 4;
-  uint32 sort = 5;
   uint32 property_value_id = 6;
-  bool main = 7;
 }
 
 message ItemRequest {

@@ -1253,8 +1253,9 @@ proto.v1.AdminItemImage.prototype.toObject = function(opt_includeInstance) {
  */
 proto.v1.AdminItemImage.toObject = function(includeInstance, msg) {
   var f, obj = {
-    filename: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    propertyValueId: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    path: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    filename: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    propertyValueId: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
   if (includeInstance) {
@@ -1293,9 +1294,13 @@ proto.v1.AdminItemImage.deserializeBinaryFromReader = function(msg, reader) {
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setFilename(value);
+      msg.setPath(value);
       break;
     case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setFilename(value);
+      break;
+    case 3:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setPropertyValueId(value);
       break;
@@ -1328,17 +1333,24 @@ proto.v1.AdminItemImage.prototype.serializeBinary = function() {
  */
 proto.v1.AdminItemImage.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getFilename();
+  f = message.getPath();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
+  f = message.getFilename();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
   f = message.getPropertyValueId();
   if (f !== 0) {
     writer.writeUint32(
-      2,
+      3,
       f
     );
   }
@@ -1346,10 +1358,10 @@ proto.v1.AdminItemImage.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional string filename = 1;
+ * optional string path = 1;
  * @return {string}
  */
-proto.v1.AdminItemImage.prototype.getFilename = function() {
+proto.v1.AdminItemImage.prototype.getPath = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
@@ -1358,17 +1370,35 @@ proto.v1.AdminItemImage.prototype.getFilename = function() {
  * @param {string} value
  * @return {!proto.v1.AdminItemImage} returns this
  */
-proto.v1.AdminItemImage.prototype.setFilename = function(value) {
+proto.v1.AdminItemImage.prototype.setPath = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
 /**
- * optional uint32 property_value_id = 2;
+ * optional string filename = 2;
+ * @return {string}
+ */
+proto.v1.AdminItemImage.prototype.getFilename = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.AdminItemImage} returns this
+ */
+proto.v1.AdminItemImage.prototype.setFilename = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional uint32 property_value_id = 3;
  * @return {number}
  */
 proto.v1.AdminItemImage.prototype.getPropertyValueId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
 
@@ -1377,7 +1407,7 @@ proto.v1.AdminItemImage.prototype.getPropertyValueId = function() {
  * @return {!proto.v1.AdminItemImage} returns this
  */
 proto.v1.AdminItemImage.prototype.setPropertyValueId = function(value) {
-  return jspb.Message.setProto3IntField(this, 2, value);
+  return jspb.Message.setProto3IntField(this, 3, value);
 };
 
 
@@ -1413,10 +1443,8 @@ proto.v1.AdminUploadImage.prototype.toObject = function(opt_includeInstance) {
  */
 proto.v1.AdminUploadImage.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    userId: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    filename: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    sort: jspb.Message.getFieldWithDefault(msg, 4, 0)
+    path: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    filename: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -1454,20 +1482,12 @@ proto.v1.AdminUploadImage.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setId(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPath(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setUserId(value);
-      break;
-    case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setFilename(value);
-      break;
-    case 4:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setSort(value);
       break;
     default:
       reader.skipField();
@@ -1498,31 +1518,17 @@ proto.v1.AdminUploadImage.prototype.serializeBinary = function() {
  */
 proto.v1.AdminUploadImage.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getId();
-  if (f !== 0) {
-    writer.writeUint32(
+  f = message.getPath();
+  if (f.length > 0) {
+    writer.writeString(
       1,
-      f
-    );
-  }
-  f = message.getUserId();
-  if (f !== 0) {
-    writer.writeUint32(
-      2,
       f
     );
   }
   f = message.getFilename();
   if (f.length > 0) {
     writer.writeString(
-      3,
-      f
-    );
-  }
-  f = message.getSort();
-  if (f !== 0) {
-    writer.writeUint32(
-      4,
+      2,
       f
     );
   }
@@ -1530,47 +1536,29 @@ proto.v1.AdminUploadImage.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional uint32 id = 1;
- * @return {number}
+ * optional string path = 1;
+ * @return {string}
  */
-proto.v1.AdminUploadImage.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.v1.AdminUploadImage.prototype.getPath = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /**
- * @param {number} value
+ * @param {string} value
  * @return {!proto.v1.AdminUploadImage} returns this
  */
-proto.v1.AdminUploadImage.prototype.setId = function(value) {
-  return jspb.Message.setProto3IntField(this, 1, value);
+proto.v1.AdminUploadImage.prototype.setPath = function(value) {
+  return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
 /**
- * optional uint32 user_id = 2;
- * @return {number}
- */
-proto.v1.AdminUploadImage.prototype.getUserId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.v1.AdminUploadImage} returns this
- */
-proto.v1.AdminUploadImage.prototype.setUserId = function(value) {
-  return jspb.Message.setProto3IntField(this, 2, value);
-};
-
-
-/**
- * optional string filename = 3;
+ * optional string filename = 2;
  * @return {string}
  */
 proto.v1.AdminUploadImage.prototype.getFilename = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
@@ -1579,25 +1567,7 @@ proto.v1.AdminUploadImage.prototype.getFilename = function() {
  * @return {!proto.v1.AdminUploadImage} returns this
  */
 proto.v1.AdminUploadImage.prototype.setFilename = function(value) {
-  return jspb.Message.setProto3StringField(this, 3, value);
-};
-
-
-/**
- * optional uint32 sort = 4;
- * @return {number}
- */
-proto.v1.AdminUploadImage.prototype.getSort = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.v1.AdminUploadImage} returns this
- */
-proto.v1.AdminUploadImage.prototype.setSort = function(value) {
-  return jspb.Message.setProto3IntField(this, 4, value);
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
@@ -2523,7 +2493,7 @@ proto.v1.AdminOffersRequest.prototype.setDirection = function(value) {
  * @private {!Array<number>}
  * @const
  */
-proto.v1.AdminEditItemRequest.repeatedFields_ = [15,16,17];
+proto.v1.AdminEditItemRequest.repeatedFields_ = [17];
 
 
 
@@ -2570,8 +2540,8 @@ proto.v1.AdminEditItemRequest.toObject = function(includeInstance, msg) {
     disable: jspb.Message.getBooleanFieldWithDefault(msg, 12, false),
     sort: jspb.Message.getFieldWithDefault(msg, 13, 0),
     vendorId: jspb.Message.getFieldWithDefault(msg, 14, 0),
-    itemImagesList: (f = jspb.Message.getRepeatedField(msg, 15)) == null ? undefined : f,
-    uploadImagesList: (f = jspb.Message.getRepeatedField(msg, 16)) == null ? undefined : f,
+    itemImages: jspb.Message.getFieldWithDefault(msg, 15, ""),
+    uploadImages: jspb.Message.getFieldWithDefault(msg, 16, ""),
     propertiesList: jspb.Message.toObjectList(msg.getPropertiesList(),
     proto.v1.AdminItemProperty.toObject, includeInstance)
   };
@@ -2667,12 +2637,12 @@ proto.v1.AdminEditItemRequest.deserializeBinaryFromReader = function(msg, reader
       msg.setVendorId(value);
       break;
     case 15:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setItemImagesList(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setItemImages(value);
       break;
     case 16:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setUploadImagesList(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUploadImages(value);
       break;
     case 17:
       var value = new proto.v1.AdminItemProperty;
@@ -2806,16 +2776,16 @@ proto.v1.AdminEditItemRequest.serializeBinaryToWriter = function(message, writer
       f
     );
   }
-  f = message.getItemImagesList();
+  f = message.getItemImages();
   if (f.length > 0) {
-    writer.writePackedUint32(
+    writer.writeString(
       15,
       f
     );
   }
-  f = message.getUploadImagesList();
+  f = message.getUploadImages();
   if (f.length > 0) {
-    writer.writePackedUint32(
+    writer.writeString(
       16,
       f
     );
@@ -3084,76 +3054,38 @@ proto.v1.AdminEditItemRequest.prototype.setVendorId = function(value) {
 
 
 /**
- * repeated uint32 item_images = 15;
- * @return {!Array<number>}
+ * optional string item_images = 15;
+ * @return {string}
  */
-proto.v1.AdminEditItemRequest.prototype.getItemImagesList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 15));
+proto.v1.AdminEditItemRequest.prototype.getItemImages = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 15, ""));
 };
 
 
 /**
- * @param {!Array<number>} value
+ * @param {string} value
  * @return {!proto.v1.AdminEditItemRequest} returns this
  */
-proto.v1.AdminEditItemRequest.prototype.setItemImagesList = function(value) {
-  return jspb.Message.setField(this, 15, value || []);
+proto.v1.AdminEditItemRequest.prototype.setItemImages = function(value) {
+  return jspb.Message.setProto3StringField(this, 15, value);
 };
 
 
 /**
- * @param {number} value
- * @param {number=} opt_index
+ * optional string upload_images = 16;
+ * @return {string}
+ */
+proto.v1.AdminEditItemRequest.prototype.getUploadImages = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 16, ""));
+};
+
+
+/**
+ * @param {string} value
  * @return {!proto.v1.AdminEditItemRequest} returns this
  */
-proto.v1.AdminEditItemRequest.prototype.addItemImages = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 15, value, opt_index);
-};
-
-
-/**
- * Clears the list making it empty but non-null.
- * @return {!proto.v1.AdminEditItemRequest} returns this
- */
-proto.v1.AdminEditItemRequest.prototype.clearItemImagesList = function() {
-  return this.setItemImagesList([]);
-};
-
-
-/**
- * repeated uint32 upload_images = 16;
- * @return {!Array<number>}
- */
-proto.v1.AdminEditItemRequest.prototype.getUploadImagesList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 16));
-};
-
-
-/**
- * @param {!Array<number>} value
- * @return {!proto.v1.AdminEditItemRequest} returns this
- */
-proto.v1.AdminEditItemRequest.prototype.setUploadImagesList = function(value) {
-  return jspb.Message.setField(this, 16, value || []);
-};
-
-
-/**
- * @param {number} value
- * @param {number=} opt_index
- * @return {!proto.v1.AdminEditItemRequest} returns this
- */
-proto.v1.AdminEditItemRequest.prototype.addUploadImages = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 16, value, opt_index);
-};
-
-
-/**
- * Clears the list making it empty but non-null.
- * @return {!proto.v1.AdminEditItemRequest} returns this
- */
-proto.v1.AdminEditItemRequest.prototype.clearUploadImagesList = function() {
-  return this.setUploadImagesList([]);
+proto.v1.AdminEditItemRequest.prototype.setUploadImages = function(value) {
+  return jspb.Message.setProto3StringField(this, 16, value);
 };
 
 

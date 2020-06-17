@@ -102,8 +102,8 @@ export class AdminItemGrpcService {
             request.setCurrencyId(data.currencyId)
             request.setDisable(data.disable)
             request.setSort(data.sort);
-            request.setItemImagesList(data.itemImages)
-            request.setUploadImagesList(data.uploadImages)
+            request.setItemImages(JSON.stringify(data.itemImages))
+            request.setUploadImages(JSON.stringify(data.uploadImages))
             request.setPropertiesList(data.properties.map(item => {
                 const wrapper = new GRPC.AdminItemProperty
                 const code = Object.keys(item)[0]

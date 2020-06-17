@@ -12,47 +12,47 @@ import (
 )
 
 type Item struct {
-	ID        uint64
+	ID        uint64    `db:"id"`
 	CreatedAt time.Time `db:"created_at"`
 
-	UserID         uint32        `db:"user_id"`
-	VendorID       uint32        `db:"vendor_id"`
-	ParentID       sql.NullInt64 `db:"parent_id"`
-	Draft          bool
-	Title          string
-	Article        string
-	Alias          string
-	Images         string
-	Description    string
-	Price          float32
+	UserID         uint32  `db:"user_id"`
+	Draft          bool    `db:"draft"`
+	Title          string  `db:"title"`
+	Article        string  `db:"article"`
+	Alias          string  `db:"alias"`
+	Images         string  `db:"images"`
+	Description    string  `db:"description"`
+	Price          float32 `db:"price"`
 	OldPrice       float32 `db:"old_price"`
-	CurrencyID     uint32  `db:"currency_id"`
-	Count          int32
-	InStock        bool `db:"in_stock"`
-	Disable        bool
-	Sort           uint32
-	SeoTitle       string `db:"seo_title"`
-	SeoDescription string `db:"seo_description"`
-	SeoKeywords    string `db:"seo_keywords"`
+	Count          int32   `db:"count"`
+	InStock        bool    `db:"in_stock"`
+	Disable        bool    `db:"disable"`
+	Sort           uint32  `db:"sort"`
+	SeoTitle       string  `db:"seo_title"`
+	SeoDescription string  `db:"seo_description"`
+	SeoKeywords    string  `db:"seo_keywords"`
+
+	ParentID   sql.NullInt64 `db:"parent_id"`
+	VendorID   sql.NullInt32 `db:"vendor_id"`
+	CurrencyID sql.NullInt32 `db:"currency_id"`
 
 	Categories []Category
 	Properties []Property
 
 	Offers   []Item
-	Vendor   Vendor
-	Currency Currency
-}
-
-type ItemImage struct {
-	Filename        string
-	PropertyValueID uint32
+	Vendor   Vendor   `struct:"vendors"`
+	Currency Currency `struct:"currencies"`
 }
 
 type UploadImage struct {
-	ID       uint32
-	UserID   uint32
+	Path     string
 	Filename string
-	Sort     uint32
+}
+
+type ItemImage struct {
+	Path            string
+	Filename        string
+	PropertyValueID uint32
 }
 
 type ItemProperty struct {
@@ -104,6 +104,23 @@ func AdminItemToResponse(item Item) *v1.AdminItem {
 	}
 }
 
+func AdminUploadImagesToResponse(images string) []*v1.AdminUploadImage {
+	var uploadImages []UploadImage
+	json.Unmarshal([]byte(images), &uploadImages)
+	respImages := []*v1.AdminUploadImage{}
+	for _, uploadImage := range uploadImages {
+		respImages = append(respImages, AdminUploadImageToResponse(uploadImage))
+	}
+	return respImages
+}
+
+func AdminUploadImageToResponse(image UploadImage) *v1.AdminUploadImage {
+	return &v1.AdminUploadImage{
+		Path:     image.Path,
+		Filename: image.Filename,
+	}
+}
+
 func AdminItemImagesToResponse(images string) []*v1.AdminItemImage {
 	var itemImages []ItemImage
 	json.Unmarshal([]byte(images), &itemImages)
@@ -116,23 +133,9 @@ func AdminItemImagesToResponse(images string) []*v1.AdminItemImage {
 
 func AdminItemImageToResponse(image ItemImage) *v1.AdminItemImage {
 	return &v1.AdminItemImage{
+		Path:            image.Path,
 		Filename:        image.Filename,
 		PropertyValueId: image.PropertyValueID,
-	}
-}
-
-func AdminUploadImagesToResponse(images []UploadImage) []*v1.AdminUploadImage {
-	respImages := []*v1.AdminUploadImage{}
-	for _, image := range images {
-		respImages = append(respImages, AdminUploadImageToResponse(image))
-	}
-	return respImages
-}
-
-func AdminUploadImageToResponse(image UploadImage) *v1.AdminUploadImage {
-	return &v1.AdminUploadImage{
-		Filename: image.Filename,
-		Sort:     image.Sort,
 	}
 }
 

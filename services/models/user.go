@@ -16,16 +16,17 @@ type User struct {
 	ID        uint32
 	CreatedAt time.Time `db:"created_at"`
 
-	Fullname  string
-	Phone     string
-	Email     string
-	Password  string
-	Photo     string
-	Role      uint32
-	Trademark string
-	Tariff    uint32
-	Amount    float32 `sql:"type:decimal(10,2)"`
-	About     string
+	Fullname     string  `db:"fullname"`
+	Phone        string  `db:"phone"`
+	Email        string  `db:"email"`
+	Password     string  `db:"password"`
+	Photo        string  `db:"photo"`
+	Role         uint32  `db:"role"`
+	Trademark    string  `db:"trademark"`
+	Tariff       uint32  `db:"tariff"`
+	Amount       float32 `db:"amount"`
+	About        string  `db:"about"`
+	UploadImages string  `db:"upload_images"`
 }
 
 func UserToResponse(user User) *v1.User {

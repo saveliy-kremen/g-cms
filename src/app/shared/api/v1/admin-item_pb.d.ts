@@ -113,6 +113,9 @@ export namespace AdminItem {
 }
 
 export class AdminItemImage extends jspb.Message {
+  getPath(): string;
+  setPath(value: string): void;
+
   getFilename(): string;
   setFilename(value: string): void;
 
@@ -129,23 +132,18 @@ export class AdminItemImage extends jspb.Message {
 
 export namespace AdminItemImage {
   export type AsObject = {
+    path: string,
     filename: string,
     propertyValueId: number,
   }
 }
 
 export class AdminUploadImage extends jspb.Message {
-  getId(): number;
-  setId(value: number): void;
-
-  getUserId(): number;
-  setUserId(value: number): void;
+  getPath(): string;
+  setPath(value: string): void;
 
   getFilename(): string;
   setFilename(value: string): void;
-
-  getSort(): number;
-  setSort(value: number): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AdminUploadImage.AsObject;
@@ -157,10 +155,8 @@ export class AdminUploadImage extends jspb.Message {
 
 export namespace AdminUploadImage {
   export type AsObject = {
-    id: number,
-    userId: number,
+    path: string,
     filename: string,
-    sort: number,
   }
 }
 
@@ -331,15 +327,11 @@ export class AdminEditItemRequest extends jspb.Message {
   getVendorId(): number;
   setVendorId(value: number): void;
 
-  getItemImagesList(): Array<number>;
-  setItemImagesList(value: Array<number>): void;
-  clearItemImagesList(): void;
-  addItemImages(value: number, index?: number): void;
+  getItemImages(): string;
+  setItemImages(value: string): void;
 
-  getUploadImagesList(): Array<number>;
-  setUploadImagesList(value: Array<number>): void;
-  clearUploadImagesList(): void;
-  addUploadImages(value: number, index?: number): void;
+  getUploadImages(): string;
+  setUploadImages(value: string): void;
 
   getPropertiesList(): Array<AdminItemProperty>;
   setPropertiesList(value: Array<AdminItemProperty>): void;
@@ -370,8 +362,8 @@ export namespace AdminEditItemRequest {
     disable: boolean,
     sort: number,
     vendorId: number,
-    itemImagesList: Array<number>,
-    uploadImagesList: Array<number>,
+    itemImages: string,
+    uploadImages: string,
     propertiesList: Array<AdminItemProperty.AsObject>,
   }
 }

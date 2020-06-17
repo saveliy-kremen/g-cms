@@ -1,7 +1,6 @@
 package db
 
 var schema = `
-DROP TABLE IF EXISTS upload_images;
 DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS vendors;
@@ -20,27 +19,16 @@ CREATE TABLE users (
 	trademark varchar(256) DEFAULT '',
 	tariff int DEFAULT 0,
 	amount numeric(10,2) DEFAULT 0,
-	about text DEFAULT ''
+	about text DEFAULT '',
+	upload_images json DEFAULT '[]'::JSON
    );
 CREATE INDEX fullname ON users (fullname);
-
-CREATE TABLE upload_images (
-	id serial PRIMARY KEY,
-
-	user_id int NOT NULL,
-	filename text NOT NULL ,
-	sort int DEFAULT 0,
-
-	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-   );
 
 CREATE TABLE items (
 	id bigserial PRIMARY KEY,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 
 	user_id int,
-	vendor_id int DEFAULT 0,
-	parent_id bigint DEFAULT NULL,
 	draft bool,
 	title text NOT NULL,
 	article varchar(256) DEFAULT '',
@@ -49,7 +37,6 @@ CREATE TABLE items (
 	description text DEFAULT '',
 	price numeric(11,2) DEFAULT 0,
 	old_price numeric(11,2) DEFAULT 0,
-	currency_id smallint DEFAULT 0,
 	count int DEFAULT 0,
 	in_stock bool DEFAULT false,
 	disable bool DEFAULT false,
@@ -57,6 +44,10 @@ CREATE TABLE items (
 	seo_title text DEFAULT '',
 	seo_description text DEFAULT '',
 	seo_keywords text DEFAULT '',
+
+	parent_id bigint DEFAULT NULL,
+	vendor_id int DEFAULT NUll,
+	currency_id smallint DEFAULT NULL,
 
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
 	FOREIGN KEY (parent_id) REFERENCES items (id) ON DELETE CASCADE

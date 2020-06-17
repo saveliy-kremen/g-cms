@@ -15,8 +15,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
+
 	"gcms/config"
 	"gcms/db"
+	"gcms/models"
 	"gcms/packages/auth"
 	"gcms/packages/thumbs"
 )
@@ -47,10 +50,10 @@ func UploadFileHandler() http.HandlerFunc {
 		fmt.Printf("MIME Header: %+v\n", handler.Header)
 
 		ctx := r.Context()
-		userID := auth.GetUserUID(ctx)
+		user := auth.GetUser(ctx)
 
 		dir, _ := filepath.Abs(config.AppConfig.UploadPath)
-		directory := dir + "/users/" + strconv.Itoa(int(userID)) + "/items/0/"
+		directory := dir + "/users/" + strconv.Itoa(int(user.ID)) + "/items/0/"
 		if _, err := os.Stat(directory); err != nil {
 			os.MkdirAll(directory, 0775)
 		}
@@ -68,13 +71,24 @@ func UploadFileHandler() http.HandlerFunc {
 			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		var imageID int
-		row := db.DB.QueryRowContext(ctx, "INSERT INTO upload_images (user_id, filename) VALUES($1, $2) RETURNING (id)", userID, handler.Filename)
-		err = row.Scan(&imageID)
+
+		var uploadImages []models.UploadImage
+		json.Unmarshal([]byte(user.UploadImages), &uploadImages)
+		uploadImage := models.UploadImage{}
+		path := uuid.New().String()
+		uploadImage.Path = path + ".jpeg"
+		uploadImage.Filename = handler.Filename
+		uploadImages = append(uploadImages, uploadImage)
+		images, err := json.Marshal(uploadImages)
+		user.UploadImages = string(images)
 		if err != nil {
 			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
 		}
-		thumb, err := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.Thumbs.Item, directory, strconv.Itoa(imageID))
+		_, err = db.DB.ExecContext(ctx, `UPDATE users SET upload_images=$1 WHERE id=$2`, user.UploadImages, user.ID)
+		if err != nil {
+			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
+		}
+		thumb, err := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.Thumbs.Item, directory, path)
 		if err != nil {
 			http.Error(w, "Error create thumb file: "+err.Error(), http.StatusBadRequest)
 			return
@@ -82,7 +96,6 @@ func UploadFileHandler() http.HandlerFunc {
 		if handler.Filename != *thumb {
 			os.Remove(directory + handler.Filename)
 		}
-
 		// return that we have successfully uploaded our file!
 		resp := Response{
 			Url: *thumb,

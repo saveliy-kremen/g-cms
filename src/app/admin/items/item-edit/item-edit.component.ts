@@ -125,10 +125,10 @@ export class ItemEditComponent implements OnInit {
       this.itemID = Number(this.activeRoute.snapshot.params["id"])
     }
     try {
+      let res: any = await this.authService.getUser()
+      this.uploadUrl = `${environment.siteUrl}/uploads/users/${res.id}/items/`
       if (this.mode == "edit") {
-        let res: any = await this.authService.getUser()
-        this.uploadUrl = `${environment.siteUrl}/uploads/users/${res.id}/items/`
-        res = await this.adminItemService.item(Number(this.itemID)).toPromise()
+        let res: any = await this.adminItemService.item(Number(this.itemID)).toPromise()
         this.item = res.item
         this.updateOffersData(res.item)
       } else {
@@ -144,7 +144,7 @@ export class ItemEditComponent implements OnInit {
         this.itemForm.controls['alias'].disable()
       }
       this.itemImages = this.item.imagesList
-      let res: any = await this.adminItemService.getUploadImages().toPromise()
+      res = await this.adminItemService.getUploadImages().toPromise()
       this.uploadImages = res.imagesList
       res = await this.adminItemService.itemCategories(this.item.id).toPromise()
       this.categoriesData = res.categoriesList
@@ -332,6 +332,7 @@ export class ItemEditComponent implements OnInit {
           this.router.navigateByUrl("/admin/items");
         }
       } catch (err) {
+        console.log(err)
         this.itemMessage = new Message("danger", err.message);
       }
     }

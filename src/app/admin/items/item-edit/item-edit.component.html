@@ -126,7 +126,7 @@
                 <button mat-stroked-button type="button" class="btn btn-secondary">{{"Add" | translate}}</button>
                 <div class="dropzone">
                   <div *ngFor="let image of uploadImages" class="upload-images"
-                    [ngStyle]="{backgroundImage: 'url('+uploadUrl + '0/' + image?.filename+')'}" ngSortgridItem
+                    [ngStyle]="{backgroundImage: 'url('+uploadUrl + '0/' + image?.path+')'}" ngSortgridItem
                     [ngSortGridItems]="uploadImages" (sorted)="storeNewOrder($event, 'upload')" ngSortGridGroup="upload"
                     draggable [dragData]="image" [dragScope]="'item'">
                     <i class="material-icons right-top-icon" (click)="uploadImageDelete($event, image.id)"

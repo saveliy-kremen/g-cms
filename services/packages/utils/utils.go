@@ -114,3 +114,52 @@ func Translit(s string) string {
 	}
 	return translate_string
 }
+
+func GetDbFields(table string, itemName string, item interface{}) (string, string) {
+	t := reflect.TypeOf(item)
+
+	fields := ""
+	pointers := ""
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+
+		tag := field.Tag.Get("struct")
+		if tag != "" {
+			subFields, subPointers := GetDbFieldsByType(tag, itemName+"."+field.Name, field.Type)
+			fields += subFields
+			pointers += subPointers
+		}
+
+		tag = field.Tag.Get("db")
+		if tag != "" {
+			fields += table + "." + tag + ", "
+			pointers += "&" + itemName + "." + field.Name + ", "
+		}
+	}
+	//fmt.Printf("%d. %v (%v), tag: '%v'\n", i+1, field.Name, field.Type, tag)
+	return fields[:len(fields)-2], pointers[:len(pointers)-2]
+}
+
+func GetDbFieldsByType(table string, itemName string, t reflect.Type) (string, string) {
+	fields := ""
+	pointers := ""
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+
+		tag := field.Tag.Get("struct")
+		if tag != "" {
+			subFields, subPointers := GetDbFieldsByType(tag, itemName+"."+field.Name, field.Type)
+			fields += subFields
+			pointers += subPointers
+		}
+
+		tag = field.Tag.Get("db")
+		if tag != "" {
+			fields += table + "." + tag + ", "
+			pointers += "&" + itemName + "." + field.Name + ", "
+		}
+	}
+	return fields, pointers
+}

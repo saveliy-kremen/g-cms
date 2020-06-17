@@ -1,27 +1,27 @@
 package models
 
 import (
+	"database/sql"
 	v1 "gcms/api/v1"
-	"time"
 )
 
 type Currency struct {
-	ID        uint32
-	CreatedAt time.Time `db:"created_at"`
+	ID        sql.NullInt32 `db:"id"`
+	CreatedAt sql.NullTime  `db:"created_at"`
 
-	Name      string
-	ShortName string `db:"short_name"`
-	Code      string
-	Rate      float32
+	Name      sql.NullString  `db:"name"`
+	ShortName sql.NullString  `db:"short_name"`
+	Code      sql.NullString  `db:"code"`
+	Rate      sql.NullFloat64 `db:"rate"`
 }
 
 func CurrencyToResponse(currency Currency) *v1.Currency {
 	return &v1.Currency{
-		Id:        uint32(currency.ID),
-		Name:      currency.Name,
-		ShortName: currency.ShortName,
-		Code:      currency.Code,
-		Rate:      currency.Rate,
+		Id:        uint32(currency.ID.Int32),
+		Name:      currency.Name.String,
+		ShortName: currency.ShortName.String,
+		Code:      currency.Code.String,
+		Rate:      float32(currency.Rate.Float64),
 	}
 }
 

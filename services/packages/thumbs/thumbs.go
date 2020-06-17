@@ -113,6 +113,7 @@ func SetWatermark(path string, text string) {
 	dc.DrawStringWrapped(text, float64(dc.Width()-30), float64(lableHeight+9), 1, 0.5, lableWidth-50, 1, gg.AlignRight)
 	dc.Clip()
 	//dc.SaveJPG(path, 100)
+	gg.SaveJPG(path, dc.Image(), 100)
 }
 
 func InstagramResize(filePath string) (io.Reader, error) {

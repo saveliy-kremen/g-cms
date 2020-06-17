@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -27,12 +28,35 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
-	err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id = $1 AND id = $2", user_id, req.Id)
+	row := db.DB.QueryRowContext(ctx,
+		`SELECT items.id, items.created_at, items.user_id, items.vendor_id, items.parent_id,
+			 items.draft, items.title, items.article, items.alias, items.images, items.description,
+			 items.price, items.old_price, items.currency_id, items.count, items.in_stock, items.disable,
+			 items.sort, items.seo_title, items.seo_description, items.seo_keywords,
+			 vendors.id, vendors.created_at, vendors.name, vendors.country,
+			 currencies.id, currencies.created_at, currencies.name, currencies.short_name, currencies.code,
+			 currencies.rate
+			FROM items
+			LEFT JOIN vendors ON items.vendor_id = vendors.id
+			LEFT JOIN currencies ON items.currency_id = currencies.id
+			WHERE items.user_id = $1 AND items.id = $2`,
+		user_id, req.Id)
+	err := row.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.VendorID, &item.ParentID,
+		&item.Draft, &item.Title, &item.Article, &item.Alias, &item.Images, &item.Description,
+		&item.Price, &item.OldPrice, &item.CurrencyID, &item.Count, &item.InStock, &item.Disable,
+		&item.Sort, &item.SeoTitle, &item.SeoDescription, &item.SeoKeywords,
+		&item.Vendor.ID, &item.Vendor.CreatedAt, &item.Vendor.Name, &item.Vendor.Country,
+		&item.Currency.ID, &item.Currency.CreatedAt, &item.Currency.Name, &item.Currency.ShortName,
+		&item.Currency.Code, &item.Currency.Rate)
 	if err != nil {
+		spew.Dump(err)
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
 
-	//if db.DB.Preload("Vendor").Preload("Currency")
+	fields, pointers := utils.GetDbFields("items", "item", item)
+	spew.Dump(fields)
+	spew.Dump(pointers)
+
 	//item.Properties = itemProperties(&item)
 	//item.Offers = itemOffers(&item, nil, nil, nil, nil)
 
@@ -49,8 +73,12 @@ func (s *AdminItemServiceImpl) AdminItems(ctx context.Context, req *v1.AdminItem
 		order = req.Sort + " " + req.Direction
 	}
 
-	db.DB.GetContext(ctx, &total, "SELECT count(*) FROM items WHERE user_id = $1 AND draft <> $2 AND parent_id = $3", user_id, true, 0)
-	db.DB.SelectContext(ctx, &items, "SELECT * FROM items WHERE user_id = $1 AND draft <> $2 AND parent_id = $3 ORDER BY $4 OFFSET $5 LIMIT $6", user_id, true, 0, order, req.Page*req.PageSize, req.PageSize)
+	db.DB.GetContext(ctx, &total, "SELECT count(*) FROM items WHERE user_id = $1 AND draft <> $2 AND parent_id IS $3", user_id, true, nil)
+	query := fmt.Sprintf(
+		`SELECT items.* FROM items WHERE (user_id = $1 AND draft <> $2 AND parent_id IS $3)
+		ORDER BY %s OFFSET $4 LIMIT $5`,
+		order)
+	db.DB.SelectContext(ctx, &items, query, user_id, true, nil, req.Page*req.PageSize, req.PageSize)
 
 	//db.DB.Preload("Vendor").Preload("Currency")
 	/*
@@ -67,7 +95,8 @@ func (s *AdminItemServiceImpl) AdminCreateDraftItem(ctx context.Context, req *v1
 	user_id := auth.GetUserUID(ctx)
 
 	draft := models.Item{}
-	err := db.DB.GetContext(ctx, &draft, "SELECT * FROM items WHERE user_id = $1 AND draft = $2", user_id, true)
+	row := db.DB.QueryRowContext(ctx, "SELECT id, title, alias, article FROM items WHERE user_id = $1 AND draft = $2", user_id, true)
+	err := row.Scan(&draft.ID, &draft.Title, &draft.Alias, &draft.Article)
 	if err != nil {
 		draft.UserID = user_id
 		draft.Draft = true
@@ -80,6 +109,7 @@ func (s *AdminItemServiceImpl) AdminCreateDraftItem(ctx context.Context, req *v1
 	db.DB.ExecContext(ctx,
 		`DELETE FROM items WHERE user_id = $1 AND draft = $2 AND id <> $3`,
 		user_id, true, draft.ID)
+
 	if req.ParentId == 0 {
 		//Item
 		draft.ParentID = sql.NullInt64{0, false}
@@ -111,7 +141,11 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 
 	item.UserID = user_id
 	item.Title = req.Title
-	item.ParentID = sql.NullInt64{int64(req.ParentId), true}
+	if req.ParentId == 0 {
+		item.ParentID = sql.NullInt64{int64(req.ParentId), false}
+	} else {
+		item.ParentID = sql.NullInt64{int64(req.ParentId), true}
+	}
 	item.Article = req.Article
 	item.Alias = req.Alias
 	if item.Alias == "" {
@@ -120,10 +154,18 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 	item.Count = req.Count
 	item.InStock = req.InStock
 	item.Description = req.Description
-	item.VendorID = req.VendorId
+	if req.ParentId == 0 {
+		item.VendorID = sql.NullInt32{int32(req.VendorId), false}
+	} else {
+		item.VendorID = sql.NullInt32{int32(req.VendorId), true}
+	}
 	item.Price = req.Price
 	item.OldPrice = req.OldPrice
-	item.CurrencyID = req.CurrencyId
+	if req.ParentId == 0 {
+		item.CurrencyID = sql.NullInt32{int32(req.CurrencyId), false}
+	} else {
+		item.CurrencyID = sql.NullInt32{int32(req.CurrencyId), true}
+	}
 	item.Disable = req.Disable
 	item.Sort = req.Sort
 	item.Draft = false
@@ -262,19 +304,8 @@ func (s *AdminItemServiceImpl) AdminDeleteOffer(ctx context.Context, req *v1.Adm
 }
 
 func (s *AdminItemServiceImpl) AdminGetUploadImages(ctx context.Context, req *empty.Empty) (*v1.AdminUploadImagesResponse, error) {
-	user_id := auth.GetUserUID(ctx)
-
-	images := []models.UploadImage{}
-	image := models.UploadImage{}
-	row := db.DB.QueryRowContext(ctx, "SELECT * FROM upload_images WHERE user_id = $1 LIMIT 1", user_id)
-	err := row.Scan(&image.ID, &image.UserID, &image.Filename, &image.Sort)
-	if err != nil {
-		spew.Dump(err)
-	}
-	db.DB.SelectContext(ctx, &images, "SELECT * FROM upload_images WHERE user_id = $1 ORDER BY sort ASC", user_id)
-	spew.Dump(images)
-	spew.Dump(image)
-	return &v1.AdminUploadImagesResponse{Images: models.AdminUploadImagesToResponse(images)}, nil
+	user := auth.GetUser(ctx)
+	return &v1.AdminUploadImagesResponse{Images: models.AdminUploadImagesToResponse(user.UploadImages)}, nil
 }
 
 func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminCategoriesResponse, error) {
@@ -456,13 +487,13 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	//user_id := auth.GetUserUID(ctx)
 
 	vendor := models.Vendor{}
-	vendor.Name = req.Vendor
-	vendor.Country = req.Country
-	err := db.DB.GetContext(ctx, &vendor, "SELECT * FROM vendors WHERE name=$1", req.Vendor)
+	vendor.Name = sql.NullString{req.Vendor, true}
+	vendor.Country = sql.NullString{req.Country, true}
+	err := db.DB.GetContext(ctx, &vendor, "SELECT * FROM vendors WHERE name=$1", sql.NullString{req.Vendor, true})
 	if err != nil && err == sql.ErrNoRows {
 		res, _ := db.DB.ExecContext(ctx, "INSERT INTO vendors (name, country) VALUES($1, $2)", req.Vendor, req.Country)
 		vendorID, _ := res.LastInsertId()
-		vendor.ID = uint32(vendorID)
+		vendor.ID = sql.NullInt32{int32(vendorID), true}
 	}
 
 	item := models.Item{}

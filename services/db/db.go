@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -9,8 +10,6 @@ import (
 
 	"github.com/jackc/pgx/v4/log/logrusadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/jackc/pgx/v4/stdlib"
-	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 
 	"gcms/config"
@@ -23,7 +22,7 @@ type simpleFormater struct {
 
 var (
 	//DB pool
-	DB *sqlx.DB
+	DB *pgxpool.Pool
 	//Logger to system.log
 	Logger *logrus.Logger
 )
@@ -63,8 +62,10 @@ func init() {
 		Timeout:   1 * time.Second,
 	}).DialContext
 
-	pgxConfig := stdlib.RegisterConnConfig(cfg.ConnConfig)
-	DB, err = sqlx.Connect("pgx", pgxConfig)
+	//pgxConfig := stdlib.RegisterConnConfig(cfg.ConnConfig)
+	//DB, err = sqlx.Connect("pgx", pgxConfig)
+
+	DB, err = pgxpool.ConnectConfig(context.Background(), cfg)
 	if err != nil {
 		log.Fatal("Could not connecto to database ", err)
 	}

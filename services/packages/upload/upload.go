@@ -86,7 +86,7 @@ func UploadFileHandler() http.HandlerFunc {
 		if err != nil {
 			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
 		}
-		_, err = db.DB.ExecContext(ctx, `UPDATE users SET upload_images=$1 WHERE id=$2`, user.UploadImages, user.ID)
+		_, err = db.DB.Exec(ctx, `UPDATE users SET upload_images=$1 WHERE id=$2`, user.UploadImages, user.ID)
 		if err != nil {
 			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
 		}

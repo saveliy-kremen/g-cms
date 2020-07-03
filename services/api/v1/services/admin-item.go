@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -37,7 +36,7 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
-	row := db.DB.QueryRowContext(ctx,
+	row := db.DB.QueryRow(ctx,
 		`SELECT items.id, items.created_at, items.user_id, items.vendor_id, items.parent_id,
 			 items.draft, items.title, items.article, items.alias, items.images, items.description,
 			 items.price, items.old_price, items.currency_id, items.count, items.in_stock, items.disable,
@@ -73,21 +72,21 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 }
 
 func (s *AdminItemServiceImpl) AdminItems(ctx context.Context, req *v1.AdminItemsRequest) (*v1.AdminItemsResponse, error) {
-	user_id := auth.GetUserUID(ctx)
+	//user_id := auth.GetUserUID(ctx)
 
 	items := []models.Item{}
 	var total uint32
-	order := "sort"
-	if req.Sort != "" {
-		order = req.Sort + " " + req.Direction
-	}
+	// order := "sort"
+	// if req.Sort != "" {
+	// 	order = req.Sort + " " + req.Direction
+	// }
 
-	db.DB.GetContext(ctx, &total, "SELECT count(*) FROM items WHERE user_id = $1 AND draft <> $2 AND parent_id IS $3", user_id, true, nil)
-	query := fmt.Sprintf(
-		`SELECT items.* FROM items WHERE (user_id = $1 AND draft <> $2 AND parent_id IS $3)
-		ORDER BY %s OFFSET $4 LIMIT $5`,
-		order)
-	db.DB.SelectContext(ctx, &items, query, user_id, true, nil, req.Page*req.PageSize, req.PageSize)
+	// db.DB.GetContext(ctx, &total, "SELECT count(*) FROM items WHERE user_id = $1 AND draft <> $2 AND parent_id IS $3", user_id, true, nil)
+	// query := fmt.Sprintf(
+	// 	`SELECT items.* FROM items WHERE (user_id = $1 AND draft <> $2 AND parent_id IS $3)
+	// 	ORDER BY %s OFFSET $4 LIMIT $5`,
+	// 	order)
+	// db.DB.SelectContext(ctx, &items, query, user_id, true, nil, req.Page*req.PageSize, req.PageSize)
 
 	//db.DB.Preload("Vendor").Preload("Currency")
 	/*
@@ -104,18 +103,18 @@ func (s *AdminItemServiceImpl) AdminCreateDraftItem(ctx context.Context, req *v1
 	user_id := auth.GetUserUID(ctx)
 
 	draft := models.Item{}
-	row := db.DB.QueryRowContext(ctx, "SELECT id, title, alias, article FROM items WHERE user_id = $1 AND draft = $2", user_id, true)
+	row := db.DB.QueryRow(ctx, "SELECT id, title, alias, article FROM items WHERE user_id = $1 AND draft = $2", user_id, true)
 	err := row.Scan(&draft.ID, &draft.Title, &draft.Alias, &draft.Article)
 	if err != nil {
 		draft.UserID = user_id
 		draft.Draft = true
-		row := db.DB.QueryRowContext(ctx, "INSERT INTO items (title, alias, user_id, draft) VALUES('', '', $1, $2) RETURNING (id)", draft.UserID, draft.Draft)
+		row := db.DB.QueryRow(ctx, "INSERT INTO items (title, alias, user_id, draft) VALUES('', '', $1, $2) RETURNING (id)", draft.UserID, draft.Draft)
 		err := row.Scan(&draft.ID)
 		if err != nil {
 			return nil, status.Errorf(codes.NotFound, "Admin add item error")
 		}
 	}
-	db.DB.ExecContext(ctx,
+	db.DB.Exec(ctx,
 		`DELETE FROM items WHERE user_id = $1 AND draft = $2 AND id <> $3`,
 		user_id, true, draft.ID)
 
@@ -127,7 +126,7 @@ func (s *AdminItemServiceImpl) AdminCreateDraftItem(ctx context.Context, req *v1
 		draft.Article = ""
 	} else {
 		//Offer
-		row := db.DB.QueryRowContext(ctx,
+		row := db.DB.QueryRow(ctx,
 			`SELECT title, alias, article FROM items WHERE user_id = $1 AND id=$2)`,
 			user_id, req.ParentId)
 		err := row.Scan(&draft.Title, &draft.Alias, &draft.Article)
@@ -136,7 +135,7 @@ func (s *AdminItemServiceImpl) AdminCreateDraftItem(ctx context.Context, req *v1
 		}
 		draft.ParentID = sql.NullInt64{int64(req.ParentId), true}
 	}
-	db.DB.ExecContext(ctx, `
+	db.DB.Exec(ctx, `
 		UPDATE items SET parent_id=$1, title=$2, alias=$3, article=$4
 		WHERE id=$5
 		`, draft.ParentID, draft.Title, draft.Alias, draft.Article, req.ParentId)
@@ -180,7 +179,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 	item.Draft = false
 
 	if req.Id != 0 {
-		_, err := db.DB.ExecContext(ctx, `
+		_, err := db.DB.Exec(ctx, `
 		UPDATE items SET title=$1, parent_id=$2, article=$3, alias=$4, count=$5, in_stock=$6,
 			description=$7, vendor_id=$8, price=$9, old_price=$10, currency_id=$11,	disable=$12,
 			sort=$13, draft=$14
@@ -194,19 +193,18 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 		}
 		item.ID = uint64(req.Id)
 	} else {
-		res, err := db.DB.ExecContext(ctx, `
+		err := db.DB.QueryRow(ctx, `
 		INSERT INTO items (user_id, title, parent_id, article, alias, count, in_stock, description,
 			vendor_id, price, old_price, currency_id, disable, sort, draft
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+		RETURNING id
 		`,
 			item.UserID, item.Title, item.ParentID, item.Article, item.Alias, item.Count, item.InStock,
 			item.Description, item.VendorID, item.Price, item.OldPrice, item.CurrencyID, item.Disable,
-			item.Sort, item.Draft)
+			item.Sort, item.Draft).Scan(&item.ID)
 		if err != nil {
 			return nil, status.Errorf(codes.Aborted, "Error create item")
 		}
-		itemID, err := res.LastInsertId()
-		item.ID = uint64(itemID)
 	}
 
 	/*
@@ -234,7 +232,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 	//Item images to remove
 	var toRemoveItemImages []models.ItemImage
 	toRemoveItemImagesMap := make(map[string]models.ItemImage)
-	row := db.DB.QueryRowContext(ctx,
+	row := db.DB.QueryRow(ctx,
 		`SELECT items.images
 			FROM items
 			WHERE items.user_id = $1 AND items.id = $2`,
@@ -253,7 +251,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 	var toRemoveUploadImages []models.UploadImage
 	toRemoveUploadImagesMap := make(map[string]models.UploadImage)
 	userImages := ""
-	row = db.DB.QueryRowContext(ctx,
+	row = db.DB.QueryRow(ctx,
 		`SELECT users.upload_images
 			FROM users
 			WHERE users.id = $1`,
@@ -314,7 +312,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 
 	itemImagesBuf, _ := json.Marshal(itemImages)
 	item.Images = string(itemImagesBuf)
-	_, err = db.DB.ExecContext(ctx, `
+	_, err = db.DB.Exec(ctx, `
 	UPDATE items SET images=$1
 	WHERE user_id=$2 AND id=$3`,
 		item.Images,
@@ -324,7 +322,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 	}
 
 	userImagesBuf, _ := json.Marshal(uploadImages)
-	_, err = db.DB.ExecContext(ctx, `
+	_, err = db.DB.Exec(ctx, `
 	UPDATE users SET upload_images=$1 WHERE id=$2`,
 		string(userImagesBuf), user_id)
 	if err != nil {
@@ -364,14 +362,14 @@ func (s *AdminItemServiceImpl) AdminGetUploadImages(ctx context.Context, req *em
 }
 
 func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminCategoriesResponse, error) {
-	user_id := auth.GetUserUID(ctx)
+	//user_id := auth.GetUserUID(ctx)
 
-	item := models.Item{}
+	//item := models.Item{}
 	if req.Id != 0 {
-		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
-		if err != nil {
-			return nil, status.Errorf(codes.NotFound, "Item not found")
-		}
+		// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
+		// if err != nil {
+		// 	return nil, status.Errorf(codes.NotFound, "Item not found")
+		// }
 	}
 
 	categories := []models.Category{}
@@ -402,19 +400,19 @@ func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.
 }
 
 func (s *AdminItemServiceImpl) AdminItemBindCategory(ctx context.Context, req *v1.AdminItemBindRequest) (*v1.AdminCategoriesResponse, error) {
-	user_id := auth.GetUserUID(ctx)
+	//user_id := auth.GetUserUID(ctx)
 
-	item := models.Item{}
-	err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1, id=$2", user_id, req.Id)
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "Item not found")
-	}
+	//item := models.Item{}
+	// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1, id=$2", user_id, req.Id)
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.NotFound, "Item not found")
+	// }
 
-	category := models.Category{}
-	err = db.DB.GetContext(ctx, &category, "SELECT * FROM categories WHERE user_id=$1, id=$2", user_id, req.CategoryId)
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "Category_not_found")
-	}
+	//category := models.Category{}
+	// err := db.DB.GetContext(ctx, &category, "SELECT * FROM categories WHERE user_id=$1, id=$2", user_id, req.CategoryId)
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.NotFound, "Category_not_found")
+	// }
 
 	//itemCategory := models.ItemsCategories{}
 
@@ -457,19 +455,19 @@ func (s *AdminItemServiceImpl) AdminItemBindCategory(ctx context.Context, req *v
 }
 
 func (s *AdminItemServiceImpl) AdminItemUnbindCategory(ctx context.Context, req *v1.AdminItemBindRequest) (*v1.AdminCategoriesResponse, error) {
-	user_id := auth.GetUserUID(ctx)
+	//user_id := auth.GetUserUID(ctx)
 
-	item := models.Item{}
-	err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "Item not found")
-	}
+	//item := models.Item{}
+	// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.NotFound, "Item not found")
+	// }
 
-	category := models.Category{}
-	err = db.DB.GetContext(ctx, &category, "SELECT * FROM categories WHERE user_id=$1 AND id=$2", user_id, req.CategoryId)
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "Category_not_found")
-	}
+	//category := models.Category{}
+	// err = db.DB.GetContext(ctx, &category, "SELECT * FROM categories WHERE user_id=$1 AND id=$2", user_id, req.CategoryId)
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.NotFound, "Category_not_found")
+	// }
 
 	/*
 		itemCategory := models.ItemsCategories{}
@@ -506,34 +504,34 @@ func (s *AdminItemServiceImpl) AdminItemUnbindCategory(ctx context.Context, req 
 }
 
 func (s *AdminItemServiceImpl) AdminItemProperties(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminPropertiesResponse, error) {
-	user_id := auth.GetUserUID(ctx)
+	//user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
 	if req.Id != 0 {
-		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
-		if err != nil {
-			logger.Error(err.Error())
-			return nil, status.Errorf(codes.NotFound, "Item not found")
-		}
+		// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
+		// if err != nil {
+		// 	logger.Error(err.Error())
+		// 	return nil, status.Errorf(codes.NotFound, "Item not found")
+		// }
 	}
 	properties := itemProperties(&item)
 	return &v1.AdminPropertiesResponse{Properties: models.AdminPropertiesToResponse(properties)}, nil
 }
 
 func (s *AdminItemServiceImpl) AdminItemOffers(ctx context.Context, req *v1.AdminOffersRequest) (*v1.AdminOffersResponse, error) {
-	user_id := auth.GetUserUID(ctx)
+	//user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
 	if req.ItemId != 0 {
-		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.ItemId)
-		if err != nil {
-			return nil, status.Errorf(codes.NotFound, "Item not found")
-		}
+		// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.ItemId)
+		// if err != nil {
+		// 	return nil, status.Errorf(codes.NotFound, "Item not found")
+		// }
 	}
 
 	offers := []models.Item{}
 	var total uint32
-	db.DB.GetContext(ctx, &total, "SELECT count(*) FROM items WHERE user_id = $1 AND parent_id = $2 AND draft <> $3", user_id, item.ID, false)
+	//db.DB.GetContext(ctx, &total, "SELECT count(*) FROM items WHERE user_id = $1 AND parent_id = $2 AND draft <> $3", user_id, item.ID, false)
 	offers = itemOffers(&item, &req.Page, &req.PageSize, &req.Sort, &req.Direction)
 	return &v1.AdminOffersResponse{Offers: models.AdminItemsToResponse(offers), Total: total}, nil
 }
@@ -544,12 +542,12 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	vendor := models.Vendor{}
 	vendor.Name = sql.NullString{req.Vendor, true}
 	vendor.Country = sql.NullString{req.Country, true}
-	err := db.DB.GetContext(ctx, &vendor, "SELECT * FROM vendors WHERE name=$1", sql.NullString{req.Vendor, true})
-	if err != nil && err == sql.ErrNoRows {
-		res, _ := db.DB.ExecContext(ctx, "INSERT INTO vendors (name, country) VALUES($1, $2)", req.Vendor, req.Country)
-		vendorID, _ := res.LastInsertId()
-		vendor.ID = sql.NullInt32{int32(vendorID), true}
-	}
+	// err := db.DB.GetContext(ctx, &vendor, "SELECT * FROM vendors WHERE name=$1", sql.NullString{req.Vendor, true})
+	// if err != nil && err == sql.ErrNoRows {
+	// 	res, _ := db.DB.ExecContext(ctx, "INSERT INTO vendors (name, country) VALUES($1, $2)", req.Vendor, req.Country)
+	// 	vendorID, _ := res.LastInsertId()
+	// 	vendor.ID = sql.NullInt32{int32(vendorID), true}
+	// }
 
 	item := models.Item{}
 

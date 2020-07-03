@@ -13,7 +13,7 @@ const (
 )
 
 type User struct {
-	ID        uint32
+	ID        uint32    `db:"id"`
 	CreatedAt time.Time `db:"created_at"`
 
 	Fullname     string  `db:"fullname"`

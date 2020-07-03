@@ -35,7 +35,13 @@ type UserServiceImpl struct {
 func (s *UserServiceImpl) Auth(ctx context.Context, req *v1.AuthRequest) (*v1.UserResponse, error) {
 	user := models.User{}
 
-	err := db.DB.GetContext(ctx, &user, "SELECT * FROM users WHERE email=$1", req.Login)
+	err := db.DB.QueryRow(ctx,
+		`SELECT users.id, users.created_at, users.fullname, users.phone, users.email, users.password,
+		users.photo, users.role, users.trademark, users.tariff, users.amount, users.about,
+		users.upload_images FROM users WHERE email=$1`,
+		req.Login).Scan(&user.ID, &user.CreatedAt, &user.Fullname, &user.Phone, &user.Email,
+		&user.Password, &user.Photo, &user.Role, &user.Trademark, &user.Tariff, &user.Amount,
+		&user.About, &user.UploadImages)
 	if err != nil {
 		return nil, status.Errorf(codes.PermissionDenied, "User not exist")
 	}
@@ -65,7 +71,10 @@ func (s *UserServiceImpl) Me(ctx context.Context, req *empty.Empty) (*v1.UserRes
 func (s *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest) (*v1.UserResponse, error) {
 	user := models.User{}
 
-	err := db.DB.GetContext(ctx, &user, "SELECT * FROM users WHERE email=$1", req.Email)
+	err := db.DB.QueryRow(ctx,
+		`SELECT users.id FROM users WHERE email=$1`,
+		req.Email).
+		Scan(&user.ID)
 	if err == nil {
 		return nil, status.Errorf(codes.AlreadyExists, "User already exist")
 	}
@@ -74,16 +83,16 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest)
 	user.Email = req.Email
 	user.Password = auth.HashAndSalt([]byte(req.Password))
 
-	res, err := db.DB.NamedExec(`
-	INSERT INTO users (fullname, phone , email, password) 
-	VALUES (:fullname, :phone, :email, :password)
-	`, user)
+	// res, err := db.DB.NamedExec(`
+	// INSERT INTO users (fullname, phone , email, password)
+	// VALUES (:fullname, :phone, :email, :password)
+	// `, user)
 
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	}
-	userID, err := res.LastInsertId()
-	user.ID = uint32(userID)
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	// }
+	// userID, err := res.LastInsertId()
+	// user.ID = uint32(userID)
 	token := auth.CreateToken(user.ID)
 	resp := &v1.UserResponse{
 		User:  models.UserToResponse(user),

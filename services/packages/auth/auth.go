@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	//"github.com/davecgh/go-spew/spew"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 
@@ -157,7 +156,13 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 func GetUser(ctx context.Context) models.User {
 	userData, _ := ctx.Value(UserAuthKey).(AuthContext)
 	user := models.User{}
-	db.DB.GetContext(ctx, &user, "SELECT * FROM users WHERE id = $1", userData.UserID)
+	db.DB.QueryRow(ctx,
+		`SELECT users.id, users.created_at, users.fullname, users.phone, users.email, users.password,
+		users.photo, users.role, users.trademark, users.tariff, users.amount, users.about,
+		users.upload_images FROM users WHERE id=$1`,
+		userData.UserID).Scan(&user.ID, &user.CreatedAt, &user.Fullname, &user.Phone, &user.Email,
+		&user.Password, &user.Photo, &user.Role, &user.Trademark, &user.Tariff, &user.Amount,
+		&user.About, &user.UploadImages)
 	return user
 }
 

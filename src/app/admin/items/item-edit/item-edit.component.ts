@@ -318,13 +318,13 @@ export class ItemEditComponent implements OnInit {
     if (this.itemForm.valid) {
       try {
         this.itemForm.value.id = (this.mode == "edit" || this.mode == "draft") ? Number(this.item.id) : null
-        this.itemForm.value.itemImages = this.itemImages.map(item => item.id)
-        this.itemForm.value.uploadImages = this.uploadImages.map(item => item.id)
+        this.itemForm.value.itemImages = this.itemImages
+        this.itemForm.value.uploadImages = this.uploadImages
         this.itemForm.value.parentID = this.parentID
         await this.adminItemService.editItem(this.itemForm.value)
-        this.itemFormSubmitted = false;
+        this.itemFormSubmitted = false
         this.matcher.changeFormState(false)
-        this.itemMessage = new Message("success", "");
+        this.itemMessage = new Message("success", "")
         this.itemForm.reset();
         if (this.activeRoute.snapshot.params["offerMode"]) {
           this.router.navigate(["/admin/items/edit", this.parentID], { queryParams: { tab: 4 } })
@@ -375,13 +375,13 @@ export class ItemEditComponent implements OnInit {
 
   onItemDrop($event, dst: string) {
     if (dst == "item") {
-      this.requestUploadImages = this.uploadImages.filter(item => item.id != $event.dragData.id)
+      this.requestUploadImages = this.uploadImages.filter(item => item.filename != $event.dragData.filename)
       this.requestItemImages = this.itemImages
       this.requestItemImages.push($event.dragData)
     } else {
       this.requestUploadImages = this.uploadImages
       this.requestUploadImages.push($event.dragData)
-      this.requestItemImages = this.itemImages.filter(item => item.id != $event.dragData.id)
+      this.requestItemImages = this.itemImages.filter(item => item.filename != $event.dragData.filename)
     }
   }
 }

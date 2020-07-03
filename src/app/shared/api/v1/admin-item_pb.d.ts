@@ -119,6 +119,9 @@ export class AdminItemImage extends jspb.Message {
   getFilename(): string;
   setFilename(value: string): void;
 
+  getName(): string;
+  setName(value: string): void;
+
   getPropertyValueId(): number;
   setPropertyValueId(value: number): void;
 
@@ -134,6 +137,7 @@ export namespace AdminItemImage {
   export type AsObject = {
     path: string,
     filename: string,
+    name: string,
     propertyValueId: number,
   }
 }
@@ -144,6 +148,9 @@ export class AdminUploadImage extends jspb.Message {
 
   getFilename(): string;
   setFilename(value: string): void;
+
+  getName(): string;
+  setName(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AdminUploadImage.AsObject;
@@ -157,6 +164,7 @@ export namespace AdminUploadImage {
   export type AsObject = {
     path: string,
     filename: string,
+    name: string,
   }
 }
 

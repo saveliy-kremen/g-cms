@@ -42,7 +42,7 @@ func init() {
 	Logger.SetLevel(logrus.ErrorLevel)
 	Logger.SetFormatter(&simpleFormater{pathMatch: wd})
 	Logger.SetReportCaller(true)
-	file, err := os.OpenFile("services.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
+	file, err := os.OpenFile("db.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
 	if err != nil {
 		log.Fatal(err)
 	}

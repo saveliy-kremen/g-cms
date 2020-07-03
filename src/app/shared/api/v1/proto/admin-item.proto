@@ -37,12 +37,14 @@ message AdminItem {
 message AdminItemImage {
   string path = 1;
   string filename = 2;
-  uint32 property_value_id = 3;
+  string name = 3;
+  uint32 property_value_id = 4;
 }
 
 message AdminUploadImage {
   string path = 1;
   string filename = 2;
+  string name = 3;
 }
 
 message AdminItemProperty {

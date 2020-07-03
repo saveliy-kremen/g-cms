@@ -3,13 +3,14 @@ package services
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -18,10 +19,18 @@ import (
 	"gcms/db"
 	"gcms/models"
 	"gcms/packages/auth"
+	"gcms/packages/thumbs"
 	"gcms/packages/utils"
 )
 
 type AdminItemServiceImpl struct {
+}
+
+var logger *logrus.Logger
+
+func init() {
+	logger = logrus.New()
+	logger.SetReportCaller(true)
 }
 
 func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminItemResponse, error) {
@@ -49,13 +58,13 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 		&item.Currency.ID, &item.Currency.CreatedAt, &item.Currency.Name, &item.Currency.ShortName,
 		&item.Currency.Code, &item.Currency.Rate)
 	if err != nil {
-		spew.Dump(err)
+		logger.Error(err.Error())
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
 
-	fields, pointers := utils.GetDbFields("items", "item", item)
-	spew.Dump(fields)
-	spew.Dump(pointers)
+	// fields, pointers := utils.GetDbFields("items", "item", item)
+	// spew.Dump(fields)
+	// spew.Dump(pointers)
 
 	//item.Properties = itemProperties(&item)
 	//item.Offers = itemOffers(&item, nil, nil, nil, nil)
@@ -183,7 +192,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 		if err != nil {
 			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
-		item.UserID = req.Id
+		item.ID = uint64(req.Id)
 	} else {
 		res, err := db.DB.ExecContext(ctx, `
 		INSERT INTO items (user_id, title, parent_id, article, alias, count, in_stock, description,
@@ -222,60 +231,106 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 		}
 	*/
 
-	//Images
+	//Item images to remove
+	var toRemoveItemImages []models.ItemImage
+	toRemoveItemImagesMap := make(map[string]models.ItemImage)
+	row := db.DB.QueryRowContext(ctx,
+		`SELECT items.images
+			FROM items
+			WHERE items.user_id = $1 AND items.id = $2`,
+		user_id, item.ID)
+	err := row.Scan(&item.Images)
+	if err != nil {
+		logger.Error(err.Error())
+	} else {
+		json.Unmarshal([]byte(item.Images), &toRemoveItemImages)
+	}
+	for i := 0; i < len(toRemoveItemImages); i++ {
+		toRemoveItemImagesMap[toRemoveItemImages[i].Filename] = toRemoveItemImages[i]
+	}
+
+	//Upload images to remove
+	var toRemoveUploadImages []models.UploadImage
+	toRemoveUploadImagesMap := make(map[string]models.UploadImage)
+	userImages := ""
+	row = db.DB.QueryRowContext(ctx,
+		`SELECT users.upload_images
+			FROM users
+			WHERE users.id = $1`,
+		user_id)
+	err = row.Scan(&userImages)
+	if err != nil {
+		logger.Error(err.Error())
+	} else {
+		json.Unmarshal([]byte(userImages), &toRemoveUploadImages)
+	}
+	for i := 0; i < len(toRemoveUploadImages); i++ {
+		toRemoveUploadImagesMap[toRemoveUploadImages[i].Filename] = toRemoveUploadImages[i]
+	}
+
 	directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/items/"
 	if _, err := os.Stat(directory + strconv.Itoa(int(item.ID))); err != nil {
 		os.MkdirAll(directory+strconv.Itoa(int(item.ID)), 0775)
 	}
 
-	/*
-		if req.ItemImages != nil {
-			itemImages := []models.ItemImage{}
-			orderValues := strings.Replace(strings.Trim(fmt.Sprint(req.ItemImages), "[]"), " ", ",", -1)
-			db.DB.Where("user_id = ? AND id IN(?)", user_id, req.ItemImages).Order(gorm.Expr(fmt.Sprintf("FIELD(id, %s)", orderValues))).Find(&itemImages)
-			for i, itemImage := range itemImages {
-				if uint(itemImage.ItemID) != item.ID {
-					itemImage.ItemID = uint32(item.ID)
-					os.Rename(directory+"0/"+itemImage.Filename, directory+strconv.Itoa(int(item.ID))+"/"+itemImage.Filename)
-					thumbs.CreateThumbs(directory+strconv.Itoa(int(item.ID)), itemImage.Filename, config.AppConfig.Thumbs.Catalog)
-				}
-				itemImage.Sort = uint32(i * 10)
-				db.DB.Save(&itemImage)
+	//Item images handle
+	itemImages := []models.ItemImage{}
+	if req.ItemImages != "" {
+		json.Unmarshal([]byte(req.ItemImages), &itemImages)
+		for i, itemImage := range itemImages {
+			if itemImage.Path != strconv.Itoa(int(item.ID)) {
+				os.Rename(directory+itemImage.Path+"/"+itemImage.Filename, directory+strconv.Itoa(int(item.ID))+"/"+itemImage.Filename)
+				thumbs.CreateThumbs(directory+strconv.Itoa(int(item.ID)), itemImage.Filename, config.AppConfig.Thumbs.Catalog)
+				itemImages[i].Path = strconv.Itoa(int(item.ID))
 			}
+			delete(toRemoveItemImagesMap, itemImage.Filename)
 		}
-		if req.UploadImages != nil {
-			uploadImages := []models.ItemImage{}
-			orderValues := strings.Replace(strings.Trim(fmt.Sprint(req.UploadImages), "[]"), " ", ",", -1)
-			db.DB.Where("user_id = ? AND id IN(?)", user_id, req.UploadImages).Order(gorm.Expr(fmt.Sprintf("FIELD(id, %s)", orderValues))).Find(&uploadImages)
-			for i, uploadImage := range uploadImages {
-				if uploadImage.ItemID != 0 {
-					uploadImage.ItemID = 0
-					os.Rename(directory+strconv.Itoa(int(item.ID))+"/"+uploadImage.Filename, directory+"0/"+uploadImage.Filename)
-					thumbs.DeleteThumbs(directory+strconv.Itoa(int(item.ID)), uploadImage.Filename, config.AppConfig.Thumbs.Catalog)
-				}
-				uploadImage.Sort = uint32(i * 10)
-				db.DB.Save(&uploadImage)
+	}
+
+	//Upload images handle
+	uploadImages := []models.UploadImage{}
+	if req.UploadImages != "" {
+		json.Unmarshal([]byte(req.UploadImages), &uploadImages)
+		for i, uploadImage := range uploadImages {
+			if uploadImage.Path != "0" {
+				os.Rename(directory+strconv.Itoa(int(item.ID))+"/"+uploadImage.Filename, directory+"0/"+uploadImage.Filename)
+				thumbs.DeleteThumbs(directory+strconv.Itoa(int(item.ID)), uploadImage.Filename, config.AppConfig.Thumbs.Catalog)
+				uploadImages[i].Path = "0"
 			}
+			delete(toRemoveUploadImagesMap, uploadImage.Filename)
 		}
-		deleteImages := []models.ItemImage{}
-		existImagesIDs := []uint32{}
-		existImagesIDs = append(existImagesIDs, req.ItemImages...)
-		existImagesIDs = append(existImagesIDs, req.UploadImages...)
-		if len(existImagesIDs) > 0 {
-			db.DB.Where("user_id = ? AND (item_id = ? OR item_id = ?) AND id NOT IN(?)", user_id, 0, item.ID, existImagesIDs).Find(&deleteImages)
-		} else {
-			db.DB.Where("user_id = ? AND (item_id = ? OR item_id = ?)", user_id, 0, item.ID).Find(&deleteImages)
-		}
-		for _, deleteImage := range deleteImages {
-			if deleteImage.ItemID == 0 {
-				os.Remove(directory + "0/" + deleteImage.Filename)
-			} else {
-				os.Remove(directory + strconv.Itoa(int(item.ID)) + "/" + deleteImage.Filename)
-				thumbs.DeleteThumbs(directory+strconv.Itoa(int(item.ID)), deleteImage.Filename, config.AppConfig.Thumbs.Catalog)
-			}
-			db.DB.Unscoped().Delete(&deleteImage)
-		}
-	*/
+	}
+
+	//Item images to remove handle
+	for _, deleteImage := range toRemoveItemImagesMap {
+		os.Remove(directory + strconv.Itoa(int(item.ID)) + "/" + deleteImage.Filename)
+		thumbs.DeleteThumbs(directory+strconv.Itoa(int(item.ID)), deleteImage.Filename, config.AppConfig.Thumbs.Catalog)
+	}
+
+	//Upload images to remove handle
+	for _, deleteImage := range toRemoveUploadImagesMap {
+		os.Remove(directory + "0/" + deleteImage.Filename)
+	}
+
+	itemImagesBuf, _ := json.Marshal(itemImages)
+	item.Images = string(itemImagesBuf)
+	_, err = db.DB.ExecContext(ctx, `
+	UPDATE items SET images=$1
+	WHERE user_id=$2 AND id=$3`,
+		item.Images,
+		item.UserID, req.Id)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+
+	userImagesBuf, _ := json.Marshal(uploadImages)
+	_, err = db.DB.ExecContext(ctx, `
+	UPDATE users SET upload_images=$1 WHERE id=$2`,
+		string(userImagesBuf), user_id)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+
 	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
 }
 
@@ -457,7 +512,7 @@ func (s *AdminItemServiceImpl) AdminItemProperties(ctx context.Context, req *v1.
 	if req.Id != 0 {
 		err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
 		if err != nil {
-			spew.Dump(err)
+			logger.Error(err.Error())
 			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
 	}

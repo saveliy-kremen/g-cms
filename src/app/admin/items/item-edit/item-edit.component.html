@@ -110,9 +110,9 @@
           <br>
           <div class="sort-grid" droppable [dropScope]="'item'" (onDrop)="onItemDrop($event, 'item')">
             <div *ngFor="let image of itemImages" class="upload-images"
-              [ngStyle]="{backgroundImage: 'url('+uploadUrl + item.id +'/' + image?.filename+')'}" ngSortgridItem
-              [ngSortGridItems]="itemImages" (sorted)="storeNewOrder($event, 'item')" ngSortGridGroup="item" draggable
-              [dragData]="image" [dragScope]="'upload'">
+              [ngStyle]="{backgroundImage: 'url(' + uploadUrl + image?.path + '/' + image?.filename + ')'}"
+              ngSortgridItem [ngSortGridItems]="itemImages" (sorted)="storeNewOrder($event, 'item')"
+              ngSortGridGroup="item" draggable [dragData]="image" [dragScope]="'upload'">
               <i class="material-icons right-top-icon" (click)="itemImageDelete(image.id)"
                 title="{{'Delete' | translate}}">highlight_off</i>
             </div>
@@ -126,9 +126,9 @@
                 <button mat-stroked-button type="button" class="btn btn-secondary">{{"Add" | translate}}</button>
                 <div class="dropzone">
                   <div *ngFor="let image of uploadImages" class="upload-images"
-                    [ngStyle]="{backgroundImage: 'url('+uploadUrl + '0/' + image?.path+')'}" ngSortgridItem
-                    [ngSortGridItems]="uploadImages" (sorted)="storeNewOrder($event, 'upload')" ngSortGridGroup="upload"
-                    draggable [dragData]="image" [dragScope]="'item'">
+                    [ngStyle]="{backgroundImage: 'url(' + uploadUrl + image?.path + '/' + image?.filename + ')'}"
+                    ngSortgridItem [ngSortGridItems]="uploadImages" (sorted)="storeNewOrder($event, 'upload')"
+                    ngSortGridGroup="upload" draggable [dragData]="image" [dragScope]="'item'">
                     <i class="material-icons right-top-icon" (click)="uploadImageDelete($event, image.id)"
                       title="{{'Delete' | translate}}">highlight_off</i>
                   </div>

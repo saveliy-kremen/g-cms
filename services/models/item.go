@@ -47,11 +47,13 @@ type Item struct {
 type UploadImage struct {
 	Path     string
 	Filename string
+	Name     string
 }
 
 type ItemImage struct {
 	Path            string
 	Filename        string
+	Name            string
 	PropertyValueID uint32
 }
 

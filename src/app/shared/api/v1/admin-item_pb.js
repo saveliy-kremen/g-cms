@@ -1255,7 +1255,8 @@ proto.v1.AdminItemImage.toObject = function(includeInstance, msg) {
   var f, obj = {
     path: jspb.Message.getFieldWithDefault(msg, 1, ""),
     filename: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    propertyValueId: jspb.Message.getFieldWithDefault(msg, 3, 0)
+    name: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    propertyValueId: jspb.Message.getFieldWithDefault(msg, 4, 0)
   };
 
   if (includeInstance) {
@@ -1301,6 +1302,10 @@ proto.v1.AdminItemImage.deserializeBinaryFromReader = function(msg, reader) {
       msg.setFilename(value);
       break;
     case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setName(value);
+      break;
+    case 4:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setPropertyValueId(value);
       break;
@@ -1347,10 +1352,17 @@ proto.v1.AdminItemImage.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getName();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
   f = message.getPropertyValueId();
   if (f !== 0) {
     writer.writeUint32(
-      3,
+      4,
       f
     );
   }
@@ -1394,11 +1406,29 @@ proto.v1.AdminItemImage.prototype.setFilename = function(value) {
 
 
 /**
- * optional uint32 property_value_id = 3;
+ * optional string name = 3;
+ * @return {string}
+ */
+proto.v1.AdminItemImage.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.AdminItemImage} returns this
+ */
+proto.v1.AdminItemImage.prototype.setName = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional uint32 property_value_id = 4;
  * @return {number}
  */
 proto.v1.AdminItemImage.prototype.getPropertyValueId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
 
 
@@ -1407,7 +1437,7 @@ proto.v1.AdminItemImage.prototype.getPropertyValueId = function() {
  * @return {!proto.v1.AdminItemImage} returns this
  */
 proto.v1.AdminItemImage.prototype.setPropertyValueId = function(value) {
-  return jspb.Message.setProto3IntField(this, 3, value);
+  return jspb.Message.setProto3IntField(this, 4, value);
 };
 
 
@@ -1444,7 +1474,8 @@ proto.v1.AdminUploadImage.prototype.toObject = function(opt_includeInstance) {
 proto.v1.AdminUploadImage.toObject = function(includeInstance, msg) {
   var f, obj = {
     path: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    filename: jspb.Message.getFieldWithDefault(msg, 2, "")
+    filename: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    name: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -1489,6 +1520,10 @@ proto.v1.AdminUploadImage.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setFilename(value);
       break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setName(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1532,6 +1567,13 @@ proto.v1.AdminUploadImage.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getName();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
 };
 
 
@@ -1568,6 +1610,24 @@ proto.v1.AdminUploadImage.prototype.getFilename = function() {
  */
 proto.v1.AdminUploadImage.prototype.setFilename = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string name = 3;
+ * @return {string}
+ */
+proto.v1.AdminUploadImage.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.AdminUploadImage} returns this
+ */
+proto.v1.AdminUploadImage.prototype.setName = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
 };
 
 

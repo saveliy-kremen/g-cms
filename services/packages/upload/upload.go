@@ -53,7 +53,8 @@ func UploadFileHandler() http.HandlerFunc {
 		user := auth.GetUser(ctx)
 
 		dir, _ := filepath.Abs(config.AppConfig.UploadPath)
-		directory := dir + "/users/" + strconv.Itoa(int(user.ID)) + "/items/0/"
+		path := "0"
+		directory := dir + "/users/" + strconv.Itoa(int(user.ID)) + "/items/" + path + "/"
 		if _, err := os.Stat(directory); err != nil {
 			os.MkdirAll(directory, 0775)
 		}
@@ -75,9 +76,10 @@ func UploadFileHandler() http.HandlerFunc {
 		var uploadImages []models.UploadImage
 		json.Unmarshal([]byte(user.UploadImages), &uploadImages)
 		uploadImage := models.UploadImage{}
-		path := uuid.New().String()
-		uploadImage.Path = path + ".jpeg"
-		uploadImage.Filename = handler.Filename
+		uploadImage.Path = path
+		filename := uuid.New().String()
+		uploadImage.Filename = filename + ".jpeg"
+		uploadImage.Name = handler.Filename
 		uploadImages = append(uploadImages, uploadImage)
 		images, err := json.Marshal(uploadImages)
 		user.UploadImages = string(images)
@@ -88,7 +90,7 @@ func UploadFileHandler() http.HandlerFunc {
 		if err != nil {
 			http.Error(w, "Error saving file: "+err.Error(), http.StatusBadRequest)
 		}
-		thumb, err := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.Thumbs.Item, directory, path)
+		thumb, err := thumbs.CreateThumb(directory+handler.Filename, config.AppConfig.Thumbs.Item, directory, filename)
 		if err != nil {
 			http.Error(w, "Error create thumb file: "+err.Error(), http.StatusBadRequest)
 			return

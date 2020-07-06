@@ -83,16 +83,13 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *v1.RegisterRequest)
 	user.Email = req.Email
 	user.Password = auth.HashAndSalt([]byte(req.Password))
 
-	// res, err := db.DB.NamedExec(`
-	// INSERT INTO users (fullname, phone , email, password)
-	// VALUES (:fullname, :phone, :email, :password)
-	// `, user)
-
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	// }
-	// userID, err := res.LastInsertId()
-	// user.ID = uint32(userID)
+	err = db.DB.QueryRow(ctx, `
+	INSERT INTO users (fullname, phone , email, password)
+	VALUES ($1, $2, $3, $4) RETURNING id
+	`, user.Fullname, user.Phone, user.Email, user.Password).Scan(&user.ID)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 	token := auth.CreateToken(user.ID)
 	resp := &v1.UserResponse{
 		User:  models.UserToResponse(user),

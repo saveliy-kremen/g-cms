@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -61,10 +63,6 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
 
-	// fields, pointers := utils.GetDbFields("items", "item", item)
-	// spew.Dump(fields)
-	// spew.Dump(pointers)
-
 	//item.Properties = itemProperties(&item)
 	//item.Offers = itemOffers(&item, nil, nil, nil, nil)
 
@@ -72,23 +70,57 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 }
 
 func (s *AdminItemServiceImpl) AdminItems(ctx context.Context, req *v1.AdminItemsRequest) (*v1.AdminItemsResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	items := []models.Item{}
 	var total uint32
-	// order := "sort"
-	// if req.Sort != "" {
-	// 	order = req.Sort + " " + req.Direction
-	// }
+	order := "sort"
+	if req.Sort != "" {
+		order = req.Sort + " " + req.Direction
+	}
 
-	// db.DB.GetContext(ctx, &total, "SELECT count(*) FROM items WHERE user_id = $1 AND draft <> $2 AND parent_id IS $3", user_id, true, nil)
-	// query := fmt.Sprintf(
-	// 	`SELECT items.* FROM items WHERE (user_id = $1 AND draft <> $2 AND parent_id IS $3)
-	// 	ORDER BY %s OFFSET $4 LIMIT $5`,
-	// 	order)
-	// db.DB.SelectContext(ctx, &items, query, user_id, true, nil, req.Page*req.PageSize, req.PageSize)
+	err := db.DB.QueryRow(ctx, "SELECT count(*) FROM items WHERE user_id = $1 AND draft <> $2 AND parent_id IS $3", user_id, true, nil).Scan(&total)
+	query := fmt.Sprintf(
+		`SELECT items.id, items.created_at, items.user_id, items.draft, items.title, items.article,
+		items.alias, items.images, items.description, items.price, items.old_price, items.count,
+		items.in_stock, items.disable, items.sort, items.seo_title, items.seo_description,
+		items.seo_keywords, items.parent_id, items.vendor_id, items.currency_id, vendors.id,
+		vendors.created_at, vendors.name, vendors.country, currencies.id, currencies.created_at,
+		currencies.name, currencies.short_name, currencies.code, currencies.rate
+		FROM items
+		LEFT JOIN vendors ON items.vendor_id = vendors.id
+		LEFT JOIN currencies ON items.currency_id = currencies.id
+		WHERE (user_id = $1 AND draft <> $2 AND parent_id IS $3)
+		ORDER BY %s OFFSET $4 LIMIT $5`,
+		order)
+	rows, err := db.DB.Query(ctx, query, user_id, true, nil, req.Page*req.PageSize, req.PageSize)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "Items not found")
+	}
+	defer rows.Close()
+	for rows.Next() {
+		item := models.Item{}
+		err := rows.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.Draft, &item.Title,
+			&item.Article, &item.Alias, &item.Images, &item.Description, &item.Price, &item.OldPrice,
+			&item.Count, &item.InStock, &item.Disable, &item.Sort, &item.SeoTitle,
+			&item.SeoDescription, &item.SeoKeywords, &item.ParentID, &item.VendorID, &item.CurrencyID,
+			&item.Vendor.ID, &item.Vendor.CreatedAt, &item.Vendor.Name, &item.Vendor.Country,
+			&item.Currency.ID, &item.Currency.CreatedAt, &item.Currency.Name, &item.Currency.ShortName,
+			&item.Currency.Code, &item.Currency.Rate)
+		if err != nil {
+			log.Fatal(err)
+		}
+		items = append(items, item)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, status.Errorf(codes.NotFound, "Items set error")
+	}
 
-	//db.DB.Preload("Vendor").Preload("Currency")
+	// item := models.Item{}
+	// fields, pointers := utils.GetDbFields("items", "item", item)
+	// spew.Dump(fields)
+	// spew.Dump(pointers)
+
 	/*
 		for i, item := range items {
 			db.DB.Preload("Vendor").Preload("Currency").Preload("Images", func(db *gorm.DB) *gorm.DB {

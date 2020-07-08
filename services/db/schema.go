@@ -67,7 +67,7 @@ CREATE TABLE categories (
 	title text NOT NULL,
 	alias varchar(256) NOT NULL,
 	description text DEFAULT '',
-	image text NOT NULL,
+	image text DEFAULT '',
 	parent varchar(256) DEFAULT '',
 	sort int DEFAULT 0,
 	disabled bool DEFAULT false,

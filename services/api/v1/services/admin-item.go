@@ -397,7 +397,7 @@ func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.
 	var exists bool
 	if req.Id != 0 {
 		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM items WHERE user_id=$1 AND id=$2)", user_id, req.Id).Scan(&exists)
-		if err != nil && err != sql.ErrNoRows {
+		if err != nil {
 			logger.Error(err.Error())
 			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
@@ -479,7 +479,7 @@ func (s *AdminItemServiceImpl) AdminItemBindCategory(ctx context.Context, req *v
 	var exists bool
 	if req.Id != 0 {
 		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM items WHERE user_id=$1 AND id=$2)", user_id, req.Id).Scan(&exists)
-		if err != nil && err != sql.ErrNoRows {
+		if err != nil {
 			logger.Error(err.Error())
 			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
@@ -487,7 +487,7 @@ func (s *AdminItemServiceImpl) AdminItemBindCategory(ctx context.Context, req *v
 
 	if req.Id != 0 {
 		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM categories WHERE user_id=$1 AND id=$2)", user_id, req.CategoryId).Scan(&exists)
-		if err != nil && err != sql.ErrNoRows {
+		if err != nil {
 			logger.Error(err.Error())
 			return nil, status.Errorf(codes.NotFound, "Category_not_found")
 		}
@@ -511,7 +511,7 @@ func (s *AdminItemServiceImpl) AdminItemUnbindCategory(ctx context.Context, req 
 	var exists bool
 	if req.Id != 0 {
 		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM items WHERE user_id=$1 AND id=$2)", user_id, req.Id).Scan(&exists)
-		if err != nil && err != sql.ErrNoRows {
+		if err != nil {
 			logger.Error(err.Error())
 			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
@@ -519,7 +519,7 @@ func (s *AdminItemServiceImpl) AdminItemUnbindCategory(ctx context.Context, req 
 
 	if req.Id != 0 {
 		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM categories WHERE user_id=$1 AND id=$2)", user_id, req.CategoryId).Scan(&exists)
-		if err != nil && err != sql.ErrNoRows {
+		if err != nil {
 			logger.Error(err.Error())
 			return nil, status.Errorf(codes.NotFound, "Category_not_found")
 		}

@@ -29,7 +29,7 @@ func main() {
 
 	// register our service implementation
 	v1.RegisterUserServiceServer(svr, &services.UserServiceImpl{})
-	//v1.RegisterAdminCategoryServiceServer(svr, &services.AdminCategoryServiceImpl{})
+	v1.RegisterAdminCategoryServiceServer(svr, &services.AdminCategoryServiceImpl{})
 	//v1.RegisterAdminPropertyServiceServer(svr, &services.AdminPropertyServiceImpl{})
 	v1.RegisterAdminItemServiceServer(svr, &services.AdminItemServiceImpl{})
 	//v1.RegisterAdminOrderServiceServer(svr, &services.AdminOrderServiceImpl{})

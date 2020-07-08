@@ -2,15 +2,20 @@ package services
 
 import (
 	"context"
-	//"github.com/davecgh/go-spew/spew"
 	"strconv"
 	"strings"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/jackc/pgx/v4"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	v1 "gcms/api/v1"
+	"gcms/config"
+	"gcms/db"
 	"gcms/models"
 	"gcms/packages/auth"
+	"gcms/packages/upload"
 	"gcms/packages/utils"
 )
 
@@ -26,195 +31,355 @@ type CategoryListItem struct {
 	Options []CategoryListItem
 }
 
-func childCategoriesIDs(user_id uint32, categoryID uint32) []uint32 {
+func childCategoriesIDs(ctx context.Context, user_id uint32, categoryID uint32) []uint32 {
 	categoriesIDs := []uint32{}
-	categories := []models.Category{}
-	//db.DB.Where("user_id = ? AND parent = ?", user_id, categoryID).Find(&categories)
-	for _, category := range categories {
-		categoriesIDs = append(categoriesIDs, category.ID)
-		childCategoriesIDs := childCategoriesIDs(user_id, category.ID)
+
+	rows, err := db.DB.Query(ctx,
+		`SELECT categories.id
+		FROM categories
+		WHERE (categories.user_id = $1 AND categories.parent = $2)
+		ORDER BY categories.title ASC`,
+		user_id, categoryID)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id uint32
+		err := rows.Scan(&categoryID)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		categoriesIDs = append(categoriesIDs, id)
+		childCategoriesIDs := childCategoriesIDs(ctx, user_id, id)
 		categoriesIDs = append(categoriesIDs, childCategoriesIDs...)
+	}
+	if err = rows.Err(); err != nil {
+		logger.Error(err.Error())
 	}
 	return categoriesIDs
 }
 
 func (s *AdminCategoryServiceImpl) AdminCategory(ctx context.Context, req *v1.AdminCategoryRequest) (*v1.AdminCategoryResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	category := models.Category{}
-	// if db.DB.Where("user_id = ? AND alias = ?", user_id, req.Alias).First(&category).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Category not found")
-	// }
+	row := db.DB.QueryRow(ctx,
+		`SELECT categories.id, categories.created_at, categories.user_id, categories.title,
+			categories.alias, categories.description, categories.image, categories.parent,
+			categories.sort, categories.disabled, categories.seo_title, categories.seo_description,
+			categories.seo_keywords
+		FROM categories
+		WHERE items.user_id = $1 AND alias = $2`,
+		user_id, req.Alias)
+	err := row.Scan(&category.ID, &category.CreatedAt, &category.UserID, &category.Title,
+		&category.Alias, &category.Description, &category.Image, &category.Parent, &category.Sort,
+		&category.Disabled, &category.SeoTitle, &category.SeoDescription, &category.SeoKeywords)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Category not found")
+	}
+
 	return &v1.AdminCategoryResponse{Category: models.AdminCategoryToResponse(category)}, nil
 }
 
 func (s *AdminCategoryServiceImpl) AdminEditCategory(ctx context.Context, req *v1.AdminEditCategoryRequest) (*v1.AdminCategoryResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
-	category := models.Category{}
-	// if db.DB.Where("user_id = ? AND alias = ?", user_id, req.OldAlias).First(&category).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Category not found")
-	// }
+	user_id := auth.GetUserUID(ctx)
 
-	category.Title = req.Title
-	category.Alias = req.Alias
-	category.Description = req.Description
-	// if db.DB.Save(&category).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error save category")
-	// }
+	var id uint32
+	err := db.DB.QueryRow(ctx,
+		`SELECT id FROM categories
+		WHERE user_id = $1 AND alias = $2`,
+		user_id, req.OldAlias).Scan(&id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Category not found")
+	}
+
+	_, err = db.DB.Exec(ctx, `
+    UPDATE categories SET title = $1, alias = $2, description = $3
+    WHERE user_id = $4 AND id = $5`,
+		req.Title, req.Alias, req.Description, user_id, id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error save category")
+	}
 
 	if req.Image != "" {
-		//directory := config.AppConfig.UploadPath + "/categories/" + strconv.Itoa(int(category.ID)) + "/"
-		//file, err := upload.UploadImage(req.Image, directory, "category", config.AppConfig.CategoryThumbSize)
-		// if err == nil {
-		// 	category.Image = *file
-		// 	db.DB.Save(&category)
-		// }
+		directory := config.AppConfig.UploadPath + "/categories/" + strconv.Itoa(int(id)) + "/"
+		file, err := upload.UploadImage(req.Image, directory, "category", config.AppConfig.CategoryThumbSize)
+		if err == nil {
+			_, err = db.DB.Exec(ctx, `
+        UPDATE categories SET image = $1
+        WHERE user_id = $2 AND id = $3`,
+				*file, user_id, id)
+		} else {
+			logger.Error(err.Error())
+		}
 	}
-	return &v1.AdminCategoryResponse{Category: models.AdminCategoryToResponse(category)}, nil
+
+	return s.AdminCategory(ctx, &v1.AdminCategoryRequest{Alias: req.Alias})
 }
 
 func (s *AdminCategoryServiceImpl) AdminUploadCategory(ctx context.Context, req *v1.AdminUploadCategoryRequest) (*v1.AdminCategoryResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
-	parentCategory := models.Category{}
-	// if db.DB.Where("user_id =? && parent = ?", user_id, "#").First(&parentCategory).RecordNotFound() {
-	// 	parentCategory.UserID = user_id
-	// 	parentCategory.Parent = "#"
-	// 	parentCategory.Title = "Categories"
-	// 	parentCategory.Alias = strconv.Itoa(int(user_id)) + "_categories"
-	// 	parentCategory.Description = "Main category"
-	// 	db.DB.Create(&parentCategory)
-	// }
-
-	category := models.Category{}
-	alias := utils.Translit(strings.ToLower(req.Title))
-	//db.DB.Where("user_id = ? AND alias = ?", user_id, alias).First(&category)
-
-	category.UserID = user_id
-	category.Title = req.Title
-	category.Alias = alias
-	if req.ParentId == 0 {
-		category.Parent = strconv.Itoa(int(parentCategory.ID))
-	} else {
-		category.Parent = strconv.Itoa(int(req.ParentId))
+	var parentID uint32
+	err := db.DB.QueryRow(ctx,
+		`SELECT id FROM categories
+		WHERE user_id = $1 AND parent = $2`,
+		user_id, "#").Scan(&parentID)
+	if err != nil && err == pgx.ErrNoRows {
+		err := db.DB.QueryRow(ctx, `
+		INSERT INTO categories (user_id, parent, title, alias, description)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id
+		`,
+			user_id, "#", "Categories", strconv.Itoa(int(user_id))+"_categories", "Main category").
+			Scan(&parentID)
+		if err != nil {
+			return nil, status.Errorf(codes.Aborted, "Error create item")
+		}
 	}
-	// if db.DB.Save(&category).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error save category")
-	// }
-	return &v1.AdminCategoryResponse{Category: models.AdminCategoryToResponse(category)}, nil
+
+	alias := utils.Translit(strings.ToLower(req.Title))
+	categoryParent := strconv.Itoa(int(parentID))
+	if req.ParentId != 0 {
+		categoryParent = strconv.Itoa(int(req.ParentId))
+	}
+
+	var id uint32
+	err = db.DB.QueryRow(ctx,
+		`SELECT id FROM categories
+		WHERE user_id = $1 AND alias = $2`,
+		user_id, alias).Scan(&id)
+	if err == nil {
+		_, err = db.DB.Exec(ctx, `
+    UPDATE categories SET  title = $1, alias = $2, parent = $3
+    WHERE user_id = $4 AND id = $5`,
+			req.Title, alias, categoryParent, user_id, id)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.Aborted, "Error save category")
+		}
+	} else if err == pgx.ErrNoRows {
+		err := db.DB.QueryRow(ctx, `
+		INSERT INTO categories (user_id, title, alias, parent)
+		VALUES ($1, $2, $3, $4)`,
+			user_id, req.Title, alias, categoryParent)
+		if err != nil {
+			return nil, status.Errorf(codes.Aborted, "Error create category")
+		}
+	} else {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error save category")
+	}
+
+	return s.AdminCategory(ctx, &v1.AdminCategoryRequest{Alias: alias})
 }
 
 func (s *AdminCategoryServiceImpl) AdminCategories(ctx context.Context, req *empty.Empty) (*v1.AdminCategoriesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	//parentCategory := models.Category{}
-	// if db.DB.Where("user_id =? && parent = ?", user_id, "#").First(&parentCategory).RecordNotFound() {
-	// 	parentCategory.UserID = user_id
-	// 	parentCategory.Parent = "#"
-	// 	parentCategory.Title = "Categories"
-	// 	parentCategory.Alias = strconv.Itoa(int(user_id)) + "_categories"
-	// 	parentCategory.Description = "Main category"
-	// 	db.DB.Create(&parentCategory)
-	// }
+	var parentID uint32
+	err := db.DB.QueryRow(ctx,
+		`SELECT id FROM categories
+		WHERE user_id = $1 AND parent = $2`,
+		user_id, "#").Scan(&parentID)
+	if err != nil && err == pgx.ErrNoRows {
+		err := db.DB.QueryRow(ctx, `
+		INSERT INTO categories (user_id, parent, title, alias, description)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id
+		`,
+			user_id, "#", "Categories", strconv.Itoa(int(user_id))+"_categories", "Main category").
+			Scan(&parentID)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.Aborted, "Error create item")
+		}
+	}
 
 	categories := []models.Category{}
-	//db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
+	rows, err := db.DB.Query(ctx, `
+    SELECT categories.id, categories.created_at, categories.user_id, categories.title,
+    categories.alias, categories.description, categories.image, categories.parent,
+    categories.sort, categories.disabled, categories.seo_title, categories.seo_description,
+    categories.seo_keywords
+    FROM categories
+    WHERE (categories.user_id = $1)
+    ORDER BY categories.sort ASC`, user_id)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "Categories not found")
+	}
+	defer rows.Close()
+	for rows.Next() {
+		category := models.Category{}
+		err := rows.Scan(&category.ID, &category.CreatedAt, &category.UserID, &category.Title,
+			&category.Alias, &category.Description, &category.Image, &category.Parent, &category.Sort,
+			&category.Disabled, &category.SeoTitle, &category.SeoDescription, &category.SeoKeywords)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		categories = append(categories, category)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, status.Errorf(codes.NotFound, "Categories not found")
+	}
+
 	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
 func (s *AdminCategoryServiceImpl) AdminAddCategory(ctx context.Context, req *v1.AdminAddCategoryRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
-	//parent := models.Category{}
-	// if db.DB.Where("user_id = ? AND id = ?", user_id, req.Parent).First(&parent).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Parent category not found")
-	// }
-	category := models.Category{}
-	category.UserID = user_id
-	category.Title = req.Text
-	category.Parent = req.Parent
+	var exists bool
+	err := db.DB.QueryRow(ctx, `
+    SELECT EXISTS(SELECT 1 FROM categories WHERE user_id = $1 AND id = $2)`,
+		user_id, req.Parent).Scan(&exists)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Parent category not found")
+	}
 
-	//last_category := models.Category{}
-	// if db.DB.Where("user_id = ? AND parent = ?", user_id, req.Parent).Order("sort DESC").First(&last_category).RecordNotFound() {
-	// 	category.Sort = 0
-	// } else {
-	// 	category.Sort = last_category.Sort + 1
-	// }
-	// if db.DB.Save(&category).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error create category")
-	// }
-	// category.Alias = strconv.Itoa(int(category.ID)) + "-" + utils.Translit(strings.ToLower(req.Text))
-	// if db.DB.Save(&category).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error create category")
-	// }
+	var sort int
+	categorySort := 0
+	err = db.DB.QueryRow(ctx, `
+    SELECT  sort FROM categories WHERE user_id = $1 AND parent = $2)`,
+		user_id, req.Parent).Scan(&sort)
+	if err == nil {
+		categorySort = sort + 1
+	}
 
-	categories := []models.Category{}
-	//db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
+	var id int
+	err = db.DB.QueryRow(ctx, `
+  INSERT INTO categories (user_id, title, parent, alias, sort)
+  VALUES ($1, $2, $3, '', $4)
+  RETURNING id
+  `,
+		user_id, req.Text, req.Parent, categorySort).
+		Scan(&id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error create category")
+	}
+
+	_, err = db.DB.Exec(ctx, `
+    UPDATE categories SET alias = $1
+    WHERE id = $2`,
+		strconv.Itoa(id)+"-"+utils.Translit(strings.ToLower(req.Text)), id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error save category")
+	}
+
+	return s.AdminCategories(ctx, nil)
 }
 
 func (s *AdminCategoryServiceImpl) AdminAddCategoryBefore(ctx context.Context, req *v1.AdminAddCategoryRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
-	before := models.Category{}
-	// if db.DB.Where("user_id = ?", user_id).First(&before, req.Parent).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Before node not found")
-	// }
-	//afters := []models.Category{}
-	// db.DB.Where("user_id = ? AND parent = ? AND sort >= ?", user_id, before.Parent, before.Sort).Find(&afters)
-	// for _, after := range afters {
-	// 	after.Sort = after.Sort + 1
-	// 	db.DB.Save(&after)
-	// }
+	var (
+		parent string
+		sort   int
+	)
+	err := db.DB.QueryRow(ctx, `
+    SELECT parent, sort
+    FROM categories WHERE user_id = $1 AND id = $2`,
+		user_id, req.Parent).Scan(&parent, &sort)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Before node not found")
+	}
 
-	category := models.Category{}
-	category.UserID = user_id
-	category.Title = req.Text
-	category.Parent = before.Parent
-	category.Sort = before.Sort
-	// if db.DB.Save(&category).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error create category")
-	// }
-	category.Alias = strconv.Itoa(int(category.ID)) + "-" + utils.Translit(strings.ToLower(req.Text))
-	// if db.DB.Save(&category).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error create category")
-	// }
+	_, err = db.DB.Exec(ctx, `
+    UPDATE categories 
+    SET sort = sort + 1
+    WHERE user_id = $1 AND parent = $2 AND sort >= $3`,
+		user_id, parent, sort)
+	if err != nil {
+		logger.Error(err.Error())
+	}
 
-	categories := []models.Category{}
-	//db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
+	categorySort := 0
+	err = db.DB.QueryRow(ctx, `
+    SELECT  sort FROM categories WHERE user_id = $1 AND parent = $2)`,
+		user_id, req.Parent).Scan(&sort)
+	if err == nil {
+		categorySort = sort + 1
+	}
+
+	var id int
+	err = db.DB.QueryRow(ctx, `
+  INSERT INTO categories (user_id, title, parent, alias, sort)
+  VALUES ($1, $2, $3, '', $4)
+  RETURNING id
+  `,
+		user_id, req.Text, parent, categorySort).
+		Scan(&id)
+	if err != nil {
+		return nil, status.Errorf(codes.Aborted, "Error create category")
+	}
+
+	_, err = db.DB.Exec(ctx, `
+    UPDATE categories SET alias = $1
+    WHERE id = $2`,
+		strconv.Itoa(id)+"-"+utils.Translit(strings.ToLower(req.Text)), id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error save category")
+	}
+
+	return s.AdminCategories(ctx, nil)
 }
 
 func (s *AdminCategoryServiceImpl) AdminAddCategoryAfter(ctx context.Context, req *v1.AdminAddCategoryRequest) (*v1.AdminCategoriesResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
-	after := models.Category{}
-	// if db.DB.Where("user_id = ?", user_id).First(&after, req.Parent).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "After node not found")
-	// }
-	//afters := []models.Category{}
-	// db.DB.Where("user_id = ? AND parent = ? AND sort > ?", user_id, after.Parent, after.Sort).Find(&afters)
-	// for _, after := range afters {
-	// 	after.Sort = after.Sort + 1
-	// 	db.DB.Save(&after)
-	// }
+	var (
+		parent string
+		sort   int
+	)
+	err := db.DB.QueryRow(ctx, `
+    SELECT parent, sort
+    FROM categories WHERE user_id = $1 AND id = $2`,
+		user_id, req.Parent).Scan(&parent, &sort)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "After node not found")
+	}
 
-	category := models.Category{}
-	category.UserID = user_id
-	category.Title = req.Text
-	category.Parent = after.Parent
-	category.Sort = after.Sort + 1
-	// if db.DB.Save(&category).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error create category")
-	// }
-	// category.Alias = strconv.Itoa(int(category.ID)) + "-" + utils.Translit(strings.ToLower(req.Text))
-	// if db.DB.Save(&category).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error create category")
-	// }
+	_, err = db.DB.Exec(ctx, `
+    UPDATE categories 
+    SET sort = sort + 1
+    WHERE user_id = $1 AND parent = $2 AND sort > $3`,
+		user_id, parent, sort)
+	if err != nil {
+		logger.Error(err.Error())
+	}
 
-	categories := []models.Category{}
-	//db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
+	var id int
+	err = db.DB.QueryRow(ctx, `
+  INSERT INTO categories (user_id, title, parent, alias, sort)
+  VALUES ($1, $2, $3, '', $4)
+  RETURNING id
+  `,
+		user_id, req.Text, parent, sort+1).
+		Scan(&id)
+	if err != nil {
+		return nil, status.Errorf(codes.Aborted, "Error create category")
+	}
+
+	_, err = db.DB.Exec(ctx, `
+    UPDATE categories SET alias = $1
+    WHERE id = $2`,
+		strconv.Itoa(id)+"-"+utils.Translit(strings.ToLower(req.Text)), id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error save category")
+	}
+
+	return s.AdminCategories(ctx, nil)
 }
 
 func (s *AdminCategoryServiceImpl) AdminMoveCategory(ctx context.Context, req *v1.AdminMoveCategoryRequest) (*v1.AdminCategoriesResponse, error) {

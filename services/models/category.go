@@ -2,28 +2,28 @@ package models
 
 import (
 	"strconv"
+	"time"
 
 	v1 "gcms/api/v1"
-
-	"github.com/jinzhu/gorm"
 )
 
 type Category struct {
-	gorm.Model `json:"-"`
+	ID        uint32    `db:"id"`
+	CreatedAt time.Time `db:"created_at"`
 
-	UserID         uint32
-	Title          string
-	Alias          string `gorm:"unique;not null"`
-	Description    string
-	Image          string
-	Parent         string
-	Sort           int
-	Disabled       bool
-	Opened         bool   `sql:"-"`
-	Selected       bool   `sql:"-"`
-	SeoTitle       string `sql:"type:text"`
-	SeoDescription string `sql:"type:text"`
-	SeoKeywords    string `sql:"type:text"`
+	UserID         uint32 `db:"user_id"`
+	Title          string `db:"title"`
+	Alias          string `db:"alias"`
+	Description    string `db:"description"`
+	Image          string `db:"image"`
+	Parent         string `db:"parent"`
+	Sort           int    `db:"sort"`
+	Disabled       bool   `db:"disabled"`
+	Opened         bool
+	Selected       bool
+	SeoTitle       string `db:"seo_title"`
+	SeoDescription string `db:"seo_description"`
+	SeoKeywords    string `db:"seo_keywords"`
 
 	Children []Category
 }

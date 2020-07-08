@@ -24,6 +24,11 @@ import (
 	"gcms/packages/utils"
 )
 
+// item := models.Item{}
+// fields, pointers := utils.GetDbFields("items", "item", item)
+// spew.Dump(fields)
+// spew.Dump(pointers)
+
 type AdminItemServiceImpl struct {
 }
 
@@ -115,11 +120,6 @@ func (s *AdminItemServiceImpl) AdminItems(ctx context.Context, req *v1.AdminItem
 	if err = rows.Err(); err != nil {
 		return nil, status.Errorf(codes.NotFound, "Items set error")
 	}
-
-	// item := models.Item{}
-	// fields, pointers := utils.GetDbFields("items", "item", item)
-	// spew.Dump(fields)
-	// spew.Dump(pointers)
 
 	/*
 		for i, item := range items {
@@ -377,14 +377,12 @@ func (s *AdminItemServiceImpl) AdminDeleteItem(ctx context.Context, req *v1.Admi
 }
 
 func (s *AdminItemServiceImpl) AdminDeleteOffer(ctx context.Context, req *v1.AdminDeleteOfferRequest) (*v1.AdminOffersResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	/*
-		err := deleteItem(user_id, req.Id)
-		if err != nil {
-			return nil, status.Errorf(codes.Aborted, "Error delete offer")
-		}
-	*/
+	err := deleteItem(user_id, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Aborted, "Error delete offer")
+	}
 	return s.AdminItemOffers(ctx, &v1.AdminOffersRequest{ItemId: req.ParentId, Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
 }
 
@@ -394,145 +392,148 @@ func (s *AdminItemServiceImpl) AdminGetUploadImages(ctx context.Context, req *em
 }
 
 func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminCategoriesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	//item := models.Item{}
+	var exists bool
 	if req.Id != 0 {
-		// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
-		// if err != nil {
-		// 	return nil, status.Errorf(codes.NotFound, "Item not found")
-		// }
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM items WHERE user_id=$1 AND id=$2)", user_id, req.Id).Scan(&exists)
+		if err != nil && err != sql.ErrNoRows {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Item not found")
+		}
+	}
+
+	var cat []uint
+	query := fmt.Sprintf(
+		`SELECT categories.id
+		FROM items_categories
+		LEFT JOIN categories ON categories.id = items_categories.category_id
+		WHERE (items_categories.item_id = $1)
+		GROUP BY categories.id`)
+	rows, err := db.DB.Query(ctx, query, req.Id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Items categories not found")
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var categoryID uint
+		err := rows.Scan(&categoryID)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		cat = append(cat, categoryID)
+	}
+	if err = rows.Err(); err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Items categories set error")
 	}
 
 	categories := []models.Category{}
-	/*
-		db.DB.Model(&item).Related(&categories, "Categories")
-		var cat []uint
-		for _, category := range categories {
-			cat = append(cat, category.ID)
+	query = fmt.Sprintf(
+		`SELECT categories.id, categories.created_at, categories.user_id, categories.title,
+		categories.alias, categories.description, categories.image, categories.parent,
+		categories.sort, categories.disabled, categories.seo_title, categories.seo_description,
+		categories.seo_keywords
+		FROM categories
+		WHERE (categories.user_id = $1)
+		ORDER BY categories.title ASC`)
+	rows, err = db.DB.Query(ctx, query, user_id)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "Categories not found")
+	}
+	defer rows.Close()
+	for rows.Next() {
+		category := models.Category{}
+		err := rows.Scan(&category.ID, &category.CreatedAt, &category.UserID, &category.Title,
+			&category.Alias, &category.Description, &category.Image, &category.Parent, &category.Sort,
+			&category.Disabled, &category.SeoTitle, &category.SeoDescription, &category.SeoKeywords)
+		if err != nil {
+			logger.Error(err.Error())
 		}
-		categories = []models.Category{}
-		db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-
-		for i, category := range categories {
-			if utils.HasElement(cat, category.ID) {
-				categories[i].Selected = true
-			} else {
-				categories[i].Selected = false
-			}
-
-			if category.Parent == "#" {
-				categories[i].Opened = true
-			} else {
-				categories[i].Opened = false
-			}
+		categories = append(categories, category)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, status.Errorf(codes.NotFound, "Categories set error")
+	}
+	for i, category := range categories {
+		if utils.HasElement(cat, category.ID) {
+			categories[i].Selected = true
+		} else {
+			categories[i].Selected = false
 		}
-	*/
+
+		if category.Parent == "#" {
+			categories[i].Opened = true
+		} else {
+			categories[i].Opened = false
+		}
+	}
+
 	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
 }
 
 func (s *AdminItemServiceImpl) AdminItemBindCategory(ctx context.Context, req *v1.AdminItemBindRequest) (*v1.AdminCategoriesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	//item := models.Item{}
-	// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1, id=$2", user_id, req.Id)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.NotFound, "Item not found")
-	// }
-
-	//category := models.Category{}
-	// err := db.DB.GetContext(ctx, &category, "SELECT * FROM categories WHERE user_id=$1, id=$2", user_id, req.CategoryId)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.NotFound, "Category_not_found")
-	// }
-
-	//itemCategory := models.ItemsCategories{}
-
-	/*
-		if db.DB.Where("user_id = ? AND item_id = ? AND category_id = ?", user_id, req.Id, req.CategoryId).First(&itemCategory).RecordNotFound() {
-			itemCategory.UserID = user_id
-			itemCategory.ItemID = uint(req.Id)
-			itemCategory.CategoryID = category.ID
-			if db.DB.Save(&itemCategory).Error != nil {
-				return nil, status.Errorf(codes.Aborted, "Error bind category")
-			}
+	var exists bool
+	if req.Id != 0 {
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM items WHERE user_id=$1 AND id=$2)", user_id, req.Id).Scan(&exists)
+		if err != nil && err != sql.ErrNoRows {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
-	*/
+	}
 
-	categories := []models.Category{}
-	/*
-		db.DB.Model(&item).Related(&categories, "Categories")
-		var cat []uint
-		for _, category := range categories {
-			cat = append(cat, category.ID)
+	if req.Id != 0 {
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM categories WHERE user_id=$1 AND id=$2)", user_id, req.CategoryId).Scan(&exists)
+		if err != nil && err != sql.ErrNoRows {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Category_not_found")
 		}
-		categories = []models.Category{}
-		db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
+	}
 
-		for i, category := range categories {
-			if utils.HasElement(cat, category.ID) {
-				categories[i].Selected = true
-			} else {
-				categories[i].Selected = false
-			}
-
-			if category.Parent == "#" {
-				categories[i].Opened = true
-			} else {
-				categories[i].Opened = false
-			}
-		}
-	*/
-	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
+	_, err := db.DB.Exec(ctx,
+		`INSERT INTO items_categories (user_id, item_id, category_id) VALUES($1, $2, $3)
+		ON CONFLICT ON CONSTRAINT items_categories_pkey 
+		DO NOTHING`,
+		user_id, req.Id, req.CategoryId)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error bind category")
+	}
+	return s.AdminItemCategories(ctx, &v1.AdminItemRequest{Id: user_id})
 }
 
 func (s *AdminItemServiceImpl) AdminItemUnbindCategory(ctx context.Context, req *v1.AdminItemBindRequest) (*v1.AdminCategoriesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	//item := models.Item{}
-	// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.NotFound, "Item not found")
-	// }
-
-	//category := models.Category{}
-	// err = db.DB.GetContext(ctx, &category, "SELECT * FROM categories WHERE user_id=$1 AND id=$2", user_id, req.CategoryId)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.NotFound, "Category_not_found")
-	// }
-
-	/*
-		itemCategory := models.ItemsCategories{}
-		if db.DB.Unscoped().Where("user_id = ? AND item_id = ? AND category_id = ?", user_id, req.Id, req.CategoryId).Delete(&itemCategory).Error != nil {
-			return nil, status.Errorf(codes.Aborted, "Error unbind category")
+	var exists bool
+	if req.Id != 0 {
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM items WHERE user_id=$1 AND id=$2)", user_id, req.Id).Scan(&exists)
+		if err != nil && err != sql.ErrNoRows {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Item not found")
 		}
-	*/
+	}
 
-	categories := []models.Category{}
-	/*
-		db.DB.Model(&item).Related(&categories, "Categories")
-		var cat []uint
-		for _, category := range categories {
-			cat = append(cat, category.ID)
+	if req.Id != 0 {
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM categories WHERE user_id=$1 AND id=$2)", user_id, req.CategoryId).Scan(&exists)
+		if err != nil && err != sql.ErrNoRows {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Category_not_found")
 		}
-		categories = []models.Category{}
-		db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
+	}
 
-		for i, category := range categories {
-			if utils.HasElement(cat, category.ID) {
-				categories[i].Selected = true
-			} else {
-				categories[i].Selected = false
-			}
-
-			if category.Parent == "#" {
-				categories[i].Opened = true
-			} else {
-				categories[i].Opened = false
-			}
-		}
-	*/
-	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
+	_, err := db.DB.Exec(ctx,
+		`DELETE FROM items_categories
+		WHERE user_id = $1 AND item_id = $2 AND category_id = $3`,
+		user_id, req.Id, req.CategoryId)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error unbind category")
+	}
+	return s.AdminItemCategories(ctx, &v1.AdminItemRequest{Id: user_id})
 }
 
 func (s *AdminItemServiceImpl) AdminItemProperties(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminPropertiesResponse, error) {

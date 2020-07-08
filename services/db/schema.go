@@ -1,6 +1,8 @@
 package db
 
 var schema = `
+DROP TABLE IF EXISTS items_categories;
+DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS vendors;
@@ -55,6 +57,34 @@ CREATE TABLE items (
 CREATE INDEX created_at ON items (created_at);
 CREATE INDEX title ON items (title);
 CREATE INDEX alias ON items (alias);
+
+CREATE TABLE categories (
+	id bigserial PRIMARY KEY,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+
+	user_id int,
+	draft bool,
+	title text NOT NULL,
+	alias varchar(256) NOT NULL,
+	description text DEFAULT '',
+	image text NOT NULL,
+	parent varchar(256) DEFAULT '',
+	sort int DEFAULT 0,
+	disabled bool DEFAULT false,
+	seo_title text DEFAULT '',
+	seo_description text DEFAULT '',
+	seo_keywords text DEFAULT '',
+
+	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+   );
+CREATE INDEX categories_created_at ON categories (created_at);
+CREATE INDEX categories_title ON categories (title);
+
+CREATE TABLE items_categories (
+	item_id    bigint REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    category_id int REFERENCES categories (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT items_categories_pkey PRIMARY KEY (item_id, category_id)
+  );
 
 CREATE TABLE vendors (
 	id serial PRIMARY KEY,

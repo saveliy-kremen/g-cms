@@ -311,9 +311,9 @@ func (s *AdminCategoryServiceImpl) AdminAddCategoryBefore(ctx context.Context, r
 
 	var id int
 	err = db.DB.QueryRow(ctx, `
-  INSERT INTO categories (user_id, title, parent, alias, sort)
-  VALUES ($1, $2, $3, '', $4)
-  RETURNING id
+    INSERT INTO categories (user_id, title, parent, alias, sort)
+    VALUES ($1, $2, $3, '', $4)
+    RETURNING id
   `,
 		user_id, req.Text, parent, categorySort).
 		Scan(&id)
@@ -360,10 +360,9 @@ func (s *AdminCategoryServiceImpl) AdminAddCategoryAfter(ctx context.Context, re
 
 	var id int
 	err = db.DB.QueryRow(ctx, `
-  INSERT INTO categories (user_id, title, parent, alias, sort)
-  VALUES ($1, $2, $3, '', $4)
-  RETURNING id
-  `,
+	INSERT INTO categories (user_id, title, parent, alias, sort)
+	VALUES ($1, $2, $3, '', $4)
+	RETURNING id`,
 		user_id, req.Text, parent, sort+1).
 		Scan(&id)
 	if err != nil {
@@ -383,39 +382,106 @@ func (s *AdminCategoryServiceImpl) AdminAddCategoryAfter(ctx context.Context, re
 }
 
 func (s *AdminCategoryServiceImpl) AdminMoveCategory(ctx context.Context, req *v1.AdminMoveCategoryRequest) (*v1.AdminCategoriesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	parent := models.Category{}
-	// if db.DB.Where("user_id = ?", user_id).First(&parent, parent).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.Aborted, "Error move category")
-	// }
-	category := models.Category{}
-	// if db.DB.Where("user_id = ?", user_id).First(&category, req.Id).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.Aborted, "Error move category")
-	// }
-	children := []models.Category{}
-	// db.DB.Where("user_id = ? AND parent = ? AND id <> ?", user_id, req.Parent, req.Id).Order("sort").Find(&children)
-	for i, child := range children {
-		if i < int(req.Position) {
-			child.Sort = i
-		} else {
-			child.Sort = i + 1
-		}
-		//db.DB.Save(&child)
+	var parentID uint32
+	err := db.DB.QueryRow(ctx,
+		`SELECT id FROM categories
+		WHERE user_id = $1 AND id = $2`,
+		user_id, req.Parent).Scan(&parentID)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error move category")
 	}
-	category.Sort = int(req.Position)
+
+	tx, err := db.DB.Begin(ctx)
+
+	var categoryID uint32
+	err = db.DB.QueryRow(ctx,
+		`SELECT id FROM categories
+		WHERE user_id = $1 AND id = $2`,
+		user_id, req.Id).Scan(&categoryID)
+	if err != nil {
+		logger.Error(err.Error())
+		tx.Rollback(ctx)
+		return nil, status.Errorf(codes.Aborted, "Error move category")
+	}
+
+	_, err = db.DB.Exec(ctx, `
+	UPDATE categories 
+	SET sort = a.row_number
+	FROM (
+		   SELECT id, row_number() over ()
+		   FROM categories
+		   WHERE user_id = $1 AND parent = $2 AND id <> $3 AND sort < $4
+		   ORDER BY sort
+		 ) a
+    WHERE categories.id = a.id AND user_id = $1 AND parent = $2 AND categories.id <> $3 AND categories.sort < $4`,
+		user_id, req.Parent, req.Id, req.Position+1)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+
+	_, err = db.DB.Exec(ctx, `
+    UPDATE categories 
+	SET sort = a.row_number + $4
+	FROM (
+		   SELECT id, row_number() over ()
+		   FROM categories
+		   WHERE user_id = $1 AND parent = $2 AND id <> $3 AND sort >= $4
+		   ORDER BY sort
+		 ) a
+    WHERE categories.id = a.id AND user_id = $1 AND parent = $2 AND categories.id <> $3 AND categories.sort >= $4`,
+		user_id, req.Parent, req.Id, req.Position+1)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+
+	categoryParent := strconv.Itoa(int(parentID))
 	if req.Parent != "#" {
-		category.Parent = req.Parent
-	} else {
-		category.Parent = strconv.Itoa(int(parent.ID))
+		categoryParent = req.Parent
 	}
-	// if db.DB.Save(&category).Error != nil {
+	_, err = db.DB.Exec(ctx, `
+    UPDATE categories 
+    SET sort = $1, parent = $2
+    WHERE user_id = $3 AND id = $4`,
+		req.Position+1, categoryParent, user_id, categoryID)
+	if err != nil {
+		logger.Error(err.Error())
+		tx.Rollback(ctx)
+		return nil, status.Errorf(codes.Aborted, "Error move category")
+	}
 
-	// 	return nil, status.Errorf(codes.Aborted, "Error move category")
-	// }
-	categories := []models.Category{}
-	//db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
+	rows, err := db.DB.Query(ctx, `
+  SELECT id
+  FROM categories
+  WHERE user_id = $1 AND parent = $2
+  ORDER BY sort`, user_id, req.Parent)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	defer rows.Close()
+	num := 1
+	for rows.Next() {
+		var id int
+		err := rows.Scan(&id)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		_, err = db.DB.Exec(ctx, `
+      UPDATE categories
+      SET sort = $1
+      WHERE user_id = $2 AND id = $3`,
+			num, user_id, id)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		num++
+	}
+
+	tx.Commit(ctx)
+
+	return s.AdminCategories(ctx, nil)
 }
 
 func deleteCategory(user_id uint32, category models.Category) {

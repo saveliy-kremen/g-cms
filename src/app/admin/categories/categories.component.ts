@@ -65,7 +65,7 @@ export class CategoriesComponent implements OnInit {
               if (op === "move_node" && more && more.core) {
                 this.loaderService.showLoader()
                 try {
-                  let res = await this.categoryService.moveCategory({ id: node.id, parent: parent.id, position: position }).toPromise()
+                  let res = await this.adminCategoryService.moveCategory({ id: node.id, parent: parent.id, position: position }).toPromise()
                   this.categoriesData = res.categoriesList
                   await this.categoriesTranslate();
                   $('#categoryTree').jstree(true).settings.core.data = this.categoriesData;

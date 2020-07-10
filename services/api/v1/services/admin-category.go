@@ -70,7 +70,7 @@ func (s *AdminCategoryServiceImpl) AdminCategory(ctx context.Context, req *v1.Ad
 			categories.sort, categories.disabled, categories.seo_title, categories.seo_description,
 			categories.seo_keywords
 		FROM categories
-		WHERE items.user_id = $1 AND alias = $2`,
+		WHERE categories.user_id = $1 AND categories.alias = $2`,
 		user_id, req.Alias)
 	err := row.Scan(&category.ID, &category.CreatedAt, &category.UserID, &category.Title,
 		&category.Alias, &category.Description, &category.Image, &category.Parent, &category.Sort,
@@ -253,8 +253,6 @@ func (s *AdminCategoryServiceImpl) AdminAddCategory(ctx context.Context, req *v1
 		user_id, req.Parent).Scan(&sort)
 	if err == nil {
 		categorySort = sort + 1
-	} else {
-		logger.Error(err.Error())
 	}
 
 	var id int

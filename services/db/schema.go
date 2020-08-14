@@ -1,6 +1,9 @@
 package db
 
 var schema = `
+DROP TABLE IF EXISTS properties_categories;
+DROP TABLE IF EXISTS properties_values;
+DROP TABLE IF EXISTS properties;
 DROP TABLE IF EXISTS items_categories;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS items;
@@ -84,6 +87,40 @@ CREATE TABLE items_categories (
 	item_id    bigint REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
     category_id int REFERENCES categories (id) ON UPDATE CASCADE ON DELETE CASCADE,
 	CONSTRAINT items_categories_pkey PRIMARY KEY (item_id, category_id)
+  );
+
+  CREATE TABLE properties (
+	id bigserial PRIMARY KEY,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+
+	user_id int,
+	title text NOT NULL,
+	code varchar(256) NOT NULL,
+	type int NOT NULL,
+	display int NOT NULL,
+	required bool DEFAULT false,
+	multiple bool DEFAULT false,
+	sort int NOT NULL,
+
+	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+   );
+CREATE INDEX properties_created_at ON properties (created_at);
+CREATE INDEX properties_title ON properties (title);
+
+CREATE TABLE properties_values (
+	id bigserial PRIMARY KEY,
+	user_id int,
+	property_id bigint REFERENCES properties (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	value varchar(256) NOT NULL,
+	image varchar(256) NOT NULL,
+	sort int NOT NULL
+  );
+
+CREATE TABLE properties_categories (
+	id bigserial PRIMARY KEY,
+	user_id int,
+	property_id bigint REFERENCES properties (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	category_id bigint REFERENCES categories (id) ON UPDATE CASCADE ON DELETE CASCADE
   );
 
 CREATE TABLE vendors (

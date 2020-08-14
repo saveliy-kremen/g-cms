@@ -25,14 +25,14 @@ const (
 type Property struct {
 	gorm.Model
 
-	UserID   uint32
-	Title    string
-	Code     string
-	Type     PropertyType
-	Display  PropertyDisplayType
-	Required bool
-	Multiple bool
-	Sort     uint
+	UserID   uint32              `db:"user_id"`
+	Title    string              `db:"title"`
+	Code     string              `db:"code"`
+	Type     PropertyType        `db:"type"`
+	Display  PropertyDisplayType `db:"display"`
+	Required bool                `db:"required"`
+	Multiple bool                `db:"multiple"`
+	Sort     uint                `db:"sort"`
 
 	Values     []PropertyValue
 	ItemValues []uint32   `sql:"-"`

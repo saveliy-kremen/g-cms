@@ -2,6 +2,8 @@ package services
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	//"github.com/golang/protobuf/ptypes/empty"
 	"os"
@@ -10,36 +12,99 @@ import (
 
 	v1 "gcms/api/v1"
 	"gcms/config"
+	"gcms/db"
 	"gcms/models"
 	"gcms/packages/auth"
 	"gcms/packages/upload"
 	"gcms/packages/utils"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type AdminPropertyServiceImpl struct {
 }
 
 func (s *AdminPropertyServiceImpl) AdminProperty(ctx context.Context, req *v1.AdminPropertyRequest) (*v1.AdminPropertyResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	property := models.Property{}
-	// if db.DB.Preload("Values").Where("user_id = ?", user_id).First(&property, req.Id).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Property not found")
-	// }
+
+	row := db.DB.QueryRow(ctx,
+		`SELECT properties.id, properties.user_id, properties.title, properties.code, properties.type,
+		properties.display, properties.required, properties.multiple, properties.sort
+			FROM properties
+			LEFT JOIN properties_values ON properties_values.property_id = properties.id
+			WHERE properties.user_id = $1 AND properties.id = $2`,
+		user_id, req.Id)
+	err := row.Scan(&property.ID, &property.UserID, &property.Title, &property.Code, &property.Type,
+		&property.Display, &property.Required, &property.Multiple, &property.Sort)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Property not found")
+	}
+
+	rows, err := db.DB.Query(ctx,
+		`SELECT properties_values.id, properties_values.value, properties_values.image,
+		properties_values.sort
+		FROM properties_values
+		WHERE properties_values.user_id = $1 AND properties_values.id = $2`,
+		user_id, req.Id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Properties values not found")
+	}
+	defer rows.Close()
+	for rows.Next() {
+		propertyValue := models.PropertyValue{}
+		err := rows.Scan(&propertyValue.ID, &propertyValue.Value, &propertyValue.Image, &propertyValue.Sort)
+		if err != nil {
+			log.Fatal(err)
+		}
+		property.Values = append(property.Values, propertyValue)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, status.Errorf(codes.NotFound, "Property values set error")
+	}
 	return &v1.AdminPropertyResponse{Property: models.AdminPropertyToResponse(property)}, nil
 }
 
 func (s *AdminPropertyServiceImpl) AdminProperties(ctx context.Context, req *v1.AdminPropertiesRequest) (*v1.AdminPropertiesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	properties := []models.Property{}
 	var total uint32
-	// order := "sort"
-	// if req.Sort != "" {
-	// 	order = req.Sort + " " + req.Direction
-	// }
-	//db.DB.Where("user_id = ?", user_id).Order("sort").Find(&properties).Count(&total)
-	//db.DB.Where("user_id = ?", user_id).Order(order).Offset(req.Page * req.PageSize).Limit(req.PageSize).Find(&properties)
+
+	order := "sort"
+	if req.Sort != "" {
+		order = req.Sort + " " + req.Direction
+	}
+
+	err := db.DB.QueryRow(ctx, "SELECT count(*) FROM properties WHERE user_id = $1", user_id).Scan(&total)
+	query := fmt.Sprintf(
+		`SELECT properties.id, properties.user_id, properties.title, properties.code, properties.type,
+			properties.display, properties.required, properties.multiple, properties.sort
+		FROM properties
+		WHERE (properties.user_id = $1)
+		ORDER BY %s OFFSET $2 LIMIT $3`,
+		order)
+	rows, err := db.DB.Query(ctx, query, user_id, req.Page*req.PageSize, req.PageSize)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "Properties not found")
+	}
+	defer rows.Close()
+	for rows.Next() {
+		property := models.Property{}
+		err := rows.Scan(&property.ID, &property.UserID, &property.Title, &property.Code, &property.Type,
+			&property.Display, &property.Required, &property.Multiple, &property.Sort)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		properties = append(properties, property)
+	}
+	if err = rows.Err(); err != nil {
+		logger.Error(err.Error())
+	}
 	return &v1.AdminPropertiesResponse{Properties: models.AdminPropertiesToResponse(properties), Position: (req.Page * req.PageSize) + 1, Total: total}, nil
 }
 
@@ -47,30 +112,49 @@ func (s *AdminPropertyServiceImpl) AdminEditProperty(ctx context.Context, req *v
 	user_id := auth.GetUserUID(ctx)
 
 	property := models.Property{}
-	if req.Id != 0 {
-		// if db.DB.Where("user_id = ?", user_id).First(&property, req.Id).RecordNotFound() {
-		// 	return nil, status.Errorf(codes.NotFound, "Property not found")
-		// }
-	}
-
 	property.UserID = user_id
 	property.Title = req.Title
 	property.Code = req.Code
 	if property.Code == "" {
 		property.Code = utils.Translit(strings.ToLower(property.Title))
 	}
-	//existProperty := models.Property{}
-	// if !db.DB.Where("user_id = ? AND code = ? AND id <> ?", user_id, property.Code, req.Id).First(&existProperty).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.Aborted, "Property code exist")
-	// }
 	property.Type = models.PropertyType(req.Type)
 	property.Display = models.PropertyDisplayType(req.Display)
 	property.Required = req.Required
 	property.Multiple = req.Multiple
 	property.Sort = uint(req.Sort)
-	// if db.DB.Save(&property).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error create property")
-	// }
+
+	var exists bool
+	err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM properties WHERE user_id = $1 AND code = $2 AND id <> $3)", user_id, property.Code, req.Id).Scan(&exists)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Property code exist")
+	}
+
+	if req.Id != 0 {
+		_, err := db.DB.Exec(ctx, `
+		UPDATE properties SET title=$1, code=$2, type=$3, display=$4, required=$5, multiple=$6, sort=$7
+		WHERE user_id=$8 AND id=$9`,
+			property.Title, property.Code, property.Type, property.Display, property.Required, property.Multiple,
+			property.Sort, user_id, req.Id)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Property not found")
+		}
+		property.ID = uint(req.Id)
+	} else {
+		err := db.DB.QueryRow(ctx, `
+		INSERT INTO properties (user_id, title, code, type, display, required, multiple, sort
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		RETURNING id
+		`,
+			property.UserID, property.Title, property.Code, property.Type, property.Display,
+			property.Required, property.Multiple, property.Sort).Scan(&property.ID)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.Aborted, "Error create property")
+		}
+	}
 	return &v1.AdminPropertyResponse{Property: models.AdminPropertyToResponse(property)}, nil
 }
 

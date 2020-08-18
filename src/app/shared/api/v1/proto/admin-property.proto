@@ -17,7 +17,9 @@ message AdminProperty{
   bool multiple = 8;
   uint32 sort = 9;
   repeated AdminPropertyValue values = 10;
-  repeated uint32 item_values = 11;
+  string values_json = 11;
+  repeated uint32 item_values = 12;
+  string item_values_json = 13;
 }
 
 message AdminPropertyValue{

@@ -35,8 +35,8 @@ type Property struct {
 	Sort     uint                `db:"sort"`
 
 	Values     []PropertyValue
-	ItemValues []uint32   `sql:"-"`
-	Categories []Category `gorm:"many2many:properties_categories;"`
+	ItemValues []uint32
+	Categories []Category
 }
 
 type PropertyValue struct {

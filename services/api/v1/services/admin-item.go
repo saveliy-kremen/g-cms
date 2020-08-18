@@ -29,6 +29,12 @@ import (
 // spew.Dump(fields)
 // spew.Dump(pointers)
 
+// array_to_string(array(
+// 	select row_to_json(properties_values)
+// 	from properties_values where property_id = properties.id
+// 	order by sort
+//   ), ',')
+
 type AdminItemServiceImpl struct {
 }
 
@@ -68,8 +74,7 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
 
-	//item.Properties = itemProperties(&item)
-	//item.Offers = itemOffers(&item, nil, nil, nil, nil)
+	item.Offers = itemOffers(&item, nil, nil, nil, nil)
 
 	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
 }
@@ -403,13 +408,12 @@ func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.
 		}
 	}
 
-	var cat []uint
+	var cat []uint32
 	query := fmt.Sprintf(
-		`SELECT categories.id
+		`SELECT category_id
 		FROM items_categories
-		LEFT JOIN categories ON categories.id = items_categories.category_id
-		WHERE (items_categories.item_id = $1)
-		GROUP BY categories.id`)
+		WHERE (item_id = $1)
+		GROUP BY category_id`)
 	rows, err := db.DB.Query(ctx, query, req.Id)
 	if err != nil {
 		logger.Error(err.Error())
@@ -417,7 +421,7 @@ func (s *AdminItemServiceImpl) AdminItemCategories(ctx context.Context, req *v1.
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var categoryID uint
+		var categoryID uint32
 		err := rows.Scan(&categoryID)
 		if err != nil {
 			logger.Error(err.Error())
@@ -537,17 +541,20 @@ func (s *AdminItemServiceImpl) AdminItemUnbindCategory(ctx context.Context, req 
 }
 
 func (s *AdminItemServiceImpl) AdminItemProperties(ctx context.Context, req *v1.AdminItemRequest) (*v1.AdminPropertiesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
-	if req.Id != 0 {
-		// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.Id)
-		// if err != nil {
-		// 	logger.Error(err.Error())
-		// 	return nil, status.Errorf(codes.NotFound, "Item not found")
-		// }
+	row := db.DB.QueryRow(ctx,
+		`SELECT items.id, items.user_id
+		FROM items
+		WHERE items.user_id = $1 AND items.id = $2`,
+		user_id, req.Id)
+	err := row.Scan(&item.ID, &item.UserID)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
-	properties := itemProperties(&item)
+	properties := itemProperties(ctx, &item)
 	return &v1.AdminPropertiesResponse{Properties: models.AdminPropertiesToResponse(properties)}, nil
 }
 

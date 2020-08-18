@@ -1,6 +1,7 @@
 package db
 
 var schema = `
+DROP TABLE IF EXISTS items_properties;
 DROP TABLE IF EXISTS properties_categories;
 DROP TABLE IF EXISTS properties_values;
 DROP TABLE IF EXISTS properties;
@@ -26,7 +27,7 @@ CREATE TABLE users (
 	amount numeric(10,2) DEFAULT 0,
 	about text DEFAULT '',
 	upload_images json DEFAULT '[]'::JSON
-   );
+);
 CREATE INDEX fullname ON users (fullname);
 
 CREATE TABLE items (
@@ -56,7 +57,7 @@ CREATE TABLE items (
 
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
 	FOREIGN KEY (parent_id) REFERENCES items (id) ON DELETE CASCADE
-   );
+);
 CREATE INDEX created_at ON items (created_at);
 CREATE INDEX title ON items (title);
 CREATE INDEX alias ON items (alias);
@@ -79,17 +80,18 @@ CREATE TABLE categories (
 	seo_keywords text DEFAULT '',
 
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-   );
+);
 CREATE INDEX categories_created_at ON categories (created_at);
 CREATE INDEX categories_title ON categories (title);
 
 CREATE TABLE items_categories (
+	user_id int,
 	item_id    bigint REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
     category_id int REFERENCES categories (id) ON UPDATE CASCADE ON DELETE CASCADE,
 	CONSTRAINT items_categories_pkey PRIMARY KEY (item_id, category_id)
-  );
+);
 
-  CREATE TABLE properties (
+CREATE TABLE properties (
 	id bigserial PRIMARY KEY,
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 
@@ -103,7 +105,7 @@ CREATE TABLE items_categories (
 	sort int NOT NULL,
 
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-   );
+);
 CREATE INDEX properties_created_at ON properties (created_at);
 CREATE INDEX properties_title ON properties (title);
 
@@ -112,16 +114,24 @@ CREATE TABLE properties_values (
 	user_id int,
 	property_id bigint REFERENCES properties (id) ON UPDATE CASCADE ON DELETE CASCADE,
 	value varchar(256) NOT NULL,
-	image varchar(256) NOT NULL,
+	image varchar(256) DEFAULT '',
 	sort int NOT NULL
-  );
+);
 
 CREATE TABLE properties_categories (
 	id bigserial PRIMARY KEY,
 	user_id int,
 	property_id bigint REFERENCES properties (id) ON UPDATE CASCADE ON DELETE CASCADE,
 	category_id bigint REFERENCES categories (id) ON UPDATE CASCADE ON DELETE CASCADE
-  );
+);
+  
+CREATE TABLE items_properties (
+	user_id int,
+	item_id    bigint REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	property_id int REFERENCES properties (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    property_value_id int REFERENCES properties_values (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT items_properties_pkey PRIMARY KEY (item_id, property_id)
+);
 
 CREATE TABLE vendors (
 	id serial PRIMARY KEY,
@@ -129,7 +139,7 @@ CREATE TABLE vendors (
 
 	name varchar(256) NOT NULL,
 	country varchar(256) DEFAULT ''
-   );
+);
 CREATE INDEX name ON vendors (name);
 
 CREATE TABLE currencies (
@@ -140,5 +150,5 @@ CREATE TABLE currencies (
 	short_name varchar(256) DEFAULT '',
 	code varchar(4) NOT NULL,
 	rate numeric(5,4) NOT NULL
-   );
+);
 `

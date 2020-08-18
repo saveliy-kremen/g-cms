@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	//"github.com/golang/protobuf/ptypes/empty"
 	"os"
 	"strconv"
 	"strings"
@@ -34,7 +33,6 @@ func (s *AdminPropertyServiceImpl) AdminProperty(ctx context.Context, req *v1.Ad
 		`SELECT properties.id, properties.user_id, properties.title, properties.code, properties.type,
 		properties.display, properties.required, properties.multiple, properties.sort
 			FROM properties
-			LEFT JOIN properties_values ON properties_values.property_id = properties.id
 			WHERE properties.user_id = $1 AND properties.id = $2`,
 		user_id, req.Id)
 	err := row.Scan(&property.ID, &property.UserID, &property.Title, &property.Code, &property.Type,
@@ -48,12 +46,8 @@ func (s *AdminPropertyServiceImpl) AdminProperty(ctx context.Context, req *v1.Ad
 		`SELECT properties_values.id, properties_values.value, properties_values.image,
 		properties_values.sort
 		FROM properties_values
-		WHERE properties_values.user_id = $1 AND properties_values.id = $2`,
+		WHERE properties_values.user_id = $1 AND properties_values.property_id = $2`,
 		user_id, req.Id)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, status.Errorf(codes.NotFound, "Properties values not found")
-	}
 	defer rows.Close()
 	for rows.Next() {
 		propertyValue := models.PropertyValue{}
@@ -144,7 +138,7 @@ func (s *AdminPropertyServiceImpl) AdminEditProperty(ctx context.Context, req *v
 		property.ID = uint(req.Id)
 	} else {
 		err := db.DB.QueryRow(ctx, `
-		INSERT INTO properties (user_id, title, code, type, display, required, multiple, sort
+		INSERT INTO properties (user_id, title, code, type, display, required, multiple, sort)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id
 		`,
@@ -159,40 +153,80 @@ func (s *AdminPropertyServiceImpl) AdminEditProperty(ctx context.Context, req *v
 }
 
 func (s *AdminPropertyServiceImpl) AdminDeleteProperty(ctx context.Context, req *v1.AdminDeletePropertyRequest) (*v1.AdminPropertiesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	// if db.DB.Unscoped().Where("user_id=? AND id = ?", user_id, req.Id).Delete(&models.Property{}).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error delete property")
-	// } else {
-	// 	propertyValues := []models.PropertyValue{}
-	// 	db.DB.Where("user_id = ? AND property_id = ?", user_id, req.Id).Find(&propertyValues)
-	// 	for _, propertyValue := range propertyValues {
-	// 		db.DB.Unscoped().Delete(&propertyValue)
-	// 	}
-	// 	directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(req.Id))
-	// 	os.RemoveAll(directory)
-	// }
+	_, err := db.DB.Exec(ctx,
+		`DELETE FROM properties
+			WHERE user_id = $1 AND id = $2`,
+		user_id, req.Id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error delete property")
+	}
+
+	directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(req.Id))
+	os.RemoveAll(directory)
+
 	return s.AdminProperties(ctx, &v1.AdminPropertiesRequest{Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
 }
 
 func (s *AdminPropertyServiceImpl) AdminPropertyCategories(ctx context.Context, req *v1.AdminPropertyRequest) (*v1.AdminCategoriesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	//property := models.Property{}
+	var exists bool
 	if req.Id != 0 {
-		// if db.DB.Where("user_id = ?", user_id).First(&property, req.Id).RecordNotFound() {
-		// 	return nil, status.Errorf(codes.NotFound, "Property not found")
-		// }
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM properties WHERE user_id=$1 AND id=$2)", user_id, req.Id).Scan(&exists)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Property not found")
+		}
+	}
+
+	var cat []uint32
+	query := fmt.Sprintf(
+		`SELECT category_id
+		FROM properties_categories
+		WHERE (property_id = $1)
+		GROUP BY category_id`)
+	rows, err := db.DB.Query(ctx, query, req.Id)
+	defer rows.Close()
+	for rows.Next() {
+		var categoryID uint32
+		err := rows.Scan(&categoryID)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		cat = append(cat, categoryID)
+	}
+	if err = rows.Err(); err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Items categories set error")
 	}
 
 	categories := []models.Category{}
-	//db.DB.Model(&property).Related(&categories, "Categories")
-	var cat []uint32
-	for _, category := range categories {
-		cat = append(cat, category.ID)
+	query = fmt.Sprintf(
+		`SELECT categories.id, categories.created_at, categories.user_id, categories.title,
+		categories.alias, categories.description, categories.image, categories.parent,
+		categories.sort, categories.disabled, categories.seo_title, categories.seo_description,
+		categories.seo_keywords
+		FROM categories
+		WHERE (categories.user_id = $1)
+		ORDER BY categories.title ASC`)
+	rows, err = db.DB.Query(ctx, query, user_id)
+	defer rows.Close()
+	for rows.Next() {
+		category := models.Category{}
+		err := rows.Scan(&category.ID, &category.CreatedAt, &category.UserID, &category.Title,
+			&category.Alias, &category.Description, &category.Image, &category.Parent, &category.Sort,
+			&category.Disabled, &category.SeoTitle, &category.SeoDescription, &category.SeoKeywords)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		categories = append(categories, category)
 	}
-	categories = []models.Category{}
-	//db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
+	if err = rows.Err(); err != nil {
+		return nil, status.Errorf(codes.NotFound, "Categories set error")
+	}
 
 	for i, category := range categories {
 		if utils.HasElement(cat, category.ID) {
@@ -212,135 +246,142 @@ func (s *AdminPropertyServiceImpl) AdminPropertyCategories(ctx context.Context, 
 }
 
 func (s *AdminPropertyServiceImpl) AdminPropertyBindCategory(ctx context.Context, req *v1.AdminPropertyBindRequest) (*v1.AdminCategoriesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	//property := models.Property{}
-	// if db.DB.Where("user_id = ?", user_id).First(&property, req.Id).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Property not found")
-	// }
-
-	//category := models.Category{}
-	// if db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryId).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Category_not_found")
-	// }
-
-	//item := models.PropertiesCategories{}
-	// if db.DB.Where("user_id = ? AND property_id = ? AND category_id = ?", user_id, req.Id, req.CategoryId).First(&item).RecordNotFound() {
-	// 	item.UserID = user_id
-	// 	item.PropertyID = uint(req.Id)
-	// 	item.CategoryID = category.ID
-	// 	if db.DB.Save(&item).Error != nil {
-	// 		return nil, status.Errorf(codes.Aborted, "Error bind category")
-	// 	}
-	// }
-
-	categories := []models.Category{}
-	//db.DB.Model(&property).Related(&categories, "Categories")
-	var cat []uint32
-	for _, category := range categories {
-		cat = append(cat, category.ID)
-	}
-	categories = []models.Category{}
-	//db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-
-	for i, category := range categories {
-		if utils.HasElement(cat, category.ID) {
-			categories[i].Selected = true
-		} else {
-			categories[i].Selected = false
-		}
-
-		if category.Parent == "#" {
-			categories[i].Opened = true
-		} else {
-			categories[i].Opened = false
+	var exists bool
+	if req.Id != 0 {
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM properties WHERE user_id=$1 AND id=$2)", user_id, req.Id).Scan(&exists)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Property not found")
 		}
 	}
-	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
+
+	if req.Id != 0 {
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM categories WHERE user_id=$1 AND id=$2)", user_id, req.CategoryId).Scan(&exists)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Category_not_found")
+		}
+	}
+
+	_, err := db.DB.Exec(ctx,
+		`INSERT INTO properties_categories (user_id, property_id, category_id) VALUES($1, $2, $3)
+		ON CONFLICT ON CONSTRAINT properties_categories_pkey 
+		DO NOTHING`,
+		user_id, req.Id, req.CategoryId)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error bind category")
+	}
+
+	return s.AdminPropertyCategories(ctx, &v1.AdminPropertyRequest{Id: req.Id})
 }
 
 func (s *AdminPropertyServiceImpl) AdminPropertyUnbindCategory(ctx context.Context, req *v1.AdminPropertyBindRequest) (*v1.AdminCategoriesResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	//property := models.Property{}
-	// if db.DB.Where("user_id = ?", user_id).First(&property, req.Id).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Property not found")
-	// }
-
-	//category := models.Category{}
-	// if db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryId).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Category_not_found")
-	// }
-
-	//item := models.PropertiesCategories{}
-	// if db.DB.Unscoped().Where("user_id = ? AND property_id = ? AND category_id = ?", user_id, req.Id, req.CategoryId).Delete(&item).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Error unbind category")
-	// }
-
-	categories := []models.Category{}
-	//db.DB.Model(&property).Related(&categories, "Categories")
-	var cat []uint32
-	for _, category := range categories {
-		cat = append(cat, category.ID)
-	}
-	categories = []models.Category{}
-	//db.DB.Where("user_id = ?", user_id).Order("sort").Find(&categories)
-
-	for i, category := range categories {
-		if utils.HasElement(cat, category.ID) {
-			categories[i].Selected = true
-		} else {
-			categories[i].Selected = false
-		}
-
-		if category.Parent == "#" {
-			categories[i].Opened = true
-		} else {
-			categories[i].Opened = false
+	var exists bool
+	if req.Id != 0 {
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM properties WHERE user_id=$1 AND id=$2)", user_id, req.Id).Scan(&exists)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Property not found")
 		}
 	}
-	return &v1.AdminCategoriesResponse{Categories: models.AdminCategoriesToResponse(categories)}, nil
+
+	if req.Id != 0 {
+		err := db.DB.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM categories WHERE user_id=$1 AND id=$2)", user_id, req.CategoryId).Scan(&exists)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Category_not_found")
+		}
+	}
+
+	_, err := db.DB.Exec(ctx,
+		`DELETE FROM properties_categories
+		WHERE user_id = $1 AND property_id = $2 AND category_id = $3`,
+		user_id, req.Id, req.CategoryId)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error unbind category")
+	}
+
+	return s.AdminPropertyCategories(ctx, &v1.AdminPropertyRequest{Id: req.Id})
 }
 
 func (s *AdminPropertyServiceImpl) AdminEditPropertyValue(ctx context.Context, req *v1.AdminEditPropertyValueRequest) (*v1.AdminPropertyResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
 	propertyValue := models.PropertyValue{}
-	if req.Id != 0 {
-		// if db.DB.Where("user_id = ?", user_id).First(&propertyValue, req.Id).RecordNotFound() {
-		// 	return nil, status.Errorf(codes.NotFound, "Property value not found")
-		// }
-	}
-
 	propertyValue.UserID = user_id
 	propertyValue.PropertyID = uint(req.PropertyId)
 	propertyValue.Value = req.Value
 	propertyValue.Sort = uint(req.Sort)
-	// if db.DB.Save(&propertyValue).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Save property value error")
-	// }
+
+	if req.Id != 0 {
+		_, err := db.DB.Exec(ctx, `
+		UPDATE properties_values SET value=$1, sort=$2
+		WHERE user_id=$3 AND id=$4`,
+			propertyValue.Value, propertyValue.Sort,
+			propertyValue.UserID, req.Id)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Property value not found")
+		}
+		propertyValue.ID = uint(req.Id)
+	} else {
+		err := db.DB.QueryRow(ctx, `
+		INSERT INTO properties_values (user_id, property_id, value, sort)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id
+		`,
+			propertyValue.UserID, propertyValue.PropertyID, propertyValue.Value, propertyValue.Sort).
+			Scan(&propertyValue.ID)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.Aborted, "Error create property value")
+		}
+	}
 
 	if req.Image != "" {
 		directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(propertyValue.PropertyID)) + "/"
 		file, err := upload.UploadImage(req.Image, directory, "thumb-"+strconv.Itoa(int(propertyValue.ID)), config.AppConfig.PropertyThumbSize)
 		if err == nil {
 			propertyValue.Image = *file
-			//db.DB.Save(&propertyValue)
+			_, err := db.DB.Exec(ctx, `
+			UPDATE properties_values SET image=$1
+			WHERE user_id=$2 AND id=$3`,
+				propertyValue.Image,
+				propertyValue.UserID, req.Id)
+			if err != nil {
+				logger.Error(err.Error())
+			}
 		}
 	}
 	return s.AdminProperty(ctx, &v1.AdminPropertyRequest{Id: req.PropertyId})
 }
 
 func (s *AdminPropertyServiceImpl) AdminDeletePropertyValue(ctx context.Context, req *v1.AdminPropertyValueRequest) (*v1.AdminPropertyResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 	propertyValue := models.PropertyValue{}
-	// if db.DB.Where("user_id = ?", user_id).First(&propertyValue, req.Id).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Property value not found")
-	// }
 
-	// if db.DB.Unscoped().Delete(&propertyValue).Error != nil {
-	// 	return nil, status.Errorf(codes.Aborted, "Delete property value error")
-	// }
+	row := db.DB.QueryRow(ctx,
+		`SELECT property_id, image FROM properties_values WHERE user_id = $1 AND id = $2`,
+		user_id, req.Id)
+	err := row.Scan(&propertyValue.PropertyID, &propertyValue.Image)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Property value not found")
+	}
+
+	_, err = db.DB.Exec(ctx,
+		`DELETE FROM properties_values WHERE user_id = $1 AND id = $2`,
+		user_id, req.Id)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Delete property value error")
+	}
 
 	if propertyValue.Image != "" {
 		directory := config.AppConfig.UploadPath + "/properties/" + strconv.Itoa(int(propertyValue.PropertyID)) + "/thumb-" + strconv.Itoa(int(propertyValue.ID)) + ".jpeg"

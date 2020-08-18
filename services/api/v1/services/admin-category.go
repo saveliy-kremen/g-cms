@@ -37,16 +37,16 @@ func childCategoriesIDs(ctx context.Context, user_id uint32, categoryID uint32) 
 	rows, err := db.DB.Query(ctx,
 		`SELECT categories.id
 		FROM categories
-		WHERE (categories.user_id = $1 AND categories.parent = $2)
+		WHERE categories.user_id = $1 AND categories.parent = $2
 		ORDER BY categories.title ASC`,
-		user_id, categoryID)
+		user_id, strconv.Itoa(int(categoryID)))
 	if err != nil {
 		logger.Error(err.Error())
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var id uint32
-		err := rows.Scan(&categoryID)
+		err := rows.Scan(&id)
 		if err != nil {
 			logger.Error(err.Error())
 		}
@@ -530,12 +530,6 @@ func deleteCategory(ctx context.Context, user_id uint32, categoryID uint32) {
 		if err != nil {
 			logger.Error(err.Error())
 		}
-
-		// properties_categories := []models.PropertiesCategories{}
-		// db.DB.Where("category_id =", categoryID).Find(&properties_categories)
-		// for _, properties_category := range properties_categories {
-		// 	db.DB.Unscoped().Delete(&properties_category)
-		// }
 	} else {
 		logger.Error(err.Error())
 	}

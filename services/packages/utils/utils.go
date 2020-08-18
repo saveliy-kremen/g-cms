@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 )
 
 func Find(slice []string, val string) (int, bool) {
@@ -26,6 +28,10 @@ func HasElement(s interface{}, elem interface{}) bool {
 	}
 
 	return false
+}
+
+func ArrayToString(a []uint32) string {
+	return strings.Trim(strings.Replace(fmt.Sprint(a), " ", ",", -1), "[]")
 }
 
 func Translit(s string) string {

@@ -58,20 +58,10 @@ export class Item extends jspb.Message {
   getSeoKeywords(): string;
   setSeoKeywords(value: string): void;
 
-  getProperties(): property_pb.Property | undefined;
-  setProperties(value?: property_pb.Property): void;
-  hasProperties(): boolean;
-  clearProperties(): void;
-
-  getVendor(): vendor_pb.Vendor | undefined;
-  setVendor(value?: vendor_pb.Vendor): void;
-  hasVendor(): boolean;
-  clearVendor(): void;
-
-  getCurrency(): currency_pb.Currency | undefined;
-  setCurrency(value?: currency_pb.Currency): void;
-  hasCurrency(): boolean;
-  clearCurrency(): void;
+  getPropertiesList(): Array<property_pb.Property>;
+  setPropertiesList(value: Array<property_pb.Property>): void;
+  clearPropertiesList(): void;
+  addProperties(value?: property_pb.Property, index?: number): property_pb.Property;
 
   getImagesList(): Array<ItemImage>;
   setImagesList(value: Array<ItemImage>): void;
@@ -82,6 +72,16 @@ export class Item extends jspb.Message {
   setOffersList(value: Array<Item>): void;
   clearOffersList(): void;
   addOffers(value?: Item, index?: number): Item;
+
+  getVendor(): vendor_pb.Vendor | undefined;
+  setVendor(value?: vendor_pb.Vendor): void;
+  hasVendor(): boolean;
+  clearVendor(): void;
+
+  getCurrency(): currency_pb.Currency | undefined;
+  setCurrency(value?: currency_pb.Currency): void;
+  hasCurrency(): boolean;
+  clearCurrency(): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Item.AsObject;
@@ -110,11 +110,11 @@ export namespace Item {
     seoTitle: string,
     seoDescription: string,
     seoKeywords: string,
-    properties?: property_pb.Property.AsObject,
-    vendor?: vendor_pb.Vendor.AsObject,
-    currency?: currency_pb.Currency.AsObject,
+    propertiesList: Array<property_pb.Property.AsObject>,
     imagesList: Array<ItemImage.AsObject>,
     offersList: Array<Item.AsObject>,
+    vendor?: vendor_pb.Vendor.AsObject,
+    currency?: currency_pb.Currency.AsObject,
   }
 }
 

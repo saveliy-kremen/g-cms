@@ -160,7 +160,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.v1.Item.repeatedFields_ = [23,24];
+proto.v1.Item.repeatedFields_ = [20,23,24];
 
 
 
@@ -210,13 +210,14 @@ proto.v1.Item.toObject = function(includeInstance, msg) {
     seoTitle: jspb.Message.getFieldWithDefault(msg, 17, ""),
     seoDescription: jspb.Message.getFieldWithDefault(msg, 18, ""),
     seoKeywords: jspb.Message.getFieldWithDefault(msg, 19, ""),
-    properties: (f = msg.getProperties()) && property_pb.Property.toObject(includeInstance, f),
-    vendor: (f = msg.getVendor()) && vendor_pb.Vendor.toObject(includeInstance, f),
-    currency: (f = msg.getCurrency()) && currency_pb.Currency.toObject(includeInstance, f),
+    propertiesList: jspb.Message.toObjectList(msg.getPropertiesList(),
+    property_pb.Property.toObject, includeInstance),
     imagesList: jspb.Message.toObjectList(msg.getImagesList(),
     proto.v1.ItemImage.toObject, includeInstance),
     offersList: jspb.Message.toObjectList(msg.getOffersList(),
-    proto.v1.Item.toObject, includeInstance)
+    proto.v1.Item.toObject, includeInstance),
+    vendor: (f = msg.getVendor()) && vendor_pb.Vendor.toObject(includeInstance, f),
+    currency: (f = msg.getCurrency()) && currency_pb.Currency.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -324,17 +325,7 @@ proto.v1.Item.deserializeBinaryFromReader = function(msg, reader) {
     case 20:
       var value = new property_pb.Property;
       reader.readMessage(value,property_pb.Property.deserializeBinaryFromReader);
-      msg.setProperties(value);
-      break;
-    case 21:
-      var value = new vendor_pb.Vendor;
-      reader.readMessage(value,vendor_pb.Vendor.deserializeBinaryFromReader);
-      msg.setVendor(value);
-      break;
-    case 22:
-      var value = new currency_pb.Currency;
-      reader.readMessage(value,currency_pb.Currency.deserializeBinaryFromReader);
-      msg.setCurrency(value);
+      msg.addProperties(value);
       break;
     case 23:
       var value = new proto.v1.ItemImage;
@@ -345,6 +336,16 @@ proto.v1.Item.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.v1.Item;
       reader.readMessage(value,proto.v1.Item.deserializeBinaryFromReader);
       msg.addOffers(value);
+      break;
+    case 21:
+      var value = new vendor_pb.Vendor;
+      reader.readMessage(value,vendor_pb.Vendor.deserializeBinaryFromReader);
+      msg.setVendor(value);
+      break;
+    case 22:
+      var value = new currency_pb.Currency;
+      reader.readMessage(value,currency_pb.Currency.deserializeBinaryFromReader);
+      msg.setCurrency(value);
       break;
     default:
       reader.skipField();
@@ -494,28 +495,12 @@ proto.v1.Item.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getProperties();
-  if (f != null) {
-    writer.writeMessage(
+  f = message.getPropertiesList();
+  if (f.length > 0) {
+    writer.writeRepeatedMessage(
       20,
       f,
       property_pb.Property.serializeBinaryToWriter
-    );
-  }
-  f = message.getVendor();
-  if (f != null) {
-    writer.writeMessage(
-      21,
-      f,
-      vendor_pb.Vendor.serializeBinaryToWriter
-    );
-  }
-  f = message.getCurrency();
-  if (f != null) {
-    writer.writeMessage(
-      22,
-      f,
-      currency_pb.Currency.serializeBinaryToWriter
     );
   }
   f = message.getImagesList();
@@ -532,6 +517,22 @@ proto.v1.Item.serializeBinaryToWriter = function(message, writer) {
       24,
       f,
       proto.v1.Item.serializeBinaryToWriter
+    );
+  }
+  f = message.getVendor();
+  if (f != null) {
+    writer.writeMessage(
+      21,
+      f,
+      vendor_pb.Vendor.serializeBinaryToWriter
+    );
+  }
+  f = message.getCurrency();
+  if (f != null) {
+    writer.writeMessage(
+      22,
+      f,
+      currency_pb.Currency.serializeBinaryToWriter
     );
   }
 };
@@ -844,113 +845,40 @@ proto.v1.Item.prototype.setSeoKeywords = function(value) {
 
 
 /**
- * optional Property properties = 20;
- * @return {?proto.v1.Property}
+ * repeated Property properties = 20;
+ * @return {!Array<!proto.v1.Property>}
  */
-proto.v1.Item.prototype.getProperties = function() {
-  return /** @type{?proto.v1.Property} */ (
-    jspb.Message.getWrapperField(this, property_pb.Property, 20));
+proto.v1.Item.prototype.getPropertiesList = function() {
+  return /** @type{!Array<!proto.v1.Property>} */ (
+    jspb.Message.getRepeatedWrapperField(this, property_pb.Property, 20));
 };
 
 
 /**
- * @param {?proto.v1.Property|undefined} value
+ * @param {!Array<!proto.v1.Property>} value
  * @return {!proto.v1.Item} returns this
 */
-proto.v1.Item.prototype.setProperties = function(value) {
-  return jspb.Message.setWrapperField(this, 20, value);
+proto.v1.Item.prototype.setPropertiesList = function(value) {
+  return jspb.Message.setRepeatedWrapperField(this, 20, value);
 };
 
 
 /**
- * Clears the message field making it undefined.
+ * @param {!proto.v1.Property=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.v1.Property}
+ */
+proto.v1.Item.prototype.addProperties = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 20, opt_value, proto.v1.Property, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
  * @return {!proto.v1.Item} returns this
  */
-proto.v1.Item.prototype.clearProperties = function() {
-  return this.setProperties(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.v1.Item.prototype.hasProperties = function() {
-  return jspb.Message.getField(this, 20) != null;
-};
-
-
-/**
- * optional Vendor vendor = 21;
- * @return {?proto.v1.Vendor}
- */
-proto.v1.Item.prototype.getVendor = function() {
-  return /** @type{?proto.v1.Vendor} */ (
-    jspb.Message.getWrapperField(this, vendor_pb.Vendor, 21));
-};
-
-
-/**
- * @param {?proto.v1.Vendor|undefined} value
- * @return {!proto.v1.Item} returns this
-*/
-proto.v1.Item.prototype.setVendor = function(value) {
-  return jspb.Message.setWrapperField(this, 21, value);
-};
-
-
-/**
- * Clears the message field making it undefined.
- * @return {!proto.v1.Item} returns this
- */
-proto.v1.Item.prototype.clearVendor = function() {
-  return this.setVendor(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.v1.Item.prototype.hasVendor = function() {
-  return jspb.Message.getField(this, 21) != null;
-};
-
-
-/**
- * optional Currency currency = 22;
- * @return {?proto.v1.Currency}
- */
-proto.v1.Item.prototype.getCurrency = function() {
-  return /** @type{?proto.v1.Currency} */ (
-    jspb.Message.getWrapperField(this, currency_pb.Currency, 22));
-};
-
-
-/**
- * @param {?proto.v1.Currency|undefined} value
- * @return {!proto.v1.Item} returns this
-*/
-proto.v1.Item.prototype.setCurrency = function(value) {
-  return jspb.Message.setWrapperField(this, 22, value);
-};
-
-
-/**
- * Clears the message field making it undefined.
- * @return {!proto.v1.Item} returns this
- */
-proto.v1.Item.prototype.clearCurrency = function() {
-  return this.setCurrency(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.v1.Item.prototype.hasCurrency = function() {
-  return jspb.Message.getField(this, 22) != null;
+proto.v1.Item.prototype.clearPropertiesList = function() {
+  return this.setPropertiesList([]);
 };
 
 
@@ -1027,6 +955,80 @@ proto.v1.Item.prototype.addOffers = function(opt_value, opt_index) {
  */
 proto.v1.Item.prototype.clearOffersList = function() {
   return this.setOffersList([]);
+};
+
+
+/**
+ * optional Vendor vendor = 21;
+ * @return {?proto.v1.Vendor}
+ */
+proto.v1.Item.prototype.getVendor = function() {
+  return /** @type{?proto.v1.Vendor} */ (
+    jspb.Message.getWrapperField(this, vendor_pb.Vendor, 21));
+};
+
+
+/**
+ * @param {?proto.v1.Vendor|undefined} value
+ * @return {!proto.v1.Item} returns this
+*/
+proto.v1.Item.prototype.setVendor = function(value) {
+  return jspb.Message.setWrapperField(this, 21, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.v1.Item} returns this
+ */
+proto.v1.Item.prototype.clearVendor = function() {
+  return this.setVendor(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.v1.Item.prototype.hasVendor = function() {
+  return jspb.Message.getField(this, 21) != null;
+};
+
+
+/**
+ * optional Currency currency = 22;
+ * @return {?proto.v1.Currency}
+ */
+proto.v1.Item.prototype.getCurrency = function() {
+  return /** @type{?proto.v1.Currency} */ (
+    jspb.Message.getWrapperField(this, currency_pb.Currency, 22));
+};
+
+
+/**
+ * @param {?proto.v1.Currency|undefined} value
+ * @return {!proto.v1.Item} returns this
+*/
+proto.v1.Item.prototype.setCurrency = function(value) {
+  return jspb.Message.setWrapperField(this, 22, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.v1.Item} returns this
+ */
+proto.v1.Item.prototype.clearCurrency = function() {
+  return this.setCurrency(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.v1.Item.prototype.hasCurrency = function() {
+  return jspb.Message.getField(this, 22) != null;
 };
 
 

@@ -28,11 +28,11 @@ message Item {
   string seo_description = 18;
   string seo_keywords = 19;
 
-  Property properties = 20;
-  Vendor vendor = 21;
-  Currency currency = 22;
+  repeated Property properties = 20;
   repeated ItemImage images = 23;
   repeated Item offers = 24;
+  Vendor vendor = 21;
+  Currency currency = 22;
 }
 
 message ItemImage {

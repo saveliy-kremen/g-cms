@@ -244,27 +244,30 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 		}
 	}
 
-	/*
-		//Properties
-		oldItemProperties := []models.ItemProperty{}
-		db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ID).Find(&oldItemProperties)
-		for _, oldItemProperty := range oldItemProperties {
-			db.DB.Unscoped().Delete(&oldItemProperty)
-		}
-		for _, propertyValue := range req.Properties {
-			property := models.Property{}
-			if !db.DB.Where("code = ?", propertyValue.Code).First(&property).RecordNotFound() {
-				for _, valueID := range propertyValue.PropertyValueIds {
-					itemProperty := models.ItemProperty{}
-					itemProperty.UserID = user_id
-					itemProperty.ItemID = uint32(item.ID)
-					itemProperty.PropertyID = uint32(property.ID)
-					itemProperty.PropertyValueID = valueID
-					db.DB.Create(&itemProperty)
-				}
+	//Properties
+	_, err := db.DB.Exec(ctx,
+		`DELETE FROM items_properties WHERE user_id = $1 AND item_id = $2`,
+		user_id, item.ID)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	for _, propertyValue := range req.Properties {
+		var propertyID uint32
+		row := db.DB.QueryRow(ctx,
+			`SELECT id
+			FROM properties
+			WHERE user_id = $1 AND code = $2`,
+			user_id, propertyValue.Code)
+		err := row.Scan(&propertyID)
+		if err == nil {
+			for _, valueID := range propertyValue.PropertyValueIds {
+				db.DB.QueryRow(ctx, `
+			INSERT INTO items_properties (user_id, item_id, property_id, property_value_id)
+			VALUES ($1, $2, $3, $4)
+			`, user_id, item.ID, propertyID, valueID)
 			}
 		}
-	*/
+	}
 
 	//Item images to remove
 	var toRemoveItemImages []models.ItemImage
@@ -274,7 +277,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 			FROM items
 			WHERE items.user_id = $1 AND items.id = $2`,
 		user_id, item.ID)
-	err := row.Scan(&item.Images)
+	err = row.Scan(&item.Images)
 	if err != nil {
 		logger.Error(err.Error())
 	} else {
@@ -370,21 +373,19 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 }
 
 func (s *AdminItemServiceImpl) AdminDeleteItem(ctx context.Context, req *v1.AdminDeleteItemRequest) (*v1.AdminItemsResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	/*
-		err := deleteItem(user_id, req.Id)
-		if err != nil {
-			return nil, status.Errorf(codes.Aborted, "Error delete item")
-		}
-	*/
+	err := deleteItem(ctx, user_id, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Aborted, "Error delete item")
+	}
 	return s.AdminItems(ctx, &v1.AdminItemsRequest{Page: req.Page, PageSize: req.PageSize, Sort: req.Sort, Direction: req.Direction})
 }
 
 func (s *AdminItemServiceImpl) AdminDeleteOffer(ctx context.Context, req *v1.AdminDeleteOfferRequest) (*v1.AdminOffersResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
-	err := deleteItem(user_id, req.Id)
+	err := deleteItem(ctx, user_id, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Aborted, "Error delete offer")
 	}

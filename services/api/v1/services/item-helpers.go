@@ -3,12 +3,13 @@ package services
 import (
 	"context"
 	"fmt"
+	"gcms/config"
 	"gcms/db"
 	"gcms/models"
+	"os"
+	"strconv"
 
 	"gcms/packages/utils"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func itemProperties(ctx context.Context, item *models.Item) []models.Property {
@@ -125,7 +126,6 @@ func itemProperties(ctx context.Context, item *models.Item) []models.Property {
 			properties[propertyIndex].ItemValues = append(properties[propertyIndex].ItemValues, propertyValueID)
 		}
 	}
-	spew.Dump(properties)
 	return properties
 }
 
@@ -149,29 +149,14 @@ func itemOffers(item *models.Item, page *uint32, pageSize *uint32, sort *string,
 	return offers
 }
 
-func deleteItem(user_id uint32, item_id uint32) error {
-	/*
-		if err := db.DB.Unscoped().Where("user_id=? AND id = ?", user_id, item_id).Delete(&models.Item{}).Error; err != nil {
-			return err
-		} else {
-			itemProperties := []models.ItemProperty{}
-			db.DB.Where("user_id = ? AND item_id = ?", user_id, item_id).Find(&itemProperties)
-			for _, itemProperty := range itemProperties {
-				db.DB.Unscoped().Delete(&itemProperty)
-			}
-			itemImages := []models.ItemImage{}
-			db.DB.Where("user_id = ? AND item_id = ?", user_id, item_id).Find(&itemImages)
-			for _, itemImage := range itemImages {
-				db.DB.Unscoped().Delete(&itemImage)
-			}
-			itemCategories := []models.ItemsCategories{}
-			db.DB.Where("user_id = ? AND item_id = ?", user_id, item_id).Find(&itemCategories)
-			for _, itemCategory := range itemCategories {
-				db.DB.Unscoped().Delete(&itemCategory)
-			}
-			directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/items/" + strconv.Itoa(int(item_id))
-			os.RemoveAll(directory)
-		}
-	*/
+func deleteItem(ctx context.Context, user_id uint32, item_id uint32) error {
+	_, err := db.DB.Exec(ctx,
+		`DELETE FROM items
+		WHERE user_id = $1 AND id = $2`,
+		user_id, item_id)
+	if err == nil {
+		directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/items/" + strconv.Itoa(int(item_id))
+		os.RemoveAll(directory)
+	}
 	return nil
 }

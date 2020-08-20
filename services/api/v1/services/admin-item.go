@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -74,7 +73,7 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
 
-	item.Offers = itemOffers(&item, nil, nil, nil, nil)
+	item.Offers = itemOffers(ctx, &item, nil, nil, nil, nil)
 
 	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
 }
@@ -118,7 +117,7 @@ func (s *AdminItemServiceImpl) AdminItems(ctx context.Context, req *v1.AdminItem
 			&item.Currency.ID, &item.Currency.CreatedAt, &item.Currency.Name, &item.Currency.ShortName,
 			&item.Currency.Code, &item.Currency.Rate)
 		if err != nil {
-			log.Fatal(err)
+			logger.Error(err.Error())
 		}
 		items = append(items, item)
 	}
@@ -126,13 +125,9 @@ func (s *AdminItemServiceImpl) AdminItems(ctx context.Context, req *v1.AdminItem
 		return nil, status.Errorf(codes.NotFound, "Items set error")
 	}
 
-	/*
-		for i, item := range items {
-			db.DB.Preload("Vendor").Preload("Currency").Preload("Images", func(db *gorm.DB) *gorm.DB {
-				return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
-			}).Where("user_id = ? AND parent_id = ?", user_id, item.ID).Order(order).Find(&items[i].Offers)
-		}
-	*/
+	for i, item := range items {
+		items[i].Offers = itemOffers(ctx, &item, nil, nil, nil, nil)
+	}
 	return &v1.AdminItemsResponse{Items: models.AdminItemsToResponse(items), Total: total}, nil
 }
 
@@ -164,10 +159,11 @@ func (s *AdminItemServiceImpl) AdminCreateDraftItem(ctx context.Context, req *v1
 	} else {
 		//Offer
 		row := db.DB.QueryRow(ctx,
-			`SELECT title, alias, article FROM items WHERE user_id = $1 AND id=$2)`,
+			`SELECT title, alias, article FROM items WHERE user_id = $1 AND id=$2`,
 			user_id, req.ParentId)
 		err := row.Scan(&draft.Title, &draft.Alias, &draft.Article)
 		if err != nil {
+			logger.Error(err.Error())
 			return nil, status.Errorf(codes.NotFound, "Parent item not found")
 		}
 		draft.ParentID = sql.NullInt64{int64(req.ParentId), true}
@@ -560,20 +556,27 @@ func (s *AdminItemServiceImpl) AdminItemProperties(ctx context.Context, req *v1.
 }
 
 func (s *AdminItemServiceImpl) AdminItemOffers(ctx context.Context, req *v1.AdminOffersRequest) (*v1.AdminOffersResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
 	item := models.Item{}
-	if req.ItemId != 0 {
-		// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE user_id=$1 AND id=$2", user_id, req.ItemId)
-		// if err != nil {
-		// 	return nil, status.Errorf(codes.NotFound, "Item not found")
-		// }
+	row := db.DB.QueryRow(ctx,
+		`SELECT id
+		FROM items
+		WHERE user_id = $1 AND id = $2`,
+		user_id, req.ItemId)
+	err := row.Scan(&item.ID)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
 
 	offers := []models.Item{}
 	var total uint32
-	//db.DB.GetContext(ctx, &total, "SELECT count(*) FROM items WHERE user_id = $1 AND parent_id = $2 AND draft <> $3", user_id, item.ID, false)
-	offers = itemOffers(&item, &req.Page, &req.PageSize, &req.Sort, &req.Direction)
+	err = db.DB.QueryRow(ctx, "SELECT count(*) FROM items WHERE user_id = $1 AND parent_id = $2 AND draft = $3", item.ID, false).Scan(&total)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	offers = itemOffers(ctx, &item, &req.Page, &req.PageSize, &req.Sort, &req.Direction)
 	return &v1.AdminOffersResponse{Offers: models.AdminItemsToResponse(offers), Total: total}, nil
 }
 

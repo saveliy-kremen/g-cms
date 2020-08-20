@@ -9,6 +9,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/jackc/pgx/v4"
+
 	"gcms/packages/utils"
 )
 
@@ -129,23 +131,56 @@ func itemProperties(ctx context.Context, item *models.Item) []models.Property {
 	return properties
 }
 
-func itemOffers(item *models.Item, page *uint32, pageSize *uint32, sort *string, direction *string) []models.Item {
+func itemOffers(ctx context.Context, item *models.Item, page *uint32, pageSize *uint32, sort *string, direction *string) []models.Item {
 	offers := []models.Item{}
-	/*
-		req := db.DB.Preload("Images", func(db *gorm.DB) *gorm.DB {
-			return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
-		}).Where("user_id = ? AND parent_id = ? AND draft = ?", item.UserID, item.ID, false)
-		if sort != nil && *sort != "" {
-			req = req.Order(*sort + " " + *direction)
+
+	order := "sort"
+	if sort != nil {
+		order = *sort + " " + *direction
+	}
+
+	var err error
+	var rows pgx.Rows
+	if pageSize != nil && *pageSize != 0 {
+		query := fmt.Sprintf(
+			`SELECT id, created_at, user_id, draft, title, article,
+			alias, images, description, price, old_price, count,
+			in_stock, disable, sort, seo_title, seo_description,
+			seo_keywords, parent_id, vendor_id, currency_id
+			FROM items
+			WHERE (user_id = $1 AND parent_id = $2 AND draft = $3)
+			ORDER BY %s OFFSET $4 LIMIT $5`,
+			order)
+		rows, err = db.DB.Query(ctx, query, item.UserID, item.ID, false, (*page)*(*pageSize), *pageSize)
+	} else {
+		query := fmt.Sprintf(
+			`SELECT id, created_at, user_id, draft, title, article,
+			alias, images, description, price, old_price, count,
+			in_stock, disable, sort, seo_title, seo_description,
+			seo_keywords, parent_id, vendor_id, currency_id
+			FROM items
+			WHERE user_id = $1 AND parent_id = $2 AND draft = $3
+			ORDER BY %s`,
+			order)
+		rows, err = db.DB.Query(ctx, query, item.UserID, item.ID, false)
+	}
+	if err != nil {
+		logger.Error(err.Error())
+		return offers
+	}
+	defer rows.Close()
+	for rows.Next() {
+		offer := models.Item{}
+		err := rows.Scan(&offer.ID, &offer.CreatedAt, &offer.UserID, &offer.Draft, &offer.Title,
+			&offer.Article, &offer.Alias, &offer.Images, &offer.Description, &offer.Price,
+			&offer.OldPrice, &offer.Count, &offer.InStock, &offer.Disable, &offer.Sort,
+			&offer.SeoTitle, &offer.SeoDescription, &offer.SeoKeywords, &offer.ParentID,
+			&offer.VendorID, &offer.CurrencyID)
+		if err != nil {
+			logger.Error(err.Error())
 		}
-		if pageSize != nil && *pageSize != 0 {
-			req = req.Offset(*page * *pageSize).Limit(*pageSize)
-		}
-		req.Find(&offers)
-		for i, _ := range offers {
-			offers[i].Properties = itemProperties(item)
-		}
-	*/
+		offers = append(offers, offer)
+	}
 	return offers
 }
 

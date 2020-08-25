@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -581,104 +583,140 @@ func (s *AdminItemServiceImpl) AdminItemOffers(ctx context.Context, req *v1.Admi
 }
 
 func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.AdminUploadOfferRequest) (*v1.AdminItemResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	vendor := models.Vendor{}
-	vendor.Name = sql.NullString{req.Vendor, true}
-	vendor.Country = sql.NullString{req.Country, true}
-	// err := db.DB.GetContext(ctx, &vendor, "SELECT * FROM vendors WHERE name=$1", sql.NullString{req.Vendor, true})
-	// if err != nil && err == sql.ErrNoRows {
-	// 	res, _ := db.DB.ExecContext(ctx, "INSERT INTO vendors (name, country) VALUES($1, $2)", req.Vendor, req.Country)
-	// 	vendorID, _ := res.LastInsertId()
-	// 	vendor.ID = sql.NullInt32{int32(vendorID), true}
-	// }
+	var vendorID int32
+
+	if req.Vendor != "" {
+		err := db.DB.QueryRow(ctx, "SELECT id vendors WHERE name=$1", req.Vendor).Scan(&vendorID)
+		if err != nil && err == sql.ErrNoRows {
+			var vendorID int32
+			row := db.DB.QueryRow(ctx, "INSERT INTO vendors (name, country) VALUES($1, $2) RETURNING (id)", req.Vendor, req.Country)
+			err := row.Scan(&vendorID)
+			if err != nil {
+				logger.Error(err.Error())
+			}
+		}
+	}
 
 	item := models.Item{}
 
-	/*
-		alias := utils.Translit(strings.ToLower(req.Title))
-		db.DB.Where("user_id = ? AND alias = ? AND parent_id = ? AND vendor_id = ?", user_id, alias, req.ParentId, vendor.ID).First(&item)
-		if item.Sort == 0 {
-			lastItem := models.Item{}
-			db.DB.Where("user_id = ? AND parent_id = ?", user_id, req.ParentId).Order("sort DESC").First(&lastItem)
-			item.Sort = lastItem.Sort + 10
-		}
-		item.UserID = user_id
-		item.Title = req.Title
-		item.Alias = alias
-		item.Article = req.Article
-		item.ParentID = req.ParentId
-		item.Price = req.Price
-		item.Count = req.Count
-		item.InStock = req.InStock
-		item.Description = req.Description
+	alias := utils.Translit(strings.ToLower(req.Title))
+	rows, err := db.DB.Query(ctx, `SELECT id, created_at, user_id, draft, title, article,
+	alias, images, description, price, old_price, count,
+	in_stock, disable, sort, seo_title, seo_description,
+	seo_keywords, parent_id, vendor_id, currency_id
+	FROM items
+	WHERE (user_id = ? AND alias = ? AND parent_id = ? AND vendor_id = ?)`,
+		user_id, alias, req.ParentId, vendor.ID)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	err = rows.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.Draft, &item.Title,
+		&item.Article, &item.Alias, &item.Images, &item.Description, &item.Price,
+		&item.OldPrice, item.Count, &item.InStock, &item.Disable, &item.Sort,
+		&item.SeoTitle, &item.SeoDescription, &item.SeoKeywords, &item.ParentID,
+		&item.VendorID, &item.CurrencyID)
+	if err != nil {
+		logger.Error(err.Error())
+	}
 
-		currency := models.Currency{}
-		if db.DB.Where("code = ?", req.Currency).First(&currency).RecordNotFound() {
-			currency.Code = req.Currency
-			currency.Name = req.Currency
-			currency.ShortName = req.Currency
-			db.DB.Create(&currency)
+	if item.Sort == 0 {
+		lastItem := models.Item{}
+		rows, err := db.DB.Query(ctx,
+			`SELECT sort
+			FROM items
+			WHERE (user_id = ? AND parent_id = ?)
+			ORDER BY sort DESC`,
+			user_id, req.ParentId)
+		if err != nil {
+			logger.Error(err.Error())
 		}
-		item.CurrencyID = uint32(currency.ID)
-		item.VendorID = uint32(vendor.ID)
-		if db.DB.Save(&item).Error != nil {
-			return nil, status.Errorf(codes.Aborted, "Error save offer")
+		err = rows.Scan(&lastItem.Sort)
+		if err != nil {
+			logger.Error(err.Error())
 		}
+		item.Sort = lastItem.Sort + 10
+	}
+	item.UserID = user_id
+	item.Title = req.Title
+	item.Alias = alias
+	item.Article = req.Article
+	item.ParentID = req.ParentId
+	item.Price = req.Price
+	item.Count = req.Count
+	item.InStock = req.InStock
+	item.Description = req.Description
 
-		if req.CategoryId != 0 {
-			category := models.Category{}
-			if !db.DB.Where("user_id = ?", user_id).First(&category, req.CategoryId).RecordNotFound() {
-				itemCategory := models.ItemsCategories{}
-				if db.DB.Where("user_id = ? AND item_id = ? AND category_id = ?", user_id, item.ID, category.ID).First(&itemCategory).RecordNotFound() {
-					itemCategory.UserID = user_id
-					itemCategory.ItemID = item.ID
-					itemCategory.CategoryID = category.ID
-					db.DB.Save(&itemCategory)
-				}
-			}
+	var currencyID int32
+	err = db.DB.QueryRow(ctx, "SELECT id FROM currencies WHERE code=$1", req.Currency).Scan(&currencyID)
+	if err != nil && err == sql.ErrNoRows {
+		var currencyID int32
+		row := db.DB.QueryRow(ctx, "INSERT INTO currencies (code, name, short_name) VALUES($1, $2, $3) RETURNING (id)", req.Currency, req.Currency, req.Currency)
+		err := row.Scan(&currencyID)
+		if err != nil {
+			logger.Error(err.Error())
 		}
+	}
+	item.CurrencyID = uint32(currencyID)
+	item.VendorID = uint32(vendorID)
+	_, err = db.DB.Exec(ctx, `
+	UPDATE items SET user_id = $1, title=$2, alias=$3, article=$4, parent_id=$5, price=$6, count=$7,
+	in_stock=$8, description=$9
+	WHERE user_id=$10 AND id=$11`,
+		item.UserID, item.Title, item.Alias, item.Article, item.ParentID, item.Price, item.Count,
+		item.InStock, item.Description,
+		user_id, item.ID)
+	if err != nil {
+		return nil, status.Errorf(codes.Aborted, "Error save offer")
+	}
 
-		//Images
-		directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/items/" + strconv.Itoa(int(item.ID)) + "/"
-		os.RemoveAll(directory)
-		os.MkdirAll(directory, 0775)
-		itemImages := []models.ItemImage{}
-		db.DB.Where("user_id = ? AND item_id = ?", user_id, item.ID).Find(&itemImages)
-		for _, itemImage := range itemImages {
-			db.DB.Unscoped().Delete(&itemImage)
+	if req.CategoryId != 0 {
+		_, err := db.DB.Exec(ctx,
+			`INSERT INTO items_categories (user_id, item_id, category_id) VALUES($1, $2, $3)
+					ON CONFLICT ON CONSTRAINT items_categories_pkey 
+					DO NOTHING`,
+			user_id, item.ID, req.CategoryId)
+		if err != nil {
+			logger.Error(err.Error())
 		}
-		for i, image := range req.Images {
-			resp, err := http.Get(image)
+	}
+
+	//Images
+	directory := config.AppConfig.UploadPath + "/users/" + strconv.Itoa(int(user_id)) + "/items/" + strconv.Itoa(int(item.ID)) + "/"
+	os.RemoveAll(directory)
+	os.MkdirAll(directory, 0775)
+	itemImages := []models.ItemImage{}
+	for i, image := range req.Images {
+		resp, err := http.Get(image)
+		if err == nil {
+			defer resp.Body.Close()
+			filepath := strings.Split(image, "/")
+			filename := filepath[len(filepath)-1]
+			file, err := os.Create(directory + filename)
 			if err == nil {
-				defer resp.Body.Close()
-				filepath := strings.Split(image, "/")
-				filename := filepath[len(filepath)-1]
-				file, err := os.Create(directory + filename)
+				defer file.Close()
+				_, err = io.Copy(file, resp.Body)
 				if err == nil {
-					defer file.Close()
-					_, err = io.Copy(file, resp.Body)
-					if err == nil {
-						itemImage := models.ItemImage{}
-						itemImage.UserID = user_id
-						itemImage.ItemID = uint32(item.ID)
-						itemImage.Filename = filename
-						itemImage.Sort = uint32(i * 10)
-						db.DB.Create(&itemImage)
-						thumb, err := thumbs.CreateThumb(directory+filename, config.AppConfig.Thumbs.Item, directory, strconv.Itoa(int(itemImage.ID)))
-						if err == nil {
-							itemImage.Filename = *thumb
-							db.DB.Save(&itemImage)
-							if filename != *thumb {
-								os.Remove(directory + filename)
-							}
-							thumbs.CreateThumbs(directory, itemImage.Filename, config.AppConfig.Thumbs.Catalog)
-						}
-					}
+					itemImage := models.ItemImage{}
+					itemImage.Filename = filename
+					itemImage.Path = strconv.Itoa(int(item.ID))
+					thumbs.CreateThumbs(directory, itemImage.Filename, config.AppConfig.Thumbs.Catalog)
+					itemImages = append(itemImages, itemImage)
 				}
 			}
 		}
-	*/
+	}
+	itemImagesBuf, _ := json.Marshal(itemImages)
+	item.Images = string(itemImagesBuf)
+	_, err = db.DB.Exec(ctx, `
+	UPDATE items SET images=$1
+	WHERE user_id=$2 AND id=$3`,
+		item.Images,
+		item.UserID, item.ID)
+	if err != nil {
+		logger.Error(err.Error())
+	}
 	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
 }
 

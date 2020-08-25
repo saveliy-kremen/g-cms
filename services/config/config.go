@@ -12,7 +12,6 @@ type ThumbStruct struct {
 }
 
 type ThumbsStruct struct {
-	Item    string
 	Catalog []ThumbStruct
 }
 

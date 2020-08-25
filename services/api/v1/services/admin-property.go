@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 
@@ -391,66 +392,113 @@ func (s *AdminPropertyServiceImpl) AdminDeletePropertyValue(ctx context.Context,
 }
 
 func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req *v1.AdminUploadPropertyRequest) (*v1.AdminPropertyResponse, error) {
-	//user_id := auth.GetUserUID(ctx)
+	user_id := auth.GetUserUID(ctx)
 
-	//code := utils.Translit(strings.ToLower(req.Title))
-	//property := models.Property{}
-	// if db.DB.Where("user_id = ? AND code = ?", user_id, code).First(&property).RecordNotFound() {
-	// 	property.UserID = user_id
-	// 	property.Title = req.Title
-	// 	property.Code = code
-	// 	property.Type = models.PropertyType(models.StringProperty)
-	// 	property.Display = models.PropertyDisplayType(models.PropertyDisplayList)
-	// 	lastProperty := models.Property{}
-	// 	db.DB.Where("user_id = ?", user_id).Order("sort DESC").First(&lastProperty)
-	// 	property.Sort = lastProperty.Sort + 10
-	// 	db.DB.Create(&property)
-	// }
+	code := utils.Translit(strings.ToLower(req.Title))
+	property := models.Property{}
+	row := db.DB.QueryRow(ctx,
+		`SELECT id, user_id, title, code, type,	display, required, multiple, sort
+			FROM properties
+			WHERE user_id = $1 AND code = $2`,
+		user_id, code)
+	err := row.Scan(&property.ID, &property.UserID, &property.Title, &property.Code, &property.Type,
+		&property.Display, &property.Required, &property.Multiple, &property.Sort)
+	if err != nil && err == sql.ErrNoRows {
+		property.UserID = user_id
+		property.Title = req.Title
+		property.Code = code
+		property.Type = models.PropertyType(models.StringProperty)
+		property.Display = models.PropertyDisplayType(models.PropertyDisplayList)
+		var lastSort uint
+		row := db.DB.QueryRow(ctx,
+			`SELECT sort
+			FROM properties
+			WHERE user_id = $1
+			ORDER BY sort DESC`,
+			user_id)
+		row.Scan(&lastSort)
+		property.Sort = lastSort + 10
+		err := db.DB.QueryRow(ctx, `
+		INSERT INTO properties (user_id, title, code, type, display, sort)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id
+		`,
+			property.UserID, property.Title, property.Code, property.Type, property.Display,
+			property.Sort).Scan(&property.ID)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+	}
 
 	propertyValue := models.PropertyValue{}
-	// if db.DB.Where("user_id = ? AND value = ?", user_id, strings.ToLower(strings.TrimSpace(req.Value))).First(&propertyValue).RecordNotFound() {
-	// 	propertyValue.UserID = user_id
-	// 	propertyValue.PropertyID = property.ID
-	// 	propertyValue.Value = req.Value
-	// 	lastPropertyValue := models.PropertyValue{}
-	// 	db.DB.Where("user_id = ? AND property_id = ?", user_id, property.ID).Order("sort DESC").First(&lastPropertyValue)
-	// 	propertyValue.Sort = lastPropertyValue.Sort + 10
-	// 	db.DB.Create(&propertyValue)
-	// }
+	row = db.DB.QueryRow(ctx,
+		`SELECT id, user_id, property_id, value, sort
+			FROM properties_values
+			WHERE user_id = $1 AND value = $2`,
+		user_id, strings.ToLower(strings.TrimSpace(req.Value)))
+	err = row.Scan(&property.ID, &property.UserID, &property.Title, &property.Code, &property.Type,
+		&property.Display, &property.Required, &property.Multiple, &property.Sort)
+	if err != nil && err == sql.ErrNoRows {
+		propertyValue.UserID = user_id
+		propertyValue.PropertyID = property.ID
+		propertyValue.Value = req.Value
+		var lastSort uint
+		row := db.DB.QueryRow(ctx,
+			`SELECT sort
+			FROM properties_values
+			WHERE user_id = $1 AND property_id = $2
+			ORDER BY sort DESC`,
+			user_id, property.ID)
+		row.Scan(&lastSort)
+		propertyValue.Sort = lastSort + 10
+		err := db.DB.QueryRow(ctx, `
+		INSERT INTO properties_values (user_id, property_id, value, sort)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id
+		`,
+			propertyValue.UserID, propertyValue.PropertyID, propertyValue.Value, propertyValue.Sort).Scan(&propertyValue.ID)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+	}
 
-	//offer := models.Item{}
-	// if db.DB.Where("user_id = ?", user_id).First(&offer, req.ItemId).RecordNotFound() {
-	// 	return nil, status.Errorf(codes.NotFound, "Item not found")
-	// }
-	// if offer.ParentID != 0 {
-	// 	offer.ID = 0
-	// 	if db.DB.Where("user_id = ?", user_id).First(&offer, offer.ParentID).RecordNotFound() {
-	// 		return nil, status.Errorf(codes.NotFound, "Parent item not found")
-	// 	}
-	// }
-	//offerCategory := models.ItemsCategories{}
-	//db.DB.Where("user_id = ? AND item_id = ?", user_id, offer.ID).First(&offerCategory)
+	offer := models.Item{}
+	err = db.DB.QueryRow(ctx, "SELECT id, parent_id FROM items WHERE user_id=$1 AND id=$2", user_id, req.ItemId).Scan(&offer.ID, &offer.ParentID)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Item not found")
+	}
+	if offer.ParentID.Valid {
+		err = db.DB.QueryRow(ctx, "SELECT id, parent_id FROM items WHERE user_id=$1 AND id=$2", user_id, offer.ParentID).Scan(&offer.ID, &offer.ParentID)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Parent item not found")
+		}
+	}
+	var categoryID int32
+	err = db.DB.QueryRow(ctx, "SELECT category_id FROM items_categories WHERE user_id=$1 AND item_id=$2", user_id, offer.ID).Scan(&categoryID)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Item category not found")
+	}
 
-	//propertyCategory := models.PropertiesCategories{}
-	// if db.DB.Where("user_id = ? AND property_id = ? AND category_id = ?", user_id, propertyValue.ID, offerCategory.CategoryID).First(&propertyCategory).RecordNotFound() {
-	// 	propertyCategory.UserID = user_id
-	// 	propertyCategory.PropertyID = propertyValue.ID
-	// 	propertyCategory.CategoryID = offerCategory.CategoryID
-	// 	if db.DB.Save(&propertyCategory).Error != nil {
-	// 		return nil, status.Errorf(codes.Aborted, "Error bind property ")
-	// 	}
-	// }
+	_, err = db.DB.Exec(ctx,
+		`INSERT INTO properties_categories (user_id, property_id, category_id) VALUES($1, $2, $3)
+		ON CONFLICT ON CONSTRAINT properties_categories_pkey DO NOTHING`,
+		user_id, propertyValue.ID, categoryID)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error bind category")
+	}
 
-	//offerProperty := models.ItemProperty{}
-	// if db.DB.Where("user_id = ? AND item_id = ? AND property_id = ? AND property_value_id = ?", user_id, req.ItemId, property.ID, propertyValue.ID).First(&offerProperty).RecordNotFound() {
-	// 	offerProperty.UserID = user_id
-	// 	offerProperty.ItemID = req.ItemId
-	// 	offerProperty.PropertyID = uint32(property.ID)
-	// 	offerProperty.PropertyValueID = uint32(propertyValue.ID)
-	// 	if db.DB.Save(&offerProperty).Error != nil {
-	// 		return nil, status.Errorf(codes.Aborted, "Error save item property ")
-	// 	}
-	// }
+	_, err = db.DB.Exec(ctx,
+		`INSERT INTO items_properties (user_id, item_id, property_id, property_value_id) VALUES($1, $2, $3, $4)
+		ON CONFLICT ON CONSTRAINT items_properties_pkey DO NOTHING`,
+		user_id, req.ItemId, property.ID, propertyValue.ID)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error save item property ")
+	}
 
 	return s.AdminProperty(ctx, &v1.AdminPropertyRequest{Id: uint32(propertyValue.PropertyID)})
 }

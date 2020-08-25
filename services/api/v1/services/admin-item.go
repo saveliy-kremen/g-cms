@@ -617,9 +617,6 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 		&item.OldPrice, item.Count, &item.InStock, &item.Disable, &item.Sort,
 		&item.SeoTitle, &item.SeoDescription, &item.SeoKeywords, &item.ParentID,
 		&item.VendorID, &item.CurrencyID)
-	if err != nil {
-		logger.Error(err.Error())
-	}
 
 	if item.Sort == 0 {
 		lastItem := models.Item{}
@@ -660,13 +657,21 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	}
 	item.CurrencyID = sql.NullInt32{currencyID, false}
 	item.VendorID = sql.NullInt32{vendorID, false}
-	_, err = db.DB.Exec(ctx, `
+	if item.ID != 0 {
+		_, err = db.DB.Exec(ctx, `
 	UPDATE items SET user_id = $1, title=$2, alias=$3, article=$4, parent_id=$5, price=$6, count=$7,
 	in_stock=$8, description=$9
 	WHERE user_id=$10 AND id=$11`,
-		item.UserID, item.Title, item.Alias, item.Article, item.ParentID, item.Price, item.Count,
-		item.InStock, item.Description,
-		user_id, item.ID)
+			item.UserID, item.Title, item.Alias, item.Article, item.ParentID, item.Price, item.Count,
+			item.InStock, item.Description,
+			user_id, item.ID)
+	} else {
+		_, err = db.DB.Exec(ctx, `
+		INSERT INTO items SET (user_id, title, alias, article, parent_id, price, count,
+		in_stock, description ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+			item.UserID, item.Title, item.Alias, item.Article, item.ParentID, item.Price, item.Count,
+			item.InStock, item.Description)
+	}
 	if err != nil {
 		return nil, status.Errorf(codes.Aborted, "Error save offer")
 	}

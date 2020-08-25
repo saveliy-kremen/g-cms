@@ -119,17 +119,19 @@ CREATE TABLE properties_values (
 );
 
 CREATE TABLE properties_categories (
-	id bigserial PRIMARY KEY,
 	user_id int,
 	property_id bigint REFERENCES properties (id) ON UPDATE CASCADE ON DELETE CASCADE,
-	category_id bigint REFERENCES categories (id) ON UPDATE CASCADE ON DELETE CASCADE
+	category_id bigint REFERENCES categories (id) ON UPDATE CASCADE ON DELETE CASCADE,
+
+	CONSTRAINT properties_categories_pkey PRIMARY KEY (user_id, property_id, category_id)
 );
   
 CREATE TABLE items_properties (
 	user_id int,
 	item_id    bigint REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
 	property_id int REFERENCES properties (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    property_value_id int REFERENCES properties_values (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	property_value_id int REFERENCES properties_values (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	
 	CONSTRAINT items_properties_pkey PRIMARY KEY (item_id, property_id)
 );
 

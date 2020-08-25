@@ -13,6 +13,7 @@
 	"CategoryThumbSize": "200x200",
 	"PropertyThumbSize": "30x30",
 	"Thumbs": {
+		"Item": "500x600",
 		"Catalog": [
 			{
 				"title": "catalog",

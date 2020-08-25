@@ -608,7 +608,7 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	seo_keywords, parent_id, vendor_id, currency_id
 	FROM items
 	WHERE (user_id = ? AND alias = ? AND parent_id = ? AND vendor_id = ?)`,
-		user_id, alias, req.ParentId, vendor.ID)
+		user_id, alias, req.ParentId, vendorID)
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -642,7 +642,7 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	item.Title = req.Title
 	item.Alias = alias
 	item.Article = req.Article
-	item.ParentID = req.ParentId
+	item.ParentID = sql.NullInt64{int64(req.ParentId), false}
 	item.Price = req.Price
 	item.Count = req.Count
 	item.InStock = req.InStock
@@ -658,8 +658,8 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 			logger.Error(err.Error())
 		}
 	}
-	item.CurrencyID = uint32(currencyID)
-	item.VendorID = uint32(vendorID)
+	item.CurrencyID = sql.NullInt32{currencyID, false}
+	item.VendorID = sql.NullInt32{vendorID, false}
 	_, err = db.DB.Exec(ctx, `
 	UPDATE items SET user_id = $1, title=$2, alias=$3, article=$4, parent_id=$5, price=$6, count=$7,
 	in_stock=$8, description=$9
@@ -687,7 +687,7 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	os.RemoveAll(directory)
 	os.MkdirAll(directory, 0775)
 	itemImages := []models.ItemImage{}
-	for i, image := range req.Images {
+	for _, image := range req.Images {
 		resp, err := http.Get(image)
 		if err == nil {
 			defer resp.Body.Close()

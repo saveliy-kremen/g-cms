@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 
@@ -18,6 +17,7 @@ import (
 	"gcms/packages/upload"
 	"gcms/packages/utils"
 
+	"github.com/jackc/pgx/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -403,7 +403,7 @@ func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req 
 		user_id, code)
 	err := row.Scan(&property.ID, &property.UserID, &property.Title, &property.Code, &property.Type,
 		&property.Display, &property.Required, &property.Multiple, &property.Sort)
-	if err != nil && err == sql.ErrNoRows {
+	if err != nil && err == pgx.ErrNoRows {
 		property.UserID = user_id
 		property.Title = req.Title
 		property.Code = code
@@ -438,7 +438,7 @@ func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req 
 		user_id, strings.ToLower(strings.TrimSpace(req.Value)))
 	err = row.Scan(&property.ID, &property.UserID, &property.Title, &property.Code, &property.Type,
 		&property.Display, &property.Required, &property.Multiple, &property.Sort)
-	if err != nil && err == sql.ErrNoRows {
+	if err != nil && err == pgx.ErrNoRows {
 		propertyValue.UserID = user_id
 		propertyValue.PropertyID = property.ID
 		propertyValue.Value = req.Value

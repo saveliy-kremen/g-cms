@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/jackc/pgx/v4"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -588,8 +589,8 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	var vendorID int32
 
 	if req.Vendor != "" {
-		err := db.DB.QueryRow(ctx, "SELECT id vendors WHERE name=$1", req.Vendor).Scan(&vendorID)
-		if err != nil && err == sql.ErrNoRows {
+		err := db.DB.QueryRow(ctx, "SELECT id FROM vendors WHERE name=$1", req.Vendor).Scan(&vendorID)
+		if err != nil && err == pgx.ErrNoRows {
 			var vendorID int32
 			row := db.DB.QueryRow(ctx, "INSERT INTO vendors (name, country) VALUES($1, $2) RETURNING (id)", req.Vendor, req.Country)
 			err := row.Scan(&vendorID)
@@ -602,21 +603,33 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	item := models.Item{}
 
 	alias := utils.Translit(strings.ToLower(req.Title))
-	rows, err := db.DB.Query(ctx, `SELECT id, created_at, user_id, draft, title, article,
-	alias, images, description, price, old_price, count,
-	in_stock, disable, sort, seo_title, seo_description,
-	seo_keywords, parent_id, vendor_id, currency_id
-	FROM items
-	WHERE (user_id=$1 AND alias=$2 AND parent_id=$3 AND vendor_id=$4)`,
-		user_id, alias, req.ParentId, vendorID)
-	if err != nil {
-		logger.Error(err.Error())
+	if req.ParentId == 0 {
+		row := db.DB.QueryRow(ctx, `
+		SELECT id, created_at, user_id, draft, title, article,
+		alias, images, description, price, old_price, count, in_stock, disable, sort, seo_title,
+		seo_description, seo_keywords, parent_id, vendor_id, currency_id
+		FROM items
+		WHERE (user_id=$1 AND alias=$2 AND parent_id IS NULL AND vendor_id=$3)`,
+			user_id, alias, vendorID)
+		row.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.Draft, &item.Title,
+			&item.Article, &item.Alias, &item.Images, &item.Description, &item.Price,
+			&item.OldPrice, item.Count, &item.InStock, &item.Disable, &item.Sort,
+			&item.SeoTitle, &item.SeoDescription, &item.SeoKeywords, &item.ParentID,
+			&item.VendorID, &item.CurrencyID)
+	} else {
+		row := db.DB.QueryRow(ctx, `
+		SELECT id, created_at, user_id, draft, title, article,
+		alias, images, description, price, old_price, count, in_stock, disable, sort, seo_title,
+		seo_description, seo_keywords, parent_id, vendor_id, currency_id
+		FROM items
+		WHERE (user_id=$1 AND alias=$2 AND parent_id=$3 AND vendor_id=$4)`,
+			user_id, alias, req.ParentId, vendorID)
+		row.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.Draft, &item.Title,
+			&item.Article, &item.Alias, &item.Images, &item.Description, &item.Price,
+			&item.OldPrice, item.Count, &item.InStock, &item.Disable, &item.Sort,
+			&item.SeoTitle, &item.SeoDescription, &item.SeoKeywords, &item.ParentID,
+			&item.VendorID, &item.CurrencyID)
 	}
-	err = rows.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.Draft, &item.Title,
-		&item.Article, &item.Alias, &item.Images, &item.Description, &item.Price,
-		&item.OldPrice, item.Count, &item.InStock, &item.Disable, &item.Sort,
-		&item.SeoTitle, &item.SeoDescription, &item.SeoKeywords, &item.ParentID,
-		&item.VendorID, &item.CurrencyID)
 
 	if item.Sort == 0 {
 		var lastItemSort uint32
@@ -626,7 +639,7 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 			WHERE (user_id=$1 AND parent_id=$2)
 			ORDER BY sort DESC`,
 			user_id, req.ParentId)
-		err = row.Scan(&lastItemSort)
+		row.Scan(&lastItemSort)
 		item.Sort = lastItemSort + 10
 	}
 
@@ -645,10 +658,10 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	item.Description = req.Description
 
 	var currencyID int32
-	err = db.DB.QueryRow(ctx, "SELECT id FROM currencies WHERE code=$1", req.Currency).Scan(&currencyID)
-	if err != nil && err == sql.ErrNoRows {
+	err := db.DB.QueryRow(ctx, "SELECT id FROM currencies WHERE code=$1", req.Currency).Scan(&currencyID)
+	if err != nil && err == pgx.ErrNoRows {
 		var currencyID int32
-		row := db.DB.QueryRow(ctx, "INSERT INTO currencies (code, name, short_name) VALUES($1, $2, $3) RETURNING (id)", req.Currency, req.Currency, req.Currency)
+		row := db.DB.QueryRow(ctx, "INSERT INTO currencies (code, name, short_name, rate) VALUES($1, $2, $3, $4) RETURNING (id)", req.Currency, req.Currency, req.Currency, 1)
 		err := row.Scan(&currencyID)
 		if err != nil {
 			logger.Error(err.Error())
@@ -664,14 +677,14 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	} else {
 		item.VendorID = sql.NullInt32{vendorID, true}
 	}
+
 	if item.ID != 0 {
 		_, err := db.DB.Exec(ctx, `
 	UPDATE items SET user_id=$1, title=$2, alias=$3, article=$4, parent_id=$5, price=$6, count=$7,
-	in_stock=$8, description=$9
-	WHERE user_id=$10 AND id=$11`,
+	in_stock=$8, description=$9, currency_id=$10
+	WHERE user_id=$11 AND id=$12`,
 			item.UserID, item.Title, item.Alias, item.Article, item.ParentID, item.Price, item.Count,
-			item.InStock, item.Description,
-			user_id, item.ID)
+			item.InStock, item.Description, item.CurrencyID, user_id, item.ID)
 		if err != nil {
 			logger.Error(err.Error())
 			return nil, status.Errorf(codes.Aborted, "Error save offer")
@@ -679,9 +692,9 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	} else {
 		row := db.DB.QueryRow(ctx, `
 		INSERT INTO items (user_id, title, alias, article, parent_id, price, count,
-		in_stock, description) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING (id)`,
+		in_stock, description, vendor_id, currency_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING (id)`,
 			item.UserID, item.Title, item.Alias, item.Article, item.ParentID, item.Price, item.Count,
-			item.InStock, item.Description)
+			item.InStock, item.Description, item.VendorID, item.CurrencyID)
 		err = row.Scan(&item.ID)
 		if err != nil {
 			logger.Error(err.Error())

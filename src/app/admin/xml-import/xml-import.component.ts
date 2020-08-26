@@ -66,6 +66,8 @@ export class XmlImportComponent implements OnInit {
   async loadData() {
     this.loadDisabled = true
     this.loaderVisible = true
+    this.categoriesMap = new Map();
+    this.offersMap = new Map();
     //console.log(this.xmlImportData)
     let loadItemsPart = 100 / (this.xmlImportData.categories.category.length + this.xmlImportData.offers.offer.length)
     try {
@@ -141,6 +143,7 @@ export class XmlImportComponent implements OnInit {
 
   fileReset() {
     this.xmlImportData = null;
+    this.xmlMessage = new Message("success", "")
   }
 
   // Changes XML to JSON

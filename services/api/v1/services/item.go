@@ -13,7 +13,7 @@ type ItemServiceImpl struct {
 func (s *ItemServiceImpl) Item(ctx context.Context, req *v1.ItemRequest) (*v1.ItemResponse, error) {
 	item := models.Item{}
 	// err := db.DB.GetContext(ctx, &item, "SELECT * FROM items WHERE id = $1", req.Id)
-	// if err == sql.ErrNoRows {
+	// if err == pgx.ErrNoRows {
 	// 	return nil, status.Errorf(codes.NotFound, "Item not found")
 	// } else if err != nil {
 	// 	return nil, status.Errorf(codes.NotFound, "Item not found")

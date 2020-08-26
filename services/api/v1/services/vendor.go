@@ -2,11 +2,14 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	v1 "gcms/api/v1"
+	"gcms/db"
 	"gcms/models"
 
-	"github.com/davecgh/go-spew/spew"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type VendorServiceImpl struct {
@@ -14,10 +17,18 @@ type VendorServiceImpl struct {
 
 func (s *VendorServiceImpl) Vendor(ctx context.Context, req *v1.VendorRequest) (*v1.VendorResponse, error) {
 	vendor := models.Vendor{}
-	// err := db.DB.GetContext(ctx, &vendor, "SELECT * FROM vendors WHERE id=$1", req.Id)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.NotFound, "Vendor not found")
-	// }
+
+	row := db.DB.QueryRow(ctx,
+		`SELECT id, created_at, name, country
+		FROM vendors
+		WHERE id = $1`,
+		req.Id)
+	err := row.Scan(&vendors.ID, &vendors.CreatedAt, &vendors.Name, &vendors.Country)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Vendor not found")
+	}
+
 	return &v1.VendorResponse{Vendor: models.VendorToResponse(vendor)}, nil
 }
 
@@ -32,10 +43,30 @@ func (s *VendorServiceImpl) Vendors(ctx context.Context, req *v1.VendorsRequest)
 	if limit == 0 {
 		limit = ^uint32(0)
 	}
-	spew.Dump(order)
-	//db.DB.GetContext(ctx, &total, "SELECT count(*) FROM vendors")
-	//query := fmt.Sprintf("SELECT * FROM vendors ORDER BY %s OFFSET $1 LIMIT $2", order)
-	//db.DB.SelectContext(ctx, &vendors, query, req.Page*req.PageSize, limit)
+
+	db.DB.QueryRow(ctx, "SELECT count(*) FROM vendors").Scan(&total)
+	query := fmt.Sprintf(
+		`SELECT id, created_at, name, country
+		FROM vendors
+		ORDER BY %s OFFSET $1 LIMIT $2`,
+		order)
+	rows, err := db.DB.Query(ctx, query, req.Page*req.PageSize, limit)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	defer rows.Close()
+	for rows.Next() {
+		vendor := models.Vendor{}
+		err := rows.Scan(&vendors.ID, &vendors.CreatedAt, &vendors.Name, &vendors.Country)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		vendors = append(vendors, vendor)
+	}
+	if err = rows.Err(); err != nil {
+		logger.Error(err.Error())
+	}
+
 	return &v1.VendorsResponse{Vendors: models.VendorsToResponse(vendors), Total: total}, nil
 }
 

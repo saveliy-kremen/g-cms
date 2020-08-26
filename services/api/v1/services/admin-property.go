@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"os"
 	"strconv"
@@ -17,6 +16,7 @@ import (
 	"gcms/packages/upload"
 	"gcms/packages/utils"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/jackc/pgx/v4"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -39,6 +39,7 @@ func (s *AdminPropertyServiceImpl) AdminProperty(ctx context.Context, req *v1.Ad
 	err := row.Scan(&property.ID, &property.UserID, &property.Title, &property.Code, &property.Type,
 		&property.Display, &property.Required, &property.Multiple, &property.Sort)
 	if err != nil {
+		spew.Dump(req.Id)
 		logger.Error(err.Error())
 		return nil, status.Errorf(codes.NotFound, "Property not found")
 	}
@@ -54,11 +55,13 @@ func (s *AdminPropertyServiceImpl) AdminProperty(ctx context.Context, req *v1.Ad
 		propertyValue := models.PropertyValue{}
 		err := rows.Scan(&propertyValue.ID, &propertyValue.Value, &propertyValue.Image, &propertyValue.Sort)
 		if err != nil {
-			log.Fatal(err)
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.NotFound, "Property values set error")
 		}
 		property.Values = append(property.Values, propertyValue)
 	}
 	if err = rows.Err(); err != nil {
+		logger.Error(err.Error())
 		return nil, status.Errorf(codes.NotFound, "Property values set error")
 	}
 	return &v1.AdminPropertyResponse{Property: models.AdminPropertyToResponse(property)}, nil
@@ -485,7 +488,7 @@ func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req 
 	_, err = db.DB.Exec(ctx,
 		`INSERT INTO properties_categories (user_id, property_id, category_id) VALUES($1, $2, $3)
 		ON CONFLICT ON CONSTRAINT properties_categories_pkey DO NOTHING`,
-		user_id, propertyValue.ID, categoryID)
+		user_id, property.ID, categoryID)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, status.Errorf(codes.Aborted, "Error bind category")
@@ -496,8 +499,10 @@ func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req 
 		ON CONFLICT ON CONSTRAINT items_properties_pkey DO NOTHING`,
 		user_id, req.ItemId, property.ID, propertyValue.ID)
 	if err != nil {
+		spew.Dump(property.ID)
+		spew.Dump(propertyValue.ID)
 		logger.Error(err.Error())
-		return nil, status.Errorf(codes.Aborted, "Error save item property ")
+		return nil, status.Errorf(codes.Aborted, "Error save item property")
 	}
 
 	return s.AdminProperty(ctx, &v1.AdminPropertyRequest{Id: uint32(propertyValue.PropertyID)})

@@ -163,11 +163,12 @@ func (s *AdminCategoryServiceImpl) AdminUploadCategory(ctx context.Context, req 
 			return nil, status.Errorf(codes.Aborted, "Error save category")
 		}
 	} else if err == pgx.ErrNoRows {
-		err := db.DB.QueryRow(ctx, `
+		_, err := db.DB.Exec(ctx, `
 		INSERT INTO categories (user_id, title, alias, parent)
 		VALUES ($1, $2, $3, $4)`,
 			user_id, req.Title, alias, categoryParent)
 		if err != nil {
+			//logger.Error(err.Error())
 			return nil, status.Errorf(codes.Aborted, "Error create category")
 		}
 	} else {
@@ -315,6 +316,7 @@ func (s *AdminCategoryServiceImpl) AdminAddCategoryBefore(ctx context.Context, r
 		user_id, req.Text, parent, sort).
 		Scan(&id)
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, status.Errorf(codes.Aborted, "Error create category")
 	}
 
@@ -366,6 +368,7 @@ func (s *AdminCategoryServiceImpl) AdminAddCategoryAfter(ctx context.Context, re
 		user_id, req.Text, parent, sort+1).
 		Scan(&id)
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, status.Errorf(codes.Aborted, "Error create category")
 	}
 

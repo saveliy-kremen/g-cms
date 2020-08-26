@@ -35,7 +35,7 @@ CREATE TABLE items (
 	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
 
 	user_id int,
-	draft bool,
+	draft bool DEFAULT false,
 	title text NOT NULL,
 	article varchar(256) DEFAULT '',
 	alias varchar(256) NOT NULL,

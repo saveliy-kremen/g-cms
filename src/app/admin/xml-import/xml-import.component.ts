@@ -66,7 +66,7 @@ export class XmlImportComponent implements OnInit {
   async loadData() {
     this.loadDisabled = true
     this.loaderVisible = true
-    console.log(this.xmlImportData)
+    //console.log(this.xmlImportData)
     let loadItemsPart = 100 / (this.xmlImportData.categories.category.length + this.xmlImportData.offers.offer.length)
     try {
       ///categories
@@ -95,6 +95,7 @@ export class XmlImportComponent implements OnInit {
           parentOffer.vendor = this.xmlImportData.offers.offer[i].vendor?.["#text"]
           parentOffer.currency = this.xmlImportData.offers.offer[i].currencyId?.["#text"]
           parentOffer.country = this.xmlImportData.offers.offer[i].country?.["#text"]
+          parentOffer.price = this.xmlImportData.offers.offer[i].price?.["#text"]
           const res: any = await this.adminItemService.uploadOffer(parentOffer).toPromise()
           this.offersMap.set(parentKey, res.item.id)
           this.xmlImportData.offers.offer[i].parentID = Number(res.item.id)

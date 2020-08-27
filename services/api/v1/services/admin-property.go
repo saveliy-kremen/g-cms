@@ -439,8 +439,7 @@ func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req 
 			FROM properties_values
 			WHERE user_id = $1 AND value = $2`,
 		user_id, strings.ToLower(strings.TrimSpace(req.Value)))
-	err = row.Scan(&property.ID, &property.UserID, &property.Title, &property.Code, &property.Type,
-		&property.Display, &property.Required, &property.Multiple, &property.Sort)
+	err = row.Scan(&propertyValue.ID, &propertyValue.UserID, &propertyValue.PropertyID, &propertyValue.Value, &propertyValue.Sort)
 	if err != nil && err == pgx.ErrNoRows {
 		propertyValue.UserID = user_id
 		propertyValue.PropertyID = property.ID

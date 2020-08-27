@@ -20,6 +20,7 @@ export class XmlImportComponent implements OnInit {
   loaderValue: number = 0
   categoriesMap: Map<string, string> = new Map();
   offersMap: Map<string, string> = new Map();
+  breakID: number = 0;
 
   constructor(
     private loaderService: LoaderService,
@@ -83,6 +84,8 @@ export class XmlImportComponent implements OnInit {
       }
       ///offers
       for (let i = 0; i < this.xmlImportData.offers.offer.length; i++) {
+        this.breakID = i;
+        //        if (i != 2314) continue;
         const offerTitle = this.xmlImportData.offers.offer[i].name?.["#text"] || this.xmlImportData.offers.offer[i].model?.["#text"]
         const parentKey = this.xmlImportData.offers.offer[i]["@attributes"].group_id ?
           this.xmlImportData.offers.offer[i]["@attributes"].group_id : offerTitle
@@ -134,6 +137,7 @@ export class XmlImportComponent implements OnInit {
         this.loaderValue += loadItemsPart
       }
     } catch (err) {
+      console.log(this.breakID, this.xmlImportData.offers.offer[this.breakID])
       console.log(err)
       this.xmlMessage = new Message("danger", err.message);
     }

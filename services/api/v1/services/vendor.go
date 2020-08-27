@@ -23,7 +23,7 @@ func (s *VendorServiceImpl) Vendor(ctx context.Context, req *v1.VendorRequest) (
 		FROM vendors
 		WHERE id = $1`,
 		req.Id)
-	err := row.Scan(&vendors.ID, &vendors.CreatedAt, &vendors.Name, &vendors.Country)
+	err := row.Scan(&vendor.ID, &vendor.CreatedAt, &vendor.Name, &vendor.Country)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, status.Errorf(codes.NotFound, "Vendor not found")
@@ -57,7 +57,7 @@ func (s *VendorServiceImpl) Vendors(ctx context.Context, req *v1.VendorsRequest)
 	defer rows.Close()
 	for rows.Next() {
 		vendor := models.Vendor{}
-		err := rows.Scan(&vendors.ID, &vendors.CreatedAt, &vendors.Name, &vendors.Country)
+		err := rows.Scan(&vendor.ID, &vendor.CreatedAt, &vendor.Name, &vendor.Country)
 		if err != nil {
 			logger.Error(err.Error())
 		}

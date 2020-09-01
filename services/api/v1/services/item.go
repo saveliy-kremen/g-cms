@@ -114,12 +114,6 @@ func (s *ItemServiceImpl) Items(ctx context.Context, req *v1.ItemsRequest) (*v1.
 		return nil, status.Errorf(codes.NotFound, "Items set error")
 	}
 
-	// for i, item := range items {
-	// 	db.DB.Preload("Vendor").Preload("Currency").Preload("Images", func(db *gorm.DB) *gorm.DB {
-	// 		return db.Order(config.AppConfig.Prefix + "_item_images.sort ASC")
-	// 	}).Where("parent_id = ?", item.ID).Order(order).Find(&items[i].Offers)
-	// }
-
 	return &v1.ItemsResponse{Items: models.ItemsToResponse(items), Total: total}, nil
 }
 

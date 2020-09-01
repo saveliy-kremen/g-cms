@@ -31,12 +31,6 @@ import (
 // spew.Dump(fields)
 // spew.Dump(pointers)
 
-// array_to_string(array(
-// 	select row_to_json(properties_values)
-// 	from properties_values where property_id = properties.id
-// 	order by sort
-//   ), ',')
-
 type AdminItemServiceImpl struct {
 }
 

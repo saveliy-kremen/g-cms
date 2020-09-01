@@ -1,13 +1,13 @@
 <div class="text-center">
-    <h2>{{ offer.title}}</h2>
-
+    <h2>{{offer.title}}</h2>
     <div class="flex-center">
-        <quill-view-html [content]="offer.photo"></quill-view-html>
+        <img height="200"
+            src="{{uploadUrl+ 'users/'+ offer.userId + '/items/' + offer.imagesList[0]?.path+'/'+offer.imagesList[0]?.filename}}"
+            alt="{{offer.imagesList[0]?.filename}}">
     </div>
+    <h2>Цена: {{offer.price}} {{product.currency.shortName}}</h2>
 
-    <h2>Price: {{offer.price}} $</h2>
+    <button [routerLink]="['/offer', offer.id]" class="btn btn-dark">Открыть</button>
 
-    <button [routerLink]="['/offer', offer.id]" class="btn btn-dark">Open</button>
-
-    <button [routerLink]="['/cart']" class="btn btn-dark" (click)="addProduct(offer)">Add to cart</button>
+    <button [routerLink]="['/cart']" class="btn btn-dark" (click)="addProduct(offer)">Дабавить в корзину</button>
 </div>

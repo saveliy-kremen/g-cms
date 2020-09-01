@@ -36,10 +36,16 @@ export class AdminProperty extends jspb.Message {
   clearValuesList(): void;
   addValues(value?: AdminPropertyValue, index?: number): AdminPropertyValue;
 
+  getValuesJson(): string;
+  setValuesJson(value: string): void;
+
   getItemValuesList(): Array<number>;
   setItemValuesList(value: Array<number>): void;
   clearItemValuesList(): void;
   addItemValues(value: number, index?: number): void;
+
+  getItemValuesJson(): string;
+  setItemValuesJson(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AdminProperty.AsObject;
@@ -61,7 +67,9 @@ export namespace AdminProperty {
     multiple: boolean,
     sort: number,
     valuesList: Array<AdminPropertyValue.AsObject>,
+    valuesJson: string,
     itemValuesList: Array<number>,
+    itemValuesJson: string,
   }
 }
 

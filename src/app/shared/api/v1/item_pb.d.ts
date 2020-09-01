@@ -119,8 +119,14 @@ export namespace Item {
 }
 
 export class ItemImage extends jspb.Message {
+  getPath(): string;
+  setPath(value: string): void;
+
   getFilename(): string;
   setFilename(value: string): void;
+
+  getName(): string;
+  setName(value: string): void;
 
   getPropertyValueId(): number;
   setPropertyValueId(value: number): void;
@@ -135,7 +141,9 @@ export class ItemImage extends jspb.Message {
 
 export namespace ItemImage {
   export type AsObject = {
+    path: string,
     filename: string,
+    name: string,
     propertyValueId: number,
   }
 }

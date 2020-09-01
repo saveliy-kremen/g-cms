@@ -36,8 +36,10 @@ message Item {
 }
 
 message ItemImage {
-  string filename = 4;
-  uint32 property_value_id = 6;
+  string path = 1;
+  string filename = 2;
+  string name = 3;
+  uint32 property_value_id = 4;
 }
 
 message ItemRequest {

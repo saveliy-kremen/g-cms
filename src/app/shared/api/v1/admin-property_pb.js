@@ -308,7 +308,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.v1.AdminProperty.repeatedFields_ = [10,11];
+proto.v1.AdminProperty.repeatedFields_ = [10,12];
 
 
 
@@ -352,7 +352,9 @@ proto.v1.AdminProperty.toObject = function(includeInstance, msg) {
     sort: jspb.Message.getFieldWithDefault(msg, 9, 0),
     valuesList: jspb.Message.toObjectList(msg.getValuesList(),
     proto.v1.AdminPropertyValue.toObject, includeInstance),
-    itemValuesList: (f = jspb.Message.getRepeatedField(msg, 11)) == null ? undefined : f
+    valuesJson: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    itemValuesList: (f = jspb.Message.getRepeatedField(msg, 12)) == null ? undefined : f,
+    itemValuesJson: jspb.Message.getFieldWithDefault(msg, 13, "")
   };
 
   if (includeInstance) {
@@ -431,8 +433,16 @@ proto.v1.AdminProperty.deserializeBinaryFromReader = function(msg, reader) {
       msg.addValues(value);
       break;
     case 11:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setValuesJson(value);
+      break;
+    case 12:
       var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
       msg.setItemValuesList(value);
+      break;
+    case 13:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setItemValuesJson(value);
       break;
     default:
       reader.skipField();
@@ -534,10 +544,24 @@ proto.v1.AdminProperty.serializeBinaryToWriter = function(message, writer) {
       proto.v1.AdminPropertyValue.serializeBinaryToWriter
     );
   }
+  f = message.getValuesJson();
+  if (f.length > 0) {
+    writer.writeString(
+      11,
+      f
+    );
+  }
   f = message.getItemValuesList();
   if (f.length > 0) {
     writer.writePackedUint32(
-      11,
+      12,
+      f
+    );
+  }
+  f = message.getItemValuesJson();
+  if (f.length > 0) {
+    writer.writeString(
+      13,
       f
     );
   }
@@ -745,11 +769,29 @@ proto.v1.AdminProperty.prototype.clearValuesList = function() {
 
 
 /**
- * repeated uint32 item_values = 11;
+ * optional string values_json = 11;
+ * @return {string}
+ */
+proto.v1.AdminProperty.prototype.getValuesJson = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.AdminProperty} returns this
+ */
+proto.v1.AdminProperty.prototype.setValuesJson = function(value) {
+  return jspb.Message.setProto3StringField(this, 11, value);
+};
+
+
+/**
+ * repeated uint32 item_values = 12;
  * @return {!Array<number>}
  */
 proto.v1.AdminProperty.prototype.getItemValuesList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 11));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 12));
 };
 
 
@@ -758,7 +800,7 @@ proto.v1.AdminProperty.prototype.getItemValuesList = function() {
  * @return {!proto.v1.AdminProperty} returns this
  */
 proto.v1.AdminProperty.prototype.setItemValuesList = function(value) {
-  return jspb.Message.setField(this, 11, value || []);
+  return jspb.Message.setField(this, 12, value || []);
 };
 
 
@@ -768,7 +810,7 @@ proto.v1.AdminProperty.prototype.setItemValuesList = function(value) {
  * @return {!proto.v1.AdminProperty} returns this
  */
 proto.v1.AdminProperty.prototype.addItemValues = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 11, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 12, value, opt_index);
 };
 
 
@@ -778,6 +820,24 @@ proto.v1.AdminProperty.prototype.addItemValues = function(value, opt_index) {
  */
 proto.v1.AdminProperty.prototype.clearItemValuesList = function() {
   return this.setItemValuesList([]);
+};
+
+
+/**
+ * optional string item_values_json = 13;
+ * @return {string}
+ */
+proto.v1.AdminProperty.prototype.getItemValuesJson = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 13, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.AdminProperty} returns this
+ */
+proto.v1.AdminProperty.prototype.setItemValuesJson = function(value) {
+  return jspb.Message.setProto3StringField(this, 13, value);
 };
 
 

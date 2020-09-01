@@ -4,6 +4,7 @@ import { switchMap, map } from 'rxjs/operators';
 import { LoaderService } from 'src/app/shared/services/loader.service';
 import { ItemGrpcService } from 'src/app/shared/services/item.service';
 import { CartService } from 'src/app/shared/services/cart.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-offer-page',
@@ -12,6 +13,7 @@ import { CartService } from 'src/app/shared/services/cart.service';
 })
 export class OfferPageComponent implements OnInit {
   offer$
+  uploadUrl = environment.siteUrl + "/uploads/"
 
   constructor(
     private loaderService: LoaderService,

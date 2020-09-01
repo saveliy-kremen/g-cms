@@ -2,10 +2,12 @@
     <h2>{{ product.title}}</h2>
 
     <div class="flex-center">
-        <quill-view-html [content]="product.photo"></quill-view-html>
+        <img height="200"
+            src="{{uploadUrl+ 'users/'+ product.userId + '/items/' + product.imagesList[0].path+'/'+product.imagesList[0].filename}}"
+            alt="{{product.imagesList[0].filename}}">
     </div>
 
-    <h2>Price: {{product.price}} $</h2>
+    <h2>Цена: {{product.price}} {{product.currency.shortName}}</h2>
 
-    <button [routerLink]="['/product', product.id]" class="btn btn-dark">Open</button>
+    <button [routerLink]="['/product', product.id]" class="btn btn-dark">Открыть</button>
 </div>

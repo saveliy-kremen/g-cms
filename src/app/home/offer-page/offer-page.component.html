@@ -1,7 +1,7 @@
 <div *ngIf="offer$ | async as offer; else loading">
     <div class="offer">
         <div class="header right">
-            <button routerLink="/" class="btn btn-dark">Back</button>
+            <button routerLink="/product/{{offer.parentId}}" class="btn btn-dark">Назад</button>
         </div>
 
         <div class="flex">
@@ -9,11 +9,13 @@
                 <h2>{{ offer.title}}</h2>
 
                 <div class="flex-center">
-                    <quill-view-html [content]="offer.photo"></quill-view-html>
+                    <img height="300"
+                        src="{{uploadUrl+ 'users/'+ offer.userId + '/items/' + offer.imagesList[0]?.path+'/'+offer.imagesList[0]?.filename}}"
+                        alt="{{offer.imagesList[0]?.filename}}">
                 </div>
 
                 <div>
-                    <h2>Price: {{offer.price}} $</h2>
+                    <h2>Цена: {{offer.price}} {{offer.currency.shortName}}</h2>
 
                     <button class="btn btn-dark" [routerLink]="['/cart']" (click)="addProduct(offer)">Add to
                         cart</button>

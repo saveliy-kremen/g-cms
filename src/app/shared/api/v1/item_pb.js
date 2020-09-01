@@ -1064,8 +1064,10 @@ proto.v1.ItemImage.prototype.toObject = function(opt_includeInstance) {
  */
 proto.v1.ItemImage.toObject = function(includeInstance, msg) {
   var f, obj = {
-    filename: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    propertyValueId: jspb.Message.getFieldWithDefault(msg, 6, 0)
+    path: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    filename: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    name: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    propertyValueId: jspb.Message.getFieldWithDefault(msg, 4, 0)
   };
 
   if (includeInstance) {
@@ -1102,11 +1104,19 @@ proto.v1.ItemImage.deserializeBinaryFromReader = function(msg, reader) {
     }
     var field = reader.getFieldNumber();
     switch (field) {
-    case 4:
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPath(value);
+      break;
+    case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setFilename(value);
       break;
-    case 6:
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setName(value);
+      break;
+    case 4:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setPropertyValueId(value);
       break;
@@ -1139,17 +1149,31 @@ proto.v1.ItemImage.prototype.serializeBinary = function() {
  */
 proto.v1.ItemImage.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getPath();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
   f = message.getFilename();
   if (f.length > 0) {
     writer.writeString(
-      4,
+      2,
+      f
+    );
+  }
+  f = message.getName();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
       f
     );
   }
   f = message.getPropertyValueId();
   if (f !== 0) {
     writer.writeUint32(
-      6,
+      4,
       f
     );
   }
@@ -1157,11 +1181,29 @@ proto.v1.ItemImage.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional string filename = 4;
+ * optional string path = 1;
+ * @return {string}
+ */
+proto.v1.ItemImage.prototype.getPath = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.ItemImage} returns this
+ */
+proto.v1.ItemImage.prototype.setPath = function(value) {
+  return jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string filename = 2;
  * @return {string}
  */
 proto.v1.ItemImage.prototype.getFilename = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
@@ -1170,16 +1212,34 @@ proto.v1.ItemImage.prototype.getFilename = function() {
  * @return {!proto.v1.ItemImage} returns this
  */
 proto.v1.ItemImage.prototype.setFilename = function(value) {
-  return jspb.Message.setProto3StringField(this, 4, value);
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
 /**
- * optional uint32 property_value_id = 6;
+ * optional string name = 3;
+ * @return {string}
+ */
+proto.v1.ItemImage.prototype.getName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.v1.ItemImage} returns this
+ */
+proto.v1.ItemImage.prototype.setName = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional uint32 property_value_id = 4;
  * @return {number}
  */
 proto.v1.ItemImage.prototype.getPropertyValueId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
 
 
@@ -1188,7 +1248,7 @@ proto.v1.ItemImage.prototype.getPropertyValueId = function() {
  * @return {!proto.v1.ItemImage} returns this
  */
 proto.v1.ItemImage.prototype.setPropertyValueId = function(value) {
-  return jspb.Message.setProto3IntField(this, 6, value);
+  return jspb.Message.setProto3IntField(this, 4, value);
 };
 
 

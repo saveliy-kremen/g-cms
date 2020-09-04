@@ -32,14 +32,13 @@ func main() {
 	v1.RegisterAdminCategoryServiceServer(svr, &services.AdminCategoryServiceImpl{})
 	v1.RegisterAdminPropertyServiceServer(svr, &services.AdminPropertyServiceImpl{})
 	v1.RegisterAdminItemServiceServer(svr, &services.AdminItemServiceImpl{})
-	//v1.RegisterAdminOrderServiceServer(svr, &services.AdminOrderServiceImpl{})
+	v1.RegisterAdminOrderServiceServer(svr, &services.AdminOrderServiceImpl{})
 	v1.RegisterCategoryServiceServer(svr, &services.CategoryServiceImpl{})
 	v1.RegisterPropertyServiceServer(svr, &services.PropertyServiceImpl{})
 	v1.RegisterItemServiceServer(svr, &services.ItemServiceImpl{})
 	v1.RegisterVendorServiceServer(svr, &services.VendorServiceImpl{})
 	v1.RegisterCurrencyServiceServer(svr, &services.CurrencyServiceImpl{})
-	//v1.RegisterOrderServiceServer(svr, &services.OrderServiceImpl{})
-	//v1.RegisterEsp8266ServiceServer(svr, &services.Esp8266ServiceImpl{})
+	v1.RegisterOrderServiceServer(svr, &services.OrderServiceImpl{})
 
 	// trap SIGINT / SIGTERM to exit cleanly
 	//c := make(chan os.Signal, 1)

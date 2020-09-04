@@ -1,6 +1,8 @@
 package db
 
 var schema = `
+DROP TABLE IF EXISTS orders_items;
+DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS items_properties;
 DROP TABLE IF EXISTS properties_categories;
 DROP TABLE IF EXISTS properties_values;
@@ -152,5 +154,22 @@ CREATE TABLE currencies (
 	short_name varchar(256) DEFAULT '',
 	code varchar(4) NOT NULL,
 	rate numeric(5,4) NOT NULL
+);
+
+CREATE TABLE orders (
+	id bigserial PRIMARY KEY,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+
+	name text NOT NULL,
+	phone varchar(256) NOT NULL,
+	address varchar(256) NOT NULL,
+	payment varchar(256) DEFAULT ''
+);
+CREATE INDEX orders_created_at ON orders (created_at);
+CREATE INDEX orders_name ON orders (name);
+
+CREATE TABLE orders_items (
+	order_id int REFERENCES orders (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	item_id bigint REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 `

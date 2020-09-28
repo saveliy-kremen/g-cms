@@ -16,6 +16,9 @@ message User{
   uint32 tariff = 8;
   float amount = 9;
   string about = 10;
+  bool active = 11;
+  string shop_name = 12;
+  string shop_url = 13;
 }
 
 message RegisterRequest {
@@ -30,13 +33,64 @@ message AuthRequest {
   string password = 2;
 }
 
+message ChangePasswordRequest {
+  string password = 1;
+}
+
+message AdminUsersRequest {
+  uint32 page = 1;
+  uint32 page_size = 2;
+  string sort = 3;
+  string direction = 4;
+  string search = 5;
+}
+
+message AdminUserRequest {
+  uint32 id = 1;
+}
+
+message AdminEditUserRequest {
+  uint32 id = 1;
+  string fullname = 2;
+  string phone = 3;
+  string email = 4;
+  string password = 5;
+  uint32 role = 6;
+  bool active = 7;
+  string shop_name = 8;
+  string shop_url = 9;
+}
+
+message AdminDeleteUserRequest {
+  uint32 id = 1;
+  uint32 page = 2;
+  uint32 page_size = 3;
+  string sort = 4;
+  string direction = 5;
+}
+
 message UserResponse {
   User user = 1;
   string token = 2;
+}
+
+message AdminUsersResponse {
+  repeated User users = 1;
+  uint32 total = 2;
+}
+
+message AdminUserResponse {
+  User user = 1;
 }
 
 service UserService {
   rpc Auth(AuthRequest) returns (UserResponse);
   rpc Me(google.protobuf.Empty) returns (UserResponse);
   rpc Register(RegisterRequest) returns (UserResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (UserResponse);
+  rpc AdminUsers(AdminUsersRequest) returns (AdminUsersResponse);
+  rpc AdminUser(AdminUserRequest) returns (AdminUserResponse);
+  rpc AdminEditUser(AdminEditUserRequest) returns (AdminUserResponse);
+  rpc AdminDeleteUser(AdminDeleteUserRequest) returns (AdminUsersResponse);
+
 }

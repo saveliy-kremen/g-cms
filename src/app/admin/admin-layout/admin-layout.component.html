@@ -38,6 +38,9 @@
   <mat-sidenav-container class="sidenav-container">
     <mat-sidenav #snav class="sidenav mat-elevation-z10" [(mode)]="sideNavMode" [(opened)]="sideNavOpened">
       <mat-nav-list dense>
+        <a mat-list-item [routerLinkActive]="'active'" [routerLink]="['users']">
+          <mat-icon class="sidenav-icon">account_box</mat-icon>{{"Users" | translate}}
+        </a>
         <a mat-list-item [routerLinkActive]="'active'" [routerLink]="['categories']">
           <mat-icon class="sidenav-icon">folder</mat-icon>{{"Categories" | translate}}
         </a>

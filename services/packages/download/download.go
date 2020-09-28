@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 )
 
@@ -93,13 +92,31 @@ func Prom(ctx context.Context) {
 	catalog.Shop.Company = "company name"
 	catalog.Shop.Url = "shop url"
 
-	catalog.Shop.Categories = getCategories(ctx)
-	catalog.Shop.Currencies = getCurrencies(ctx)
-	catalog.Shop.Offers = getOffers(ctx)
+	query := fmt.Sprintf(
+		`SELECT id
+		FROM users`)
+	rows, err := db.DB.Query(ctx, query)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	defer rows.Close()
+	for rows.Next() {
+		user := models.User{}
+		err := rows.Scan(&user.ID)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		catalog.Shop.Categories = getCategories(ctx)
+		catalog.Shop.Currencies = getCurrencies(ctx)
+		catalog.Shop.Offers = getOffers(ctx)
 
-	out, err := xml.MarshalIndent(catalog, " ", "  ")
-	logger.Error(err)
-	fmt.Println(xml.Header + string(out))
+		out, err := xml.MarshalIndent(catalog, " ", "  ")
+		logger.Error(err)
+		fmt.Println(xml.Header + string(out))
+	}
+	if err = rows.Err(); err != nil {
+		logger.Error(err.Error())
+	}
 }
 
 func getCategories(ctx context.Context) []Category {
@@ -218,10 +235,6 @@ func getOffers(ctx context.Context) []Offer {
 		offer.NotDisable = !offer.NotDisable
 		offer.Available = offer.NotDisable
 		offers = append(offers, offer)
-		if offer.ID == 4649 {
-			spew.Dump(offer)
-			break
-		}
 	}
 	if err = rows.Err(); err != nil {
 		logger.Error(err.Error())

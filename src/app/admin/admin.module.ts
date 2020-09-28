@@ -36,11 +36,16 @@ import { CurrencyGrpcService } from '../shared/services/grpc/currency.service'
 import { GrpcHelper } from '../shared/services/grpc/helpers/grpc-helper';
 import { QuillFormFieldDirective } from '../shared/directives/quill.form.field.directive'
 import { AdminOrderGrpcService } from '../shared/services/grpc/admin-order.service'
+import { UsersComponent } from './users_page/users.component'
+import { UsersEditComponent } from './users_page/users-edit/users-edit.component'
+import { SearchService } from '../shared/services/search.service'
 
 @NgModule({
   declarations: [
     AdminLayoutComponent,
     IndexComponent,
+    UsersComponent,
+    UsersEditComponent,
     CategoriesComponent,
     CategoryEditComponent,
     PropertiesComponent,
@@ -50,7 +55,7 @@ import { AdminOrderGrpcService } from '../shared/services/grpc/admin-order.servi
     ItemEditComponent,
     XmlImportComponent,
     OrdersPageComponent,
-    QuillFormFieldDirective
+    QuillFormFieldDirective,
   ],
   imports: [
     CommonModule,
@@ -71,6 +76,7 @@ import { AdminOrderGrpcService } from '../shared/services/grpc/admin-order.servi
   providers: [
     LoaderService,
     UploadService,
+    SearchService,
     AdminAuthGuard,
     GrpcHelper,
     AdminCategoryGrpcService,

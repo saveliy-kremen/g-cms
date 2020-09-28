@@ -36,6 +36,9 @@ type User struct {
 	Tariff               uint32   `protobuf:"varint,8,opt,name=tariff,proto3" json:"tariff,omitempty"`
 	Amount               float32  `protobuf:"fixed32,9,opt,name=amount,proto3" json:"amount,omitempty"`
 	About                string   `protobuf:"bytes,10,opt,name=about,proto3" json:"about,omitempty"`
+	Active               bool     `protobuf:"varint,11,opt,name=active,proto3" json:"active,omitempty"`
+	ShopName             string   `protobuf:"bytes,12,opt,name=shop_name,json=shopName,proto3" json:"shop_name,omitempty"`
+	ShopUrl              string   `protobuf:"bytes,13,opt,name=shop_url,json=shopUrl,proto3" json:"shop_url,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -132,6 +135,27 @@ func (m *User) GetAmount() float32 {
 func (m *User) GetAbout() string {
 	if m != nil {
 		return m.About
+	}
+	return ""
+}
+
+func (m *User) GetActive() bool {
+	if m != nil {
+		return m.Active
+	}
+	return false
+}
+
+func (m *User) GetShopName() string {
+	if m != nil {
+		return m.ShopName
+	}
+	return ""
+}
+
+func (m *User) GetShopUrl() string {
+	if m != nil {
+		return m.ShopUrl
 	}
 	return ""
 }
@@ -246,6 +270,329 @@ func (m *AuthRequest) GetPassword() string {
 	return ""
 }
 
+type ChangePasswordRequest struct {
+	Password             string   `protobuf:"bytes,1,opt,name=password,proto3" json:"password,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ChangePasswordRequest) Reset()         { *m = ChangePasswordRequest{} }
+func (m *ChangePasswordRequest) String() string { return proto.CompactTextString(m) }
+func (*ChangePasswordRequest) ProtoMessage()    {}
+func (*ChangePasswordRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_116e343673f7ffaf, []int{3}
+}
+
+func (m *ChangePasswordRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ChangePasswordRequest.Unmarshal(m, b)
+}
+func (m *ChangePasswordRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ChangePasswordRequest.Marshal(b, m, deterministic)
+}
+func (m *ChangePasswordRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ChangePasswordRequest.Merge(m, src)
+}
+func (m *ChangePasswordRequest) XXX_Size() int {
+	return xxx_messageInfo_ChangePasswordRequest.Size(m)
+}
+func (m *ChangePasswordRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ChangePasswordRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ChangePasswordRequest proto.InternalMessageInfo
+
+func (m *ChangePasswordRequest) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+type AdminUsersRequest struct {
+	Page                 uint32   `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize             uint32   `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	Sort                 string   `protobuf:"bytes,3,opt,name=sort,proto3" json:"sort,omitempty"`
+	Direction            string   `protobuf:"bytes,4,opt,name=direction,proto3" json:"direction,omitempty"`
+	Search               string   `protobuf:"bytes,5,opt,name=search,proto3" json:"search,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AdminUsersRequest) Reset()         { *m = AdminUsersRequest{} }
+func (m *AdminUsersRequest) String() string { return proto.CompactTextString(m) }
+func (*AdminUsersRequest) ProtoMessage()    {}
+func (*AdminUsersRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_116e343673f7ffaf, []int{4}
+}
+
+func (m *AdminUsersRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AdminUsersRequest.Unmarshal(m, b)
+}
+func (m *AdminUsersRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AdminUsersRequest.Marshal(b, m, deterministic)
+}
+func (m *AdminUsersRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AdminUsersRequest.Merge(m, src)
+}
+func (m *AdminUsersRequest) XXX_Size() int {
+	return xxx_messageInfo_AdminUsersRequest.Size(m)
+}
+func (m *AdminUsersRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AdminUsersRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AdminUsersRequest proto.InternalMessageInfo
+
+func (m *AdminUsersRequest) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
+func (m *AdminUsersRequest) GetPageSize() uint32 {
+	if m != nil {
+		return m.PageSize
+	}
+	return 0
+}
+
+func (m *AdminUsersRequest) GetSort() string {
+	if m != nil {
+		return m.Sort
+	}
+	return ""
+}
+
+func (m *AdminUsersRequest) GetDirection() string {
+	if m != nil {
+		return m.Direction
+	}
+	return ""
+}
+
+func (m *AdminUsersRequest) GetSearch() string {
+	if m != nil {
+		return m.Search
+	}
+	return ""
+}
+
+type AdminUserRequest struct {
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AdminUserRequest) Reset()         { *m = AdminUserRequest{} }
+func (m *AdminUserRequest) String() string { return proto.CompactTextString(m) }
+func (*AdminUserRequest) ProtoMessage()    {}
+func (*AdminUserRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_116e343673f7ffaf, []int{5}
+}
+
+func (m *AdminUserRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AdminUserRequest.Unmarshal(m, b)
+}
+func (m *AdminUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AdminUserRequest.Marshal(b, m, deterministic)
+}
+func (m *AdminUserRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AdminUserRequest.Merge(m, src)
+}
+func (m *AdminUserRequest) XXX_Size() int {
+	return xxx_messageInfo_AdminUserRequest.Size(m)
+}
+func (m *AdminUserRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AdminUserRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AdminUserRequest proto.InternalMessageInfo
+
+func (m *AdminUserRequest) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type AdminEditUserRequest struct {
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Fullname             string   `protobuf:"bytes,2,opt,name=fullname,proto3" json:"fullname,omitempty"`
+	Phone                string   `protobuf:"bytes,3,opt,name=phone,proto3" json:"phone,omitempty"`
+	Email                string   `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	Password             string   `protobuf:"bytes,5,opt,name=password,proto3" json:"password,omitempty"`
+	Role                 uint32   `protobuf:"varint,6,opt,name=role,proto3" json:"role,omitempty"`
+	Active               bool     `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`
+	ShopName             string   `protobuf:"bytes,8,opt,name=shop_name,json=shopName,proto3" json:"shop_name,omitempty"`
+	ShopUrl              string   `protobuf:"bytes,9,opt,name=shop_url,json=shopUrl,proto3" json:"shop_url,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AdminEditUserRequest) Reset()         { *m = AdminEditUserRequest{} }
+func (m *AdminEditUserRequest) String() string { return proto.CompactTextString(m) }
+func (*AdminEditUserRequest) ProtoMessage()    {}
+func (*AdminEditUserRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_116e343673f7ffaf, []int{6}
+}
+
+func (m *AdminEditUserRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AdminEditUserRequest.Unmarshal(m, b)
+}
+func (m *AdminEditUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AdminEditUserRequest.Marshal(b, m, deterministic)
+}
+func (m *AdminEditUserRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AdminEditUserRequest.Merge(m, src)
+}
+func (m *AdminEditUserRequest) XXX_Size() int {
+	return xxx_messageInfo_AdminEditUserRequest.Size(m)
+}
+func (m *AdminEditUserRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AdminEditUserRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AdminEditUserRequest proto.InternalMessageInfo
+
+func (m *AdminEditUserRequest) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *AdminEditUserRequest) GetFullname() string {
+	if m != nil {
+		return m.Fullname
+	}
+	return ""
+}
+
+func (m *AdminEditUserRequest) GetPhone() string {
+	if m != nil {
+		return m.Phone
+	}
+	return ""
+}
+
+func (m *AdminEditUserRequest) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *AdminEditUserRequest) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+func (m *AdminEditUserRequest) GetRole() uint32 {
+	if m != nil {
+		return m.Role
+	}
+	return 0
+}
+
+func (m *AdminEditUserRequest) GetActive() bool {
+	if m != nil {
+		return m.Active
+	}
+	return false
+}
+
+func (m *AdminEditUserRequest) GetShopName() string {
+	if m != nil {
+		return m.ShopName
+	}
+	return ""
+}
+
+func (m *AdminEditUserRequest) GetShopUrl() string {
+	if m != nil {
+		return m.ShopUrl
+	}
+	return ""
+}
+
+type AdminDeleteUserRequest struct {
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Page                 uint32   `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize             uint32   `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	Sort                 string   `protobuf:"bytes,4,opt,name=sort,proto3" json:"sort,omitempty"`
+	Direction            string   `protobuf:"bytes,5,opt,name=direction,proto3" json:"direction,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AdminDeleteUserRequest) Reset()         { *m = AdminDeleteUserRequest{} }
+func (m *AdminDeleteUserRequest) String() string { return proto.CompactTextString(m) }
+func (*AdminDeleteUserRequest) ProtoMessage()    {}
+func (*AdminDeleteUserRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_116e343673f7ffaf, []int{7}
+}
+
+func (m *AdminDeleteUserRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AdminDeleteUserRequest.Unmarshal(m, b)
+}
+func (m *AdminDeleteUserRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AdminDeleteUserRequest.Marshal(b, m, deterministic)
+}
+func (m *AdminDeleteUserRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AdminDeleteUserRequest.Merge(m, src)
+}
+func (m *AdminDeleteUserRequest) XXX_Size() int {
+	return xxx_messageInfo_AdminDeleteUserRequest.Size(m)
+}
+func (m *AdminDeleteUserRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AdminDeleteUserRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AdminDeleteUserRequest proto.InternalMessageInfo
+
+func (m *AdminDeleteUserRequest) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *AdminDeleteUserRequest) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
+func (m *AdminDeleteUserRequest) GetPageSize() uint32 {
+	if m != nil {
+		return m.PageSize
+	}
+	return 0
+}
+
+func (m *AdminDeleteUserRequest) GetSort() string {
+	if m != nil {
+		return m.Sort
+	}
+	return ""
+}
+
+func (m *AdminDeleteUserRequest) GetDirection() string {
+	if m != nil {
+		return m.Direction
+	}
+	return ""
+}
+
 type UserResponse struct {
 	User                 *User    `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	Token                string   `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
@@ -258,7 +605,7 @@ func (m *UserResponse) Reset()         { *m = UserResponse{} }
 func (m *UserResponse) String() string { return proto.CompactTextString(m) }
 func (*UserResponse) ProtoMessage()    {}
 func (*UserResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{3}
+	return fileDescriptor_116e343673f7ffaf, []int{8}
 }
 
 func (m *UserResponse) XXX_Unmarshal(b []byte) error {
@@ -293,11 +640,104 @@ func (m *UserResponse) GetToken() string {
 	return ""
 }
 
+type AdminUsersResponse struct {
+	Users                []*User  `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+	Total                uint32   `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AdminUsersResponse) Reset()         { *m = AdminUsersResponse{} }
+func (m *AdminUsersResponse) String() string { return proto.CompactTextString(m) }
+func (*AdminUsersResponse) ProtoMessage()    {}
+func (*AdminUsersResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_116e343673f7ffaf, []int{9}
+}
+
+func (m *AdminUsersResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AdminUsersResponse.Unmarshal(m, b)
+}
+func (m *AdminUsersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AdminUsersResponse.Marshal(b, m, deterministic)
+}
+func (m *AdminUsersResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AdminUsersResponse.Merge(m, src)
+}
+func (m *AdminUsersResponse) XXX_Size() int {
+	return xxx_messageInfo_AdminUsersResponse.Size(m)
+}
+func (m *AdminUsersResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AdminUsersResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AdminUsersResponse proto.InternalMessageInfo
+
+func (m *AdminUsersResponse) GetUsers() []*User {
+	if m != nil {
+		return m.Users
+	}
+	return nil
+}
+
+func (m *AdminUsersResponse) GetTotal() uint32 {
+	if m != nil {
+		return m.Total
+	}
+	return 0
+}
+
+type AdminUserResponse struct {
+	User                 *User    `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AdminUserResponse) Reset()         { *m = AdminUserResponse{} }
+func (m *AdminUserResponse) String() string { return proto.CompactTextString(m) }
+func (*AdminUserResponse) ProtoMessage()    {}
+func (*AdminUserResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_116e343673f7ffaf, []int{10}
+}
+
+func (m *AdminUserResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AdminUserResponse.Unmarshal(m, b)
+}
+func (m *AdminUserResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AdminUserResponse.Marshal(b, m, deterministic)
+}
+func (m *AdminUserResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AdminUserResponse.Merge(m, src)
+}
+func (m *AdminUserResponse) XXX_Size() int {
+	return xxx_messageInfo_AdminUserResponse.Size(m)
+}
+func (m *AdminUserResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AdminUserResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AdminUserResponse proto.InternalMessageInfo
+
+func (m *AdminUserResponse) GetUser() *User {
+	if m != nil {
+		return m.User
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*User)(nil), "v1.User")
 	proto.RegisterType((*RegisterRequest)(nil), "v1.RegisterRequest")
 	proto.RegisterType((*AuthRequest)(nil), "v1.AuthRequest")
+	proto.RegisterType((*ChangePasswordRequest)(nil), "v1.ChangePasswordRequest")
+	proto.RegisterType((*AdminUsersRequest)(nil), "v1.AdminUsersRequest")
+	proto.RegisterType((*AdminUserRequest)(nil), "v1.AdminUserRequest")
+	proto.RegisterType((*AdminEditUserRequest)(nil), "v1.AdminEditUserRequest")
+	proto.RegisterType((*AdminDeleteUserRequest)(nil), "v1.AdminDeleteUserRequest")
 	proto.RegisterType((*UserResponse)(nil), "v1.UserResponse")
+	proto.RegisterType((*AdminUsersResponse)(nil), "v1.AdminUsersResponse")
+	proto.RegisterType((*AdminUserResponse)(nil), "v1.AdminUserResponse")
 }
 
 func init() {
@@ -305,31 +745,51 @@ func init() {
 }
 
 var fileDescriptor_116e343673f7ffaf = []byte{
-	// 379 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x52, 0x4b, 0x4e, 0xe3, 0x40,
-	0x10, 0x95, 0x7b, 0x9c, 0x8c, 0x53, 0x99, 0x99, 0x8c, 0x7a, 0xa2, 0xa8, 0xe5, 0x61, 0x11, 0x65,
-	0x15, 0x36, 0x8e, 0x12, 0x0e, 0x80, 0x40, 0x62, 0xc9, 0xc6, 0x88, 0x03, 0x74, 0x70, 0xd9, 0xb1,
-	0x62, 0xbb, 0x4d, 0x7f, 0x82, 0x38, 0x0b, 0x57, 0xe4, 0x10, 0xa8, 0xdb, 0x1f, 0x48, 0xc2, 0xce,
-	0xef, 0xf5, 0xab, 0xf7, 0xaa, 0xca, 0x05, 0x60, 0x14, 0xca, 0xa8, 0x96, 0x42, 0x0b, 0x4a, 0x0e,
-	0xeb, 0xf0, 0x7f, 0x26, 0x44, 0x56, 0xe0, 0xca, 0x31, 0x5b, 0x93, 0xae, 0xb0, 0xac, 0xf5, 0x6b,
-	0x23, 0x58, 0xbc, 0x7b, 0xe0, 0x3f, 0x2a, 0x94, 0xf4, 0x0f, 0x90, 0x3c, 0x61, 0xde, 0xdc, 0x5b,
-	0xfe, 0x8e, 0x49, 0x9e, 0xd0, 0x10, 0x82, 0xd4, 0x14, 0x45, 0xc5, 0x4b, 0x64, 0x64, 0xee, 0x2d,
-	0x47, 0x71, 0x8f, 0xe9, 0x14, 0x06, 0xf5, 0x4e, 0x54, 0xc8, 0x7e, 0xb8, 0x87, 0x06, 0x58, 0x16,
-	0x4b, 0x9e, 0x17, 0xcc, 0x6f, 0x58, 0x07, 0x5a, 0xad, 0x16, 0x6c, 0xd0, 0x6b, 0xb5, 0xa0, 0x14,
-	0x7c, 0x29, 0x0a, 0x64, 0x43, 0x97, 0xe7, 0xbe, 0xe9, 0x05, 0x8c, 0xb4, 0xe4, 0x09, 0x96, 0x5c,
-	0xee, 0xd9, 0x4f, 0xa7, 0xfe, 0x24, 0xe8, 0x0c, 0x86, 0x9a, 0xcb, 0x3c, 0x4d, 0x59, 0xe0, 0x6a,
-	0x5a, 0x64, 0x79, 0x5e, 0x0a, 0x53, 0x69, 0x36, 0x9a, 0x7b, 0x4b, 0x12, 0xb7, 0xc8, 0xe6, 0xf2,
-	0xad, 0x30, 0x9a, 0x41, 0x93, 0xeb, 0xc0, 0xc2, 0xc0, 0x24, 0xc6, 0x2c, 0x57, 0x1a, 0x65, 0x8c,
-	0xcf, 0x06, 0x95, 0x3e, 0x1a, 0xd4, 0x3b, 0x1f, 0xb4, 0x19, 0x89, 0x9c, 0x8f, 0x74, 0x3a, 0x7e,
-	0x08, 0x41, 0xcd, 0x95, 0x7a, 0x11, 0x32, 0x69, 0x37, 0xd0, 0xe3, 0xc5, 0x35, 0x8c, 0x6f, 0x8c,
-	0xde, 0x75, 0x91, 0x53, 0x18, 0x14, 0x22, 0xcb, 0xab, 0x36, 0xaf, 0x01, 0x47, 0x06, 0xe4, 0xc4,
-	0xe0, 0x16, 0x7e, 0xd9, 0xbf, 0x14, 0xa3, 0xaa, 0x45, 0xa5, 0xec, 0xae, 0x7c, 0xfb, 0x97, 0x9d,
-	0xc1, 0x78, 0x13, 0x44, 0x87, 0x75, 0xe4, 0xde, 0x1d, 0x6b, 0xfd, 0xb5, 0xd8, 0x63, 0xd5, 0xb5,
-	0xed, 0xc0, 0xe6, 0xcd, 0x83, 0xb1, 0x15, 0x3d, 0xa0, 0x3c, 0xe4, 0x4f, 0x48, 0x2f, 0xc1, 0xb7,
-	0x4d, 0xd1, 0x89, 0xad, 0xfe, 0xd2, 0x5e, 0xf8, 0xb7, 0xb7, 0xeb, 0xe2, 0x22, 0x20, 0xf7, 0x48,
-	0x67, 0x51, 0x73, 0x49, 0x51, 0x77, 0x49, 0xd1, 0x9d, 0xbd, 0xa4, 0x6f, 0xf4, 0x6b, 0x08, 0xba,
-	0x35, 0xd3, 0x7f, 0xf6, 0xf5, 0x64, 0xe9, 0xe7, 0x25, 0xdb, 0xa1, 0x33, 0xbd, 0xfa, 0x08, 0x00,
-	0x00, 0xff, 0xff, 0x3b, 0x75, 0x56, 0x3a, 0xbe, 0x02, 0x00, 0x00,
+	// 697 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xc1, 0x6e, 0xd3, 0x40,
+	0x10, 0x95, 0x9d, 0xa4, 0x4d, 0x26, 0x4d, 0x5b, 0x96, 0x34, 0xda, 0xa6, 0x08, 0x45, 0x3e, 0x85,
+	0x4b, 0xaa, 0xb4, 0x17, 0x24, 0x84, 0xa0, 0x40, 0x2f, 0x48, 0x20, 0x94, 0xaa, 0xe7, 0xca, 0x8d,
+	0x27, 0xce, 0xaa, 0x8e, 0xd7, 0xec, 0xae, 0x83, 0xe8, 0x2f, 0x20, 0xf1, 0x45, 0x7c, 0x09, 0x1f,
+	0xc1, 0x37, 0xa0, 0x5d, 0xaf, 0x9d, 0xd8, 0x4d, 0x2a, 0x0e, 0x9c, 0xec, 0x37, 0xfb, 0x66, 0x76,
+	0x67, 0xe6, 0xcd, 0x00, 0xa4, 0x12, 0xc5, 0x28, 0x11, 0x5c, 0x71, 0xe2, 0x2e, 0xc7, 0xfd, 0x93,
+	0x90, 0xf3, 0x30, 0xc2, 0x53, 0x63, 0xb9, 0x4d, 0x67, 0xa7, 0xb8, 0x48, 0xd4, 0xf7, 0x8c, 0xe0,
+	0xfd, 0x72, 0xa1, 0x7e, 0x2d, 0x51, 0x90, 0x7d, 0x70, 0x59, 0x40, 0x9d, 0x81, 0x33, 0xec, 0x4c,
+	0x5c, 0x16, 0x90, 0x3e, 0x34, 0x67, 0x69, 0x14, 0xc5, 0xfe, 0x02, 0xa9, 0x3b, 0x70, 0x86, 0xad,
+	0x49, 0x81, 0x49, 0x17, 0x1a, 0xc9, 0x9c, 0xc7, 0x48, 0x6b, 0xe6, 0x20, 0x03, 0xda, 0x8a, 0x0b,
+	0x9f, 0x45, 0xb4, 0x9e, 0x59, 0x0d, 0xb0, 0x5c, 0xc5, 0x69, 0xa3, 0xe0, 0x2a, 0x4e, 0x08, 0xd4,
+	0x05, 0x8f, 0x90, 0xee, 0x98, 0xfb, 0xcc, 0x3f, 0x79, 0x06, 0x2d, 0x25, 0xfc, 0x00, 0x17, 0xbe,
+	0xb8, 0xa3, 0xbb, 0x86, 0xbd, 0x32, 0x90, 0x1e, 0xec, 0x28, 0x5f, 0xb0, 0xd9, 0x8c, 0x36, 0x8d,
+	0x8f, 0x45, 0xda, 0xee, 0x2f, 0x78, 0x1a, 0x2b, 0xda, 0x1a, 0x38, 0x43, 0x77, 0x62, 0x91, 0xbe,
+	0xd7, 0xbf, 0xe5, 0xa9, 0xa2, 0x90, 0xdd, 0x6b, 0x80, 0x61, 0x4f, 0x15, 0x5b, 0x22, 0x6d, 0x0f,
+	0x9c, 0x61, 0x73, 0x62, 0x11, 0x39, 0x81, 0x96, 0x9c, 0xf3, 0xe4, 0xc6, 0xa4, 0xbb, 0x97, 0xa5,
+	0xab, 0x0d, 0x9f, 0x75, 0xba, 0xc7, 0x60, 0xfe, 0x6f, 0x52, 0x11, 0xd1, 0x8e, 0x39, 0xdb, 0xd5,
+	0xf8, 0x5a, 0x44, 0x5e, 0x0a, 0x07, 0x13, 0x0c, 0x99, 0x54, 0x28, 0x26, 0xf8, 0x35, 0x45, 0xa9,
+	0x4a, 0x85, 0x73, 0x1e, 0x16, 0x2e, 0x2b, 0x91, 0xfb, 0xb0, 0x44, 0xd5, 0x72, 0xf6, 0xa1, 0x99,
+	0xf8, 0x52, 0x7e, 0xe3, 0x22, 0xb0, 0x15, 0x2d, 0xb0, 0xf7, 0x06, 0xda, 0x17, 0xa9, 0x9a, 0xe7,
+	0x57, 0x76, 0xa1, 0x11, 0xf1, 0x90, 0xc5, 0xf6, 0xbe, 0x0c, 0x94, 0x02, 0xb8, 0x95, 0x00, 0xe7,
+	0x70, 0xf4, 0x7e, 0xee, 0xc7, 0x21, 0x7e, 0xb1, 0x96, 0xb5, 0xd7, 0x17, 0x4e, 0x4e, 0xc5, 0xe9,
+	0xa7, 0x03, 0x4f, 0x2e, 0x82, 0x05, 0x8b, 0xb5, 0x60, 0x64, 0xee, 0x41, 0xa0, 0x9e, 0xf8, 0x21,
+	0x5a, 0xe9, 0x98, 0x7f, 0x5d, 0x4e, 0xfd, 0xbd, 0x91, 0xec, 0x3e, 0x53, 0x4f, 0x47, 0x87, 0x09,
+	0xf1, 0x8a, 0xdd, 0xa3, 0x76, 0x90, 0x5c, 0x28, 0x9b, 0xad, 0xf9, 0xd7, 0xbd, 0x0f, 0x98, 0xc0,
+	0xa9, 0x62, 0x3c, 0xb6, 0xd9, 0xae, 0x0c, 0xba, 0x6b, 0x12, 0x7d, 0x31, 0x9d, 0x5b, 0x11, 0x59,
+	0xe4, 0x79, 0x70, 0x58, 0xbc, 0x27, 0x7f, 0x4e, 0x45, 0xc7, 0xde, 0x1f, 0x07, 0xba, 0x86, 0x74,
+	0x19, 0x30, 0xf5, 0x08, 0xf1, 0xbf, 0x09, 0x7e, 0xbd, 0x82, 0x8d, 0x72, 0x05, 0x37, 0xca, 0x7e,
+	0x25, 0xc9, 0xdd, 0xed, 0x92, 0x6c, 0x3e, 0x22, 0xc9, 0x56, 0x59, 0x92, 0x3f, 0x1c, 0xe8, 0x99,
+	0x84, 0x3f, 0x60, 0x84, 0x0a, 0x1f, 0x4b, 0x39, 0x6f, 0x9d, 0xbb, 0xad, 0x75, 0xb5, 0x2d, 0xad,
+	0xab, 0x6f, 0x6b, 0x5d, 0xa3, 0xd2, 0x3a, 0xef, 0x1d, 0xec, 0x65, 0x2f, 0x90, 0x09, 0x8f, 0xa5,
+	0x1e, 0xf2, 0xba, 0x5e, 0x4f, 0xe6, 0x11, 0xed, 0xb3, 0xe6, 0x68, 0x39, 0x1e, 0x99, 0x73, 0x63,
+	0xd5, 0x15, 0x55, 0xfc, 0x0e, 0xe3, 0x7c, 0x3e, 0x0c, 0xf0, 0x3e, 0x02, 0x59, 0x97, 0x9d, 0x8d,
+	0xf4, 0x1c, 0x1a, 0xda, 0x47, 0x52, 0x67, 0x50, 0x2b, 0x85, 0xca, 0xcc, 0x59, 0x2c, 0xe5, 0x47,
+	0x36, 0xbb, 0x0c, 0x78, 0xe3, 0x35, 0x09, 0xff, 0xdb, 0xa3, 0xce, 0x7e, 0xd7, 0xa0, 0xad, 0xe1,
+	0x15, 0x8a, 0x25, 0x9b, 0x22, 0x79, 0x01, 0x75, 0x3d, 0x7c, 0xe4, 0x40, 0xf3, 0xd6, 0xc6, 0xb0,
+	0x7f, 0x58, 0x38, 0xe6, 0x81, 0x47, 0xe0, 0x7e, 0x42, 0xd2, 0x1b, 0x65, 0x1b, 0x78, 0x94, 0x6f,
+	0xe0, 0xd1, 0xa5, 0xde, 0xc0, 0x1b, 0xf8, 0x63, 0x68, 0xe6, 0xeb, 0x84, 0x3c, 0xd5, 0xa7, 0x95,
+	0xe5, 0xb2, 0xc1, 0xe5, 0x35, 0xec, 0x97, 0x27, 0x99, 0x1c, 0x6b, 0xce, 0xc6, 0xe9, 0xde, 0xe0,
+	0xfe, 0x0a, 0x60, 0x55, 0x5b, 0x72, 0x64, 0x52, 0xaa, 0x8e, 0x78, 0xbf, 0x57, 0x35, 0x5b, 0xe7,
+	0x97, 0xd0, 0x2a, 0xac, 0xa4, 0x5b, 0x22, 0xe5, 0xae, 0x47, 0x15, 0xab, 0xf5, 0x7c, 0x0b, 0x9d,
+	0xd2, 0x50, 0x12, 0x5a, 0xf0, 0x2a, 0x73, 0xba, 0x2d, 0xc2, 0x25, 0x1c, 0x54, 0x54, 0x4e, 0xfa,
+	0x05, 0xf3, 0x81, 0xf4, 0xb7, 0xa5, 0x70, 0xbb, 0x63, 0x7a, 0x72, 0xfe, 0x37, 0x00, 0x00, 0xff,
+	0xff, 0x1b, 0x8b, 0x80, 0x39, 0x35, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -347,6 +807,11 @@ type UserServiceClient interface {
 	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	Me(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*UserResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	AdminUsers(ctx context.Context, in *AdminUsersRequest, opts ...grpc.CallOption) (*AdminUsersResponse, error)
+	AdminUser(ctx context.Context, in *AdminUserRequest, opts ...grpc.CallOption) (*AdminUserResponse, error)
+	AdminEditUser(ctx context.Context, in *AdminEditUserRequest, opts ...grpc.CallOption) (*AdminUserResponse, error)
+	AdminDeleteUser(ctx context.Context, in *AdminDeleteUserRequest, opts ...grpc.CallOption) (*AdminUsersResponse, error)
 }
 
 type userServiceClient struct {
@@ -384,11 +849,61 @@ func (c *userServiceClient) Register(ctx context.Context, in *RegisterRequest, o
 	return out, nil
 }
 
+func (c *userServiceClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+	out := new(UserResponse)
+	err := c.cc.Invoke(ctx, "/v1.UserService/ChangePassword", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AdminUsers(ctx context.Context, in *AdminUsersRequest, opts ...grpc.CallOption) (*AdminUsersResponse, error) {
+	out := new(AdminUsersResponse)
+	err := c.cc.Invoke(ctx, "/v1.UserService/AdminUsers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AdminUser(ctx context.Context, in *AdminUserRequest, opts ...grpc.CallOption) (*AdminUserResponse, error) {
+	out := new(AdminUserResponse)
+	err := c.cc.Invoke(ctx, "/v1.UserService/AdminUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AdminEditUser(ctx context.Context, in *AdminEditUserRequest, opts ...grpc.CallOption) (*AdminUserResponse, error) {
+	out := new(AdminUserResponse)
+	err := c.cc.Invoke(ctx, "/v1.UserService/AdminEditUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AdminDeleteUser(ctx context.Context, in *AdminDeleteUserRequest, opts ...grpc.CallOption) (*AdminUsersResponse, error) {
+	out := new(AdminUsersResponse)
+	err := c.cc.Invoke(ctx, "/v1.UserService/AdminDeleteUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 type UserServiceServer interface {
 	Auth(context.Context, *AuthRequest) (*UserResponse, error)
 	Me(context.Context, *empty.Empty) (*UserResponse, error)
 	Register(context.Context, *RegisterRequest) (*UserResponse, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*UserResponse, error)
+	AdminUsers(context.Context, *AdminUsersRequest) (*AdminUsersResponse, error)
+	AdminUser(context.Context, *AdminUserRequest) (*AdminUserResponse, error)
+	AdminEditUser(context.Context, *AdminEditUserRequest) (*AdminUserResponse, error)
+	AdminDeleteUser(context.Context, *AdminDeleteUserRequest) (*AdminUsersResponse, error)
 }
 
 // UnimplementedUserServiceServer can be embedded to have forward compatible implementations.
@@ -403,6 +918,21 @@ func (*UnimplementedUserServiceServer) Me(ctx context.Context, req *empty.Empty)
 }
 func (*UnimplementedUserServiceServer) Register(ctx context.Context, req *RegisterRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (*UnimplementedUserServiceServer) ChangePassword(ctx context.Context, req *ChangePasswordRequest) (*UserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
+}
+func (*UnimplementedUserServiceServer) AdminUsers(ctx context.Context, req *AdminUsersRequest) (*AdminUsersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminUsers not implemented")
+}
+func (*UnimplementedUserServiceServer) AdminUser(ctx context.Context, req *AdminUserRequest) (*AdminUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminUser not implemented")
+}
+func (*UnimplementedUserServiceServer) AdminEditUser(ctx context.Context, req *AdminEditUserRequest) (*AdminUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminEditUser not implemented")
+}
+func (*UnimplementedUserServiceServer) AdminDeleteUser(ctx context.Context, req *AdminDeleteUserRequest) (*AdminUsersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminDeleteUser not implemented")
 }
 
 func RegisterUserServiceServer(s *grpc.Server, srv UserServiceServer) {
@@ -463,6 +993,96 @@ func _UserService_Register_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).ChangePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.UserService/ChangePassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AdminUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AdminUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.UserService/AdminUsers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AdminUsers(ctx, req.(*AdminUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AdminUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AdminUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.UserService/AdminUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AdminUser(ctx, req.(*AdminUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AdminEditUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminEditUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AdminEditUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.UserService/AdminEditUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AdminEditUser(ctx, req.(*AdminEditUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AdminDeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminDeleteUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AdminDeleteUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.UserService/AdminDeleteUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AdminDeleteUser(ctx, req.(*AdminDeleteUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _UserService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "v1.UserService",
 	HandlerType: (*UserServiceServer)(nil),
@@ -478,6 +1098,26 @@ var _UserService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Register",
 			Handler:    _UserService_Register_Handler,
+		},
+		{
+			MethodName: "ChangePassword",
+			Handler:    _UserService_ChangePassword_Handler,
+		},
+		{
+			MethodName: "AdminUsers",
+			Handler:    _UserService_AdminUsers_Handler,
+		},
+		{
+			MethodName: "AdminUser",
+			Handler:    _UserService_AdminUser_Handler,
+		},
+		{
+			MethodName: "AdminEditUser",
+			Handler:    _UserService_AdminEditUser_Handler,
+		},
+		{
+			MethodName: "AdminDeleteUser",
+			Handler:    _UserService_AdminDeleteUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

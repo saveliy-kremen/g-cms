@@ -27,6 +27,17 @@ type User struct {
 	Amount       float32 `db:"amount"`
 	About        string  `db:"about"`
 	UploadImages string  `db:"upload_images"`
+	Active       bool    `db:"active"`
+	ShopName     string  `db:"shop_name"`
+	ShopUrl      string  `db:"shop_url"`
+}
+
+func UsersToResponse(users []User) []*v1.User {
+	respUsers := []*v1.User{}
+	for _, user := range users {
+		respUsers = append(respUsers, UserToResponse(user))
+	}
+	return respUsers
 }
 
 func UserToResponse(user User) *v1.User {
@@ -41,5 +52,8 @@ func UserToResponse(user User) *v1.User {
 		Tariff:    uint32(user.Tariff),
 		Amount:    user.Amount,
 		About:     user.About,
+		Active:    user.Active,
+		ShopName:  user.ShopName,
+		ShopUrl:   user.ShopUrl,
 	}
 }

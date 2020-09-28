@@ -12,7 +12,14 @@ import * as grpcWeb from 'grpc-web';
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 
 import {
+  AdminDeleteUserRequest,
+  AdminEditUserRequest,
+  AdminUserRequest,
+  AdminUserResponse,
+  AdminUsersRequest,
+  AdminUsersResponse,
   AuthRequest,
+  ChangePasswordRequest,
   RegisterRequest,
   UserResponse} from './user_pb';
 
@@ -98,6 +105,116 @@ export class UserServiceClient {
       request,
       metadata || {},
       this.methodInfoRegister,
+      callback);
+  }
+
+  methodInfoChangePassword = new grpcWeb.AbstractClientBase.MethodInfo(
+    UserResponse,
+    (request: ChangePasswordRequest) => {
+      return request.serializeBinary();
+    },
+    UserResponse.deserializeBinary
+  );
+
+  changePassword(
+    request: ChangePasswordRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: UserResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.UserService/ChangePassword',
+      request,
+      metadata || {},
+      this.methodInfoChangePassword,
+      callback);
+  }
+
+  methodInfoAdminUsers = new grpcWeb.AbstractClientBase.MethodInfo(
+    AdminUsersResponse,
+    (request: AdminUsersRequest) => {
+      return request.serializeBinary();
+    },
+    AdminUsersResponse.deserializeBinary
+  );
+
+  adminUsers(
+    request: AdminUsersRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: AdminUsersResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.UserService/AdminUsers',
+      request,
+      metadata || {},
+      this.methodInfoAdminUsers,
+      callback);
+  }
+
+  methodInfoAdminUser = new grpcWeb.AbstractClientBase.MethodInfo(
+    AdminUserResponse,
+    (request: AdminUserRequest) => {
+      return request.serializeBinary();
+    },
+    AdminUserResponse.deserializeBinary
+  );
+
+  adminUser(
+    request: AdminUserRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: AdminUserResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.UserService/AdminUser',
+      request,
+      metadata || {},
+      this.methodInfoAdminUser,
+      callback);
+  }
+
+  methodInfoAdminEditUser = new grpcWeb.AbstractClientBase.MethodInfo(
+    AdminUserResponse,
+    (request: AdminEditUserRequest) => {
+      return request.serializeBinary();
+    },
+    AdminUserResponse.deserializeBinary
+  );
+
+  adminEditUser(
+    request: AdminEditUserRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: AdminUserResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.UserService/AdminEditUser',
+      request,
+      metadata || {},
+      this.methodInfoAdminEditUser,
+      callback);
+  }
+
+  methodInfoAdminDeleteUser = new grpcWeb.AbstractClientBase.MethodInfo(
+    AdminUsersResponse,
+    (request: AdminDeleteUserRequest) => {
+      return request.serializeBinary();
+    },
+    AdminUsersResponse.deserializeBinary
+  );
+
+  adminDeleteUser(
+    request: AdminDeleteUserRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: AdminUsersResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.UserService/AdminDeleteUser',
+      request,
+      metadata || {},
+      this.methodInfoAdminDeleteUser,
       callback);
   }
 

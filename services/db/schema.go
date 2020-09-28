@@ -28,7 +28,10 @@ CREATE TABLE users (
 	tariff int DEFAULT 0,
 	amount numeric(10,2) DEFAULT 0,
 	about text DEFAULT '',
-	upload_images json DEFAULT '[]'::JSON
+	upload_images json DEFAULT '[]'::JSON,
+	active bool DEFAULT false,
+	shop_name varchar(256) DEFAULT '',
+	shop_url varchar(256) DEFAULT ''
 );
 CREATE INDEX fullname ON users (fullname);
 

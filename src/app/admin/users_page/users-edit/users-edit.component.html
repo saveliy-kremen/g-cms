@@ -1,0 +1,91 @@
+<mat-card>
+  <mat-card-title>{{"Users" | translate}}</mat-card-title>
+  <mat-card-subtitle>{{userID != undefined ? ("Edit" | translate) : ("Add" | translate)}}
+  </mat-card-subtitle>
+
+  <mat-card-content>
+    <form novalidate #form="ngForm" [formGroup]="userForm" (ngSubmit)="submitUserForm()">
+      <div class="alert alert-{{userMessage.type}}" *ngIf="userMessage.text">
+        {{userMessage.text}}
+      </div>
+
+      <mat-form-field class="third-width">
+        <input matInput formControlName="fullname" placeholder="{{'Fullname' | translate}}">
+        <mat-error>
+          <validator-message [field]="userForm.get('fullname')" [submitted]="userFormSubmitted" title="Fullname">
+          </validator-message>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="third-width">
+        <input matInput formControlName="shopName" placeholder="{{'ShopName' | translate}}">
+        <mat-error>
+          <validator-message [field]="userForm.get('shopName')" [submitted]="userFormSubmitted" title="ShopName">
+          </validator-message>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="third-width">
+        <input matInput formControlName="shopUrl" placeholder="{{'ShopUrl' | translate}}">
+        <mat-error>
+          <validator-message [field]="userForm.get('shopUrl')" [submitted]="userFormSubmitted" title="ShopUrl">
+          </validator-message>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="third-width">
+        <input matInput formControlName="phone" placeholder="Phone">
+        <mat-error>
+          <validator-message [field]="userForm.get('phone')" [submitted]="userFormSubmitted" title="Phone">
+          </validator-message>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="third-width">
+        <input matInput formControlName="email" placeholder="{{'Email' | translate}}" autocomplete="off">
+        <mat-error>
+          <validator-message [field]="userForm.get('email')" [submitted]="userFormSubmitted" title="Email">
+          </validator-message>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="third-width">
+        <mat-label>{{'Role' | translate}}</mat-label>
+        <mat-select formControlName="role">
+          <mat-option *ngFor="let role of roles; let i=index" [value]="i">
+            {{role | translate}}</mat-option>
+        </mat-select>
+        <mat-error>
+          <validator-message [field]="userForm.get('role')" [submitted]="userFormSubmitted" title="Role">
+          </validator-message>
+        </mat-error>
+      </mat-form-field>
+      <br>
+      <div *ngIf="changePassword">
+        <mat-form-field class="third-width">
+          <input matInput formControlName="password" type="password" placeholder="{{'Password' | translate}}">
+          <mat-error>
+            <validator-message [field]="userForm.get('password')" [submitted]="userFormSubmitted" title="password">
+            </validator-message>
+          </mat-error>
+        </mat-form-field>
+        <br>
+        <mat-form-field class="third-width">
+          <input matInput formControlName="confirmPassword" type="password"
+            placeholder="{{'Confirm password' | translate}}" autocomplete="off">
+          <mat-error>
+            <validator-message [field]="userForm.get('confirmPassword')" [submitted]="userFormSubmitted"
+              title="confirm password">
+            </validator-message>
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <br>
+      <mat-checkbox labelPosition="after" formControlName="active">
+        {{"Active" | translate}}
+      </mat-checkbox>
+      <br><br><br>
+      <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;">
+        {{"Save" | translate}}
+      </button>
+      <button mat-raised-button type="reset" class="btn btn-secondary" routerLink="/admin/users">
+        {{"Cancel" | translate}}
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>

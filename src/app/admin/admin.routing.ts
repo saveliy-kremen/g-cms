@@ -11,11 +11,16 @@ import { ItemEditComponent } from './items/item-edit/item-edit.component';
 import { XmlImportComponent } from './xml-import/xml-import.component';
 import { AdminAuthGuard } from '../shared/guards/guards';
 import { OrdersPageComponent } from './orders-page/orders-page.component';
+import { UsersComponent } from './users_page/users.component';
+import { UsersEditComponent } from './users_page/users-edit/users-edit.component';
 
 export const AdminRoutes: Routes = [
   {
     path: '', component: AdminLayoutComponent, canActivate: [AdminAuthGuard], children: [
       { path: '', component: IndexComponent },
+      { path: 'users', component: UsersComponent },
+      { path: 'users/create', component: UsersEditComponent },
+      { path: 'users/edit/:id', component: UsersEditComponent },
       { path: 'categories', component: CategoriesComponent },
       { path: 'categories/edit/:alias', component: CategoryEditComponent },
       { path: 'properties', component: PropertiesComponent },

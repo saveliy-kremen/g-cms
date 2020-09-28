@@ -1,0 +1,11 @@
+<mat-card>
+    <div style="display: flex; flex-direction: row; justify-content: space-between; margin: 0px 10px 10px 20px;">
+        <mat-card-title>{{"Users" | translate}}</mat-card-title>
+        <button mat-raised-button color="primary" routerLink="/admin/users/create">{{"Add" | translate}}</button>
+    </div>
+    <mat-card-content class="example-container mat-elevation-z8" style="overflow: auto;">
+        <app-table [columnDefs]="columnDefs" [displayedColumns]="displayedColumns" [dataSource]="usersData"
+            [length]="total" (changePageHandler)="changePage($event)" actions="actions">
+        </app-table>
+    </mat-card-content>
+</mat-card>

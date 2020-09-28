@@ -9,6 +9,9 @@ export class User {
     public tariff: number = null,
     public trademark: string = null,
     public amount: number = null,
-    public about: string = null
+    public about: string = null,
+    public shopName: string = null,
+    public shopUrl: string = null,
+    public active: boolean = null,
   ) { }
 }

@@ -10,6 +10,7 @@
 	"Dbname": "newud_gcms",
 	"Password": "MKTG853Vup",
 	"UploadPath": "../../public_html/uploads",
+	"DownloadPath": "../../public_html/downloads",
 	"CategoryThumbSize": "200x200",
 	"PropertyThumbSize": "30x30",
 	"Thumbs": {

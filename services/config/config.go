@@ -29,6 +29,7 @@ type Configuration struct {
 	Password          string
 	Dbname            string
 	UploadPath        string
+	DownloadPath      string
 	CategoryThumbSize string
 	PropertyThumbSize string
 	Thumbs            ThumbsStruct

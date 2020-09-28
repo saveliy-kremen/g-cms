@@ -8,6 +8,9 @@ import (
 	"gcms/config"
 	"gcms/db"
 	"gcms/models"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -86,14 +89,8 @@ type Picture struct {
 }
 
 func Prom(ctx context.Context) {
-	catalog := Catalog{}
-	catalog.Date = time.Now()
-	catalog.Shop.Name = "shop name"
-	catalog.Shop.Company = "company name"
-	catalog.Shop.Url = "shop url"
-
 	query := fmt.Sprintf(
-		`SELECT id
+		`SELECT id, shop_name, shop_url
 		FROM users`)
 	rows, err := db.DB.Query(ctx, query)
 	if err != nil {
@@ -102,30 +99,43 @@ func Prom(ctx context.Context) {
 	defer rows.Close()
 	for rows.Next() {
 		user := models.User{}
-		err := rows.Scan(&user.ID)
+		err := rows.Scan(&user.ID, &user.ShopName, &user.ShopUrl)
 		if err != nil {
 			logger.Error(err.Error())
 		}
-		catalog.Shop.Categories = getCategories(ctx)
+		catalog := Catalog{}
+		catalog.Date = time.Now()
+		catalog.Shop.Name = user.ShopName
+		catalog.Shop.Company = user.ShopName
+		catalog.Shop.Url = user.ShopUrl
+		catalog.Shop.Categories = getCategories(ctx, user.ID)
 		catalog.Shop.Currencies = getCurrencies(ctx)
-		catalog.Shop.Offers = getOffers(ctx)
+		catalog.Shop.Offers = getOffers(ctx, user.ID)
 
 		out, err := xml.MarshalIndent(catalog, " ", "  ")
 		logger.Error(err)
-		fmt.Println(xml.Header + string(out))
+		file := xml.Header + string(out)
+
+		dir, _ := filepath.Abs(config.AppConfig.DownloadPath)
+		directory := dir + "/users/" + strconv.Itoa(int(user.ID)) + "/"
+		if _, err := os.Stat(directory); err != nil {
+			os.MkdirAll(directory, 0775)
+		}
+		_ = ioutil.WriteFile(directory+"prom.xml", []byte(file), 0644)
+		fmt.Println("http://alllead.best/downloads/" + "users/" + strconv.Itoa(int(user.ID)) + "/prom.xml" + " - " + strconv.Itoa(len(catalog.Shop.Offers)))
 	}
 	if err = rows.Err(); err != nil {
 		logger.Error(err.Error())
 	}
 }
 
-func getCategories(ctx context.Context) []Category {
+func getCategories(ctx context.Context, userID uint32) []Category {
 	categories := []Category{}
 	rows, err := db.DB.Query(ctx, `
     SELECT id, title, parent
 	FROM categories
-	WHERE parent <> '#'
-    ORDER BY id ASC`)
+	WHERE user_id = $1 AND parent <> '#'
+    ORDER BY id ASC`, userID)
 	if err != nil {
 		logger.Error(err.Error())
 	}
@@ -172,7 +182,7 @@ func getCurrencies(ctx context.Context) []Currency {
 	return currencies
 }
 
-func getOffers(ctx context.Context) []Offer {
+func getOffers(ctx context.Context, userID uint32) []Offer {
 	offers := []Offer{}
 
 	query := fmt.Sprintf(
@@ -190,15 +200,15 @@ func getOffers(ctx context.Context) []Offer {
 		 	), ',') || ']',
 		  	(SELECT items_categories.category_id 
 				FROM items_categories
-				WHERE items_categories.item_id = items.id
+				WHERE user_id = $1 AND items_categories.item_id = items.id
 				ORDER BY items_categories.category_id ASC
 				LIMIT 1
 			)
 		FROM items
 		INNER JOIN vendors ON items.vendor_id = vendors.id
-		WHERE draft <> $1
+		WHERE user_id = $1 AND draft <> $2
 		ORDER BY id ASC`)
-	rows, err := db.DB.Query(ctx, query, true)
+	rows, err := db.DB.Query(ctx, query, userID, true)
 	if err != nil {
 		logger.Error(err.Error())
 	}

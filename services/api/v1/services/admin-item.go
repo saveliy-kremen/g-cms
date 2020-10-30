@@ -607,7 +607,7 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 			user_id, alias, vendorID)
 		row.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.Draft, &item.Title,
 			&item.Article, &item.Alias, &item.Images, &item.Description, &item.Price,
-			&item.OldPrice, item.Count, &item.InStock, &item.Disable, &item.Sort,
+			&item.OldPrice, &item.Count, &item.InStock, &item.Disable, &item.Sort,
 			&item.SeoTitle, &item.SeoDescription, &item.SeoKeywords, &item.ParentID,
 			&item.VendorID, &item.CurrencyID)
 	} else {
@@ -620,7 +620,7 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 			user_id, alias, req.ParentId, vendorID)
 		row.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.Draft, &item.Title,
 			&item.Article, &item.Alias, &item.Images, &item.Description, &item.Price,
-			&item.OldPrice, item.Count, &item.InStock, &item.Disable, &item.Sort,
+			&item.OldPrice, &item.Count, &item.InStock, &item.Disable, &item.Sort,
 			&item.SeoTitle, &item.SeoDescription, &item.SeoKeywords, &item.ParentID,
 			&item.VendorID, &item.CurrencyID)
 	}

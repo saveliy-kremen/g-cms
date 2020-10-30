@@ -60,7 +60,8 @@ func main() {
 	}()
 
 	fmt.Printf("download")
-	download.Prom(context.Background())
+	//download.Prom(context.Background())
+	download.Rozetka(context.Background())
 
 	// finally, run the server
 	fmt.Printf("GRPC listening on %v\n", grpc_lis.Addr())

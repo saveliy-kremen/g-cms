@@ -2,6 +2,7 @@ package download
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -13,82 +14,75 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
-var logger *logrus.Logger
+const DefaultCount = 10
 
-func init() {
-	logger = logrus.New()
-	logger.SetReportCaller(true)
+type RozetkaCatalog struct {
+	XMLName xml.Name    `xml:"yml_catalog"`
+	Date    time.Time   `xml:"date,attr"`
+	Shop    RozetkaShop `xml:"shop"`
 }
 
-type Catalog struct {
-	XMLName xml.Name  `xml:"yml_catalog"`
-	Date    time.Time `xml:"date,attr"`
-	Shop    Shop      `xml:"shop"`
+type RozetkaShop struct {
+	Name       string            `xml:"name"`
+	Company    string            `xml:"company"`
+	Url        string            `xml:"url"`
+	Currencies []RozetkaCurrency `xml:"currencies>currency"`
+	Categories []RozetkaCategory `xml:"categories>category"`
+	Offers     []RozetkaOffer    `xml:"offers>offer"`
 }
 
-type Shop struct {
-	Name       string     `xml:"name"`
-	Company    string     `xml:"company"`
-	Url        string     `xml:"url"`
-	Currencies []Currency `xml:"currencies>currency"`
-	Categories []Category `xml:"categories>category"`
-	Offers     []Offer    `xml:"offers>offer"`
-}
-
-type Category struct {
+type RozetkaCategory struct {
 	ID     uint32 `xml:"id,attr"`
 	Title  string `xml:",chardata"`
 	Parent string `xml:"parentId,attr,omitempty"`
 }
 
-type Currency struct {
+type RozetkaCurrency struct {
 	Code string  `xml:"id,attr"`
 	Rate float64 `xml:"rate,attr"`
 }
 
-type Offer struct {
-	ID          uint32    `xml:"id,attr"`
-	ParentID    *uint32   `xml:"group_id,attr"`
-	UserID      uint32    `xml:"-"`
-	NotDisable  bool      `xml:"available,attr"`
-	Url         string    `xml:"url"`
-	Title       string    `xml:"name"`
-	Description string    `xml:"description"`
-	CategoryID  *uint32   `xml:"categoryId"`
-	Price       float64   `xml:"price"`
-	CurrencyID  uint32    `xml:"currencyId"`
-	Images      string    `xml:"-"`
-	Properties  string    `xml:"-"`
-	Params      []Param   `xml:"param"`
-	Pictures    []Picture `xml:"picture"`
-	VendorID    uint32    `xml:"vendorCode"`
-	Vendor      string    `xml:"vendor"`
-	Country     string    `xml:"country"`
-	Available   bool      `xml:"available"`
-	Count       uint32    `xml:"-"`
+type RozetkaOffer struct {
+	ID          uint32           `xml:"id,attr"`
+	ParentID    *uint32          `xml:"group_id,attr"`
+	UserID      uint32           `xml:"-"`
+	NotDisable  bool             `xml:"available,attr"`
+	Url         string           `xml:"url"`
+	Title       string           `xml:"name"`
+	Description string           `xml:"description"`
+	CategoryID  *uint32          `xml:"categoryId"`
+	Price       float64          `xml:"price"`
+	CurrencyID  string           `xml:"currencyId"`
+	Images      string           `xml:"-"`
+	Properties  string           `xml:"-"`
+	Params      []RozetkaParam   `xml:"param"`
+	Pictures    []RozetkaPicture `xml:"picture"`
+	VendorID    uint32           `xml:"vendorCode"`
+	Vendor      string           `xml:"vendor"`
+	Country     string           `xml:"country"`
+	Available   bool             `xml:"available"`
+	Count       uint32           `xml:"stock_quantity"`
 }
 
-type Property struct {
+type RozetkaProperty struct {
 	PropertyID      uint32 `json:"property_id"`
 	PropertyValueID uint32 `json:"property_value_id"`
 	Title           string `json:"title"`
 	Value           string `json:"value"`
 }
 
-type Param struct {
+type RozetkaParam struct {
 	Name  string `xml:"name,attr"`
 	Value string `xml:",chardata"`
 }
 
-type Picture struct {
+type RozetkaPicture struct {
 	Url string `xml:",chardata"`
 }
 
-func Prom(ctx context.Context) {
+func Rozetka(ctx context.Context) {
 	query := fmt.Sprintf(
 		`SELECT id, shop_name, shop_url
 		FROM users`)
@@ -103,14 +97,14 @@ func Prom(ctx context.Context) {
 		if err != nil {
 			logger.Error(err.Error())
 		}
-		catalog := Catalog{}
+		catalog := RozetkaCatalog{}
 		catalog.Date = time.Now()
 		catalog.Shop.Name = user.ShopName
 		catalog.Shop.Company = user.ShopName
 		catalog.Shop.Url = user.ShopUrl
-		catalog.Shop.Categories = getCategories(ctx, user.ID)
-		catalog.Shop.Currencies = getCurrencies(ctx)
-		catalog.Shop.Offers = getOffers(ctx, user.ID)
+		catalog.Shop.Categories = getRozetkaCategories(ctx, user.ID)
+		catalog.Shop.Currencies = getRozetkaCurrencies(ctx)
+		catalog.Shop.Offers = getRozetkaOffers(ctx, user.ID)
 
 		out, err := xml.MarshalIndent(catalog, " ", "  ")
 		logger.Error(err)
@@ -121,16 +115,16 @@ func Prom(ctx context.Context) {
 		if _, err := os.Stat(directory); err != nil {
 			os.MkdirAll(directory, 0775)
 		}
-		_ = ioutil.WriteFile(directory+"prom.xml", []byte(file), 0644)
-		fmt.Println("http://alllead.best/downloads/" + "users/" + strconv.Itoa(int(user.ID)) + "/prom.xml" + " - " + strconv.Itoa(len(catalog.Shop.Offers)))
+		_ = ioutil.WriteFile(directory+"rozetka.xml", []byte(file), 0644)
+		fmt.Println("http://alllead.best/downloads/" + "users/" + strconv.Itoa(int(user.ID)) + "/rozetka.xml" + " - " + strconv.Itoa(len(catalog.Shop.Offers)))
 	}
 	if err = rows.Err(); err != nil {
 		logger.Error(err.Error())
 	}
 }
 
-func getCategories(ctx context.Context, userID uint32) []Category {
-	categories := []Category{}
+func getRozetkaCategories(ctx context.Context, userID uint32) []RozetkaCategory {
+	categories := []RozetkaCategory{}
 	rows, err := db.DB.Query(ctx, `
     SELECT id, title, parent
 	FROM categories
@@ -141,7 +135,7 @@ func getCategories(ctx context.Context, userID uint32) []Category {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		category := Category{}
+		category := RozetkaCategory{}
 		err := rows.Scan(&category.ID, &category.Title, &category.Parent)
 		if err != nil {
 			logger.Error(err.Error())
@@ -157,8 +151,8 @@ func getCategories(ctx context.Context, userID uint32) []Category {
 	return categories
 }
 
-func getCurrencies(ctx context.Context) []Currency {
-	currencies := []Currency{}
+func getRozetkaCurrencies(ctx context.Context) []RozetkaCurrency {
+	currencies := []RozetkaCurrency{}
 	query := fmt.Sprintf(
 		`SELECT code, rate
 		FROM currencies
@@ -169,7 +163,7 @@ func getCurrencies(ctx context.Context) []Currency {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		currency := Currency{}
+		currency := RozetkaCurrency{}
 		err := rows.Scan(&currency.Code, &currency.Rate)
 		if err != nil {
 			logger.Error(err.Error())
@@ -182,12 +176,19 @@ func getCurrencies(ctx context.Context) []Currency {
 	return currencies
 }
 
-func getOffers(ctx context.Context, userID uint32) []Offer {
-	offers := []Offer{}
+func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
+	offers := []RozetkaOffer{}
 
+	var parentCategoryID sql.NullInt32
+	var offerImages sql.NullString
 	query := fmt.Sprintf(
 		`SELECT items.id, items.parent_id, items.user_id, items.disable, items.title, items.description,
-		items.price, items.currency_id, items.vendor_id, items.count, items.images, vendors.name,
+		items.price, items.vendor_id, items.count, items.images, vendors.name,
+		(SELECT code
+			FROM currencies
+			WHERE currencies.id = items.currency_id
+			LIMIT 1
+		),
 		'[' || array_to_string(array(
 			SELECT row_to_json(row)
 				FROM (
@@ -203,6 +204,17 @@ func getOffers(ctx context.Context, userID uint32) []Offer {
 				WHERE user_id = $1 AND items_categories.item_id = items.id
 				ORDER BY items_categories.category_id ASC
 				LIMIT 1
+			),
+			(SELECT offer.images 
+				FROM items offer
+				WHERE offer.parent_id = items.id
+				ORDER BY offer.sort ASC
+				LIMIT 1
+			),
+			(SELECT pc.category_id 
+				FROM items_categories pc
+				WHERE user_id = $1 AND pc.item_id = items.parent_id
+				LIMIT 1
 			)
 		FROM items
 		INNER JOIN vendors ON items.vendor_id = vendors.id
@@ -214,25 +226,33 @@ func getOffers(ctx context.Context, userID uint32) []Offer {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		offer := Offer{}
+		offer := RozetkaOffer{}
 		err := rows.Scan(&offer.ID, &offer.ParentID, &offer.UserID, &offer.NotDisable, &offer.Title,
-			&offer.Description, &offer.Price, &offer.CurrencyID, &offer.VendorID, &offer.Count,
-			&offer.Images, &offer.Vendor, &offer.Properties, &offer.CategoryID)
+			&offer.Description, &offer.Price, &offer.VendorID, &offer.Count, &offer.Images, &offer.Vendor,
+			&offer.CurrencyID, &offer.Properties, &offer.CategoryID, &offerImages, &parentCategoryID)
 		if err != nil {
 			logger.Error(err.Error())
 		}
+		offer.Description = "<![CDATA[" + offer.Description + "]]>"
 		var images []models.ItemImage
+		if offer.ParentID == nil {
+			offer.Images = offerImages.String
+		} else {
+			offer.Title += " (" + strconv.Itoa(int(offer.ID)) + ")"
+			parentCategory := uint32(parentCategoryID.Int32)
+			offer.CategoryID = &parentCategory
+		}
 		json.Unmarshal([]byte(offer.Images), &images)
 		for _, image := range images {
-			picture := Picture{}
+			picture := RozetkaPicture{}
 			picture.Url = config.AppConfig.Host + "uploads/users/" +
 				strconv.Itoa(int(offer.UserID)) + "/items/" + image.Path + "/" + image.Filename
 			offer.Pictures = append(offer.Pictures, picture)
 		}
-		var properties []Property
+		var properties []RozetkaProperty
 		json.Unmarshal([]byte(offer.Properties), &properties)
 		for _, property := range properties {
-			param := Param{}
+			param := RozetkaParam{}
 			param.Name = property.Title
 			param.Value = property.Value
 			offer.Params = append(offer.Params, param)
@@ -244,6 +264,9 @@ func getOffers(ctx context.Context, userID uint32) []Offer {
 		}
 		offer.NotDisable = !offer.NotDisable
 		offer.Available = offer.NotDisable
+		if offer.Count == 0 {
+			offer.Count = DefaultCount
+		}
 		offers = append(offers, offer)
 	}
 	if err = rows.Err(); err != nil {

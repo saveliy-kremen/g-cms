@@ -85,7 +85,14 @@ export class XmlImportComponent implements OnInit {
       ///offers
       for (let i = 0; i < this.xmlImportData.offers.offer.length; i++) {
         this.breakID = i;
-        //        if (i != 2314) continue;
+        // if (this.xmlImportData.offers.offer[i]["@attributes"].id != 10068) continue
+        // else {
+        //   console.log(this.xmlImportData.offers.offer[i])
+        // }
+        let categoryID = this.xmlImportData.offers.offer[i].categoryId
+        if (Array.isArray(categoryID)) {
+          categoryID = categoryID[0]
+        }
         const offerTitle = this.xmlImportData.offers.offer[i].name?.["#text"] || this.xmlImportData.offers.offer[i].model?.["#text"]
         const parentKey = this.xmlImportData.offers.offer[i]["@attributes"].group_id ?
           this.xmlImportData.offers.offer[i]["@attributes"].group_id : offerTitle
@@ -93,8 +100,8 @@ export class XmlImportComponent implements OnInit {
           this.xmlImportData.offers.offer[i].parentID = Number(this.offersMap.get(parentKey))
         } else {
           let parentOffer = Object.assign({}, this.xmlImportData.offers.offer[i])
-          parentOffer.categoryID = this.xmlImportData.offers.offer[i].categoryId && this.categoriesMap.has(this.xmlImportData.offers.offer[i].categoryId["#text"])
-            ? Number(this.categoriesMap.get(this.xmlImportData.offers.offer[i].categoryId["#text"]))
+          parentOffer.categoryID = categoryID && this.categoriesMap.has(categoryID["#text"])
+            ? Number(this.categoriesMap.get(categoryID["#text"]))
             : 0
           parentOffer.title = offerTitle.replace(/\s*\([^(]*?\)\s*$/g, '')
           parentOffer.vendor = this.xmlImportData.offers.offer[i].vendor?.["#text"]

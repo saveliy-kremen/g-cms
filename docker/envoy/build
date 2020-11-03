@@ -1,2 +1,2 @@
 docker build -t g-cms_envoy:v1 .
-docker run  -p 2091:2091 -p 5004:5004 --net=host g-cms_envoy:v1
+docker run -p 2091:2091 -p 5004:5004 --net=host g-cms_envoy:v1

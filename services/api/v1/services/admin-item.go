@@ -596,7 +596,8 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 
 	item := models.Item{}
 
-	alias := utils.Translit(strings.ToLower(req.Title))
+	title := utils.StandardizeSpaces(req.Title)
+	alias := utils.Translit(strings.ToLower(title))
 	if req.ParentId == 0 {
 		row := db.DB.QueryRow(ctx, `
 		SELECT id, created_at, user_id, draft, title, article,
@@ -638,7 +639,7 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	}
 
 	item.UserID = user_id
-	item.Title = req.Title
+	item.Title = title
 	item.Alias = alias
 	item.Article = req.Article
 	if req.ParentId == 0 {
@@ -717,7 +718,7 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 		if err == nil {
 			defer resp.Body.Close()
 			filepath := strings.Split(image, "/")
-			filename := filepath[len(filepath)-1]
+			filename := strings.Replace(filepath[len(filepath)-1], "%20", "_", -1)
 			file, err := os.Create(directory + filename)
 			if err == nil {
 				defer file.Close()

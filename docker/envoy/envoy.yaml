@@ -32,6 +32,13 @@ static_resources:
           - name: envoy.grpc_web
           - name: envoy.cors
           - name: envoy.router
+      tls_context:
+        common_tls_context:
+          tls_certificates:
+            - certificate_chain:
+                filename: "/etc/alllead/fullchain.pem"
+              private_key:
+                filename: "/etc/alllead/privkey.pem"
   - name: listener_1
     address:
       socket_address: { address: 0.0.0.0, port_value: 5004 }

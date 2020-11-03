@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  siteUrl: "http://alllead.best",
-  uploadURL: "http://alllead.best/upload/",
-  grpcUrl: "http://alllead.best:2091",
+  siteUrl: "https://alllead.best",
+  uploadURL: "https://alllead.best/upload/",
+  grpcUrl: "https://alllead.best:2091",
   roles: ["user", "admin"],
   jwtCoockieName: "ngJWT",
   propertyTypes: ["Число", "Строка", "Изображение"],

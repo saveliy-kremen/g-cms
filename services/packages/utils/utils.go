@@ -121,6 +121,10 @@ func Translit(s string) string {
 	return translate_string
 }
 
+func StandardizeSpaces(s string) string {
+	return strings.Join(strings.Fields(s), " ")
+}
+
 func GetDbFields(table string, itemName string, item interface{}) (string, string) {
 	t := reflect.TypeOf(item)
 

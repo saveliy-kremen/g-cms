@@ -4,7 +4,7 @@
     <div class="flex-center">
         <img height="200"
             src="{{uploadUrl+ 'users/'+ product.userId + '/items/' + product.imagesList[0].path+'/'+product.imagesList[0].filename}}"
-            alt="{{product.imagesList[0].filename}}">
+            alt="{{product.imagesList[0].filename}}" *ngIf="product.imagesList.length > 0">
     </div>
 
     <h2>Цена: {{product.price}} {{product.currency.shortName}}</h2>

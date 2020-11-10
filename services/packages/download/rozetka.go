@@ -17,6 +17,7 @@ import (
 )
 
 const DefaultCount = 10
+const DefaultVendor = "Alllead"
 
 type RozetkaCatalog struct {
 	XMLName xml.Name    `xml:"yml_catalog"`
@@ -59,8 +60,7 @@ type RozetkaOffer struct {
 	Properties  string           `xml:"-"`
 	Params      []RozetkaParam   `xml:"param"`
 	Pictures    []RozetkaPicture `xml:"picture"`
-	VendorID    uint32           `xml:"vendorCode"`
-	Vendor      string           `xml:"vendor"`
+	Vendor      sql.NullString   `xml:"vendor"`
 	Country     string           `xml:"country"`
 	Available   bool             `xml:"available"`
 	Count       uint32           `xml:"stock_quantity"`
@@ -183,7 +183,7 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 	var offerImages sql.NullString
 	query := fmt.Sprintf(
 		`SELECT items.id, items.parent_id, items.user_id, items.disable, items.title, items.description,
-		items.price, items.vendor_id, items.count, items.images, vendors.name,
+		items.price, items.count, items.images, vendors.name,
 		(SELECT code
 			FROM currencies
 			WHERE currencies.id = items.currency_id
@@ -217,7 +217,7 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 				LIMIT 1
 			)
 		FROM items
-		INNER JOIN vendors ON items.vendor_id = vendors.id
+		LEFT JOIN vendors ON items.vendor_id = vendors.id
 		WHERE user_id = $1 AND draft <> $2
 		ORDER BY id ASC`)
 	rows, err := db.DB.Query(ctx, query, userID, true)
@@ -228,10 +228,13 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 	for rows.Next() {
 		offer := RozetkaOffer{}
 		err := rows.Scan(&offer.ID, &offer.ParentID, &offer.UserID, &offer.NotDisable, &offer.Title,
-			&offer.Description, &offer.Price, &offer.VendorID, &offer.Count, &offer.Images, &offer.Vendor,
+			&offer.Description, &offer.Price, &offer.Count, &offer.Images, &offer.Vendor,
 			&offer.CurrencyID, &offer.Properties, &offer.CategoryID, &offerImages, &parentCategoryID)
 		if err != nil {
 			logger.Error(err.Error())
+		}
+		if !offer.Vendor.Valid {
+			offer.Vendor = sql.NullString{String: DefaultVendor, Valid: true}
 		}
 		offer.Description = "<![CDATA[" + offer.Description + "]]>"
 		var images []models.ItemImage

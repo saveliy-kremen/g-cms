@@ -18,6 +18,7 @@ import (
 
 const DefaultCount = 10
 const DefaultVendor = "Alllead"
+const DefaulrPhoto = "assets/img/no-photo.png"
 
 type RozetkaCatalog struct {
 	XMLName xml.Name    `xml:"yml_catalog"`
@@ -60,7 +61,8 @@ type RozetkaOffer struct {
 	Properties  string           `xml:"-"`
 	Params      []RozetkaParam   `xml:"param"`
 	Pictures    []RozetkaPicture `xml:"picture"`
-	Vendor      sql.NullString   `xml:"vendor"`
+	Vendor      string           `xml:"vendor"`
+	VendorSql   sql.NullString   `xml:"-"`
 	Country     string           `xml:"country"`
 	Available   bool             `xml:"available"`
 	Count       uint32           `xml:"stock_quantity"`
@@ -228,13 +230,15 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 	for rows.Next() {
 		offer := RozetkaOffer{}
 		err := rows.Scan(&offer.ID, &offer.ParentID, &offer.UserID, &offer.NotDisable, &offer.Title,
-			&offer.Description, &offer.Price, &offer.Count, &offer.Images, &offer.Vendor,
+			&offer.Description, &offer.Price, &offer.Count, &offer.Images, &offer.VendorSql,
 			&offer.CurrencyID, &offer.Properties, &offer.CategoryID, &offerImages, &parentCategoryID)
 		if err != nil {
 			logger.Error(err.Error())
 		}
-		if !offer.Vendor.Valid {
-			offer.Vendor = sql.NullString{String: DefaultVendor, Valid: true}
+		if offer.VendorSql.Valid {
+			offer.Vendor = offer.VendorSql.String
+		} else {
+			offer.Vendor = DefaultVendor
 		}
 		offer.Description = "<![CDATA[" + offer.Description + "]]>"
 		var images []models.ItemImage
@@ -252,6 +256,11 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 				strconv.Itoa(int(offer.UserID)) + "/items/" + image.Path + "/" + image.Filename
 			offer.Pictures = append(offer.Pictures, picture)
 		}
+		if len(offer.Pictures) == 0 {
+			picture := RozetkaPicture{}
+			picture.Url = config.AppConfig.Host + "assets/img/no-photo.png"
+			offer.Pictures = append(offer.Pictures, picture)
+		}
 		var properties []RozetkaProperty
 		json.Unmarshal([]byte(offer.Properties), &properties)
 		for _, property := range properties {
@@ -261,6 +270,7 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 			offer.Params = append(offer.Params, param)
 		}
 		if offer.ParentID == nil {
+			continue
 			offer.Url = config.AppConfig.Host + "product/" + strconv.Itoa(int(offer.ID))
 		} else {
 			offer.Url = config.AppConfig.Host + "offer/" + strconv.Itoa(int(offer.ID))

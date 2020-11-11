@@ -3,7 +3,7 @@
 	"Port": 2090,
 	"EnvoyPort": 2091,
 	"UploadPort": 2092,
-	"Host": "http://alllead.best/",
+	"Host": "https://alllead.best/",
 	"Domain": "@alllead.best",
 	"Prefix": "g",
 	"User": "newud",

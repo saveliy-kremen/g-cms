@@ -13,6 +13,7 @@ import { AdminAuthGuard } from '../shared/guards/guards';
 import { OrdersPageComponent } from './orders-page/orders-page.component';
 import { UsersComponent } from './users_page/users.component';
 import { UsersEditComponent } from './users_page/users-edit/users-edit.component';
+import { SettingsComponent } from './settings/settings.component';
 
 export const AdminRoutes: Routes = [
   {
@@ -33,6 +34,7 @@ export const AdminRoutes: Routes = [
       { path: 'items/:mode/:id/offers/:offerMode/:offerID', component: ItemEditComponent },
       { path: 'xml_import', component: XmlImportComponent },
       { path: 'orders', component: OrdersPageComponent },
+      { path: 'settings', component: SettingsComponent },
       { path: '**', redirectTo: '' }
     ]
   }

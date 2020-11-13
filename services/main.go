@@ -35,6 +35,7 @@ func main() {
 	v1.RegisterAdminPropertyServiceServer(svr, &services.AdminPropertyServiceImpl{})
 	v1.RegisterAdminItemServiceServer(svr, &services.AdminItemServiceImpl{})
 	v1.RegisterAdminOrderServiceServer(svr, &services.AdminOrderServiceImpl{})
+	v1.RegisterAdminSettingsServiceServer(svr, &services.AdminSettingsServiceImpl{})
 	v1.RegisterCategoryServiceServer(svr, &services.CategoryServiceImpl{})
 	v1.RegisterPropertyServiceServer(svr, &services.PropertyServiceImpl{})
 	v1.RegisterItemServiceServer(svr, &services.ItemServiceImpl{})

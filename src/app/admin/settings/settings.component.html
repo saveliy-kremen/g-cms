@@ -1,0 +1,28 @@
+<mat-card>
+  <mat-card-title>{{"Settings" | translate}}</mat-card-title>
+
+  <mat-card-content>
+    <form novalidate #form="ngForm" [formGroup]="settingsForm" (ngSubmit)="submitSettingsForm()">
+      <div class="alert alert-{{settingsMessage.type}}" *ngIf="settingsMessage.text">
+        {{settingsMessage.text}}
+      </div>
+
+      <mat-form-field class="third-width-always">
+        <input matInput formControlName="rozetkaMarkup" placeholder="{{'RozetkaMarkup' | translate}}, %" type="number">
+        <mat-error>
+          <validator-message [field]="settingsForm.get('rozetkaMarkup')" [submitted]="settingsFormSubmitted"
+            title="RozetkaMarkup">
+          </validator-message>
+        </mat-error>
+      </mat-form-field>
+
+      <br><br><br>
+      <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;">
+        {{"Save" | translate}}
+      </button>
+      <button mat-raised-button type="reset" class="btn btn-secondary" routerLink="/admin">
+        {{"Cancel" | translate}}
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>

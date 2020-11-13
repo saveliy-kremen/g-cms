@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/protobuf/empty.proto";
+
+message AdminSettings {
+  double rozetka_markup = 1;
+}
+
+message AdminEditSettingsRequest {
+  double rozetka_markup = 1;
+}
+
+message AdminSettingsResponse {
+  AdminSettings settings = 1;
+}
+
+service AdminSettingsService {
+  rpc AdminSettings(google.protobuf.Empty) returns (AdminSettingsResponse);
+  rpc AdminEditSettings(AdminEditSettingsRequest) returns (AdminSettingsResponse);
+}

@@ -1,6 +1,7 @@
 package db
 
 var schema = `
+DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS orders_items;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS items_properties;
@@ -174,5 +175,13 @@ CREATE INDEX orders_name ON orders (name);
 CREATE TABLE orders_items (
 	order_id int REFERENCES orders (id) ON UPDATE CASCADE ON DELETE CASCADE,
 	item_id bigint REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE settings (
+	id bigserial PRIMARY KEY,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+
+	user_id int,
+	rozetka_markup numeric(4,2) DEFAULT 0
 );
 `

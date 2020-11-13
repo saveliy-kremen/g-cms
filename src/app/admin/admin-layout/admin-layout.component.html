@@ -53,6 +53,9 @@
         <a mat-list-item [routerLinkActive]="'active'" [routerLink]="['orders']">
           <mat-icon class="sidenav-icon">list_alt</mat-icon>{{"Orders" | translate}}
         </a>
+        <a mat-list-item [routerLinkActive]="'active'" [routerLink]="['settings']">
+          <mat-icon class="sidenav-icon">settings</mat-icon>{{"Settings" | translate}}
+        </a>
         <div class="nested-menu">
           <a mat-list-item (click)="showImportMenu=!showImportMenu">
             <mat-icon class="sidenav-icon">add</mat-icon>{{"Import" | translate}}

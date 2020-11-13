@@ -14,11 +14,17 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"gcms/packages/utils"
+
+	qevix "github.com/AlexanderGrom/go-qevix"
 )
 
 const DefaultCount = 10
 const DefaultVendor = "Alllead"
 const DefaulrPhoto = "assets/img/no-photo.png"
+
+var deniedVendors = []string{"Dahua", "Hikvision", "Ajax"}
 
 type RozetkaCatalog struct {
 	XMLName xml.Name    `xml:"yml_catalog"`
@@ -180,6 +186,16 @@ func getRozetkaCurrencies(ctx context.Context) []RozetkaCurrency {
 
 func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 	offers := []RozetkaOffer{}
+	skipped := 0
+
+	qvx := qevix.New()
+	qvx.CfgSetTagCutWithContent([]string{"img", "video", "iframe", "a"})
+	settings := models.Settings{}
+	db.DB.QueryRow(ctx,
+		`SELECT rozetka_markup
+			FROM settings
+			WHERE user_id = $1`,
+		userID).Scan(&settings.RozetkaMarkup)
 
 	var parentCategoryID sql.NullInt32
 	var offerImages sql.NullString
@@ -228,6 +244,7 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 	}
 	defer rows.Close()
 	for rows.Next() {
+		//continue
 		offer := RozetkaOffer{}
 		err := rows.Scan(&offer.ID, &offer.ParentID, &offer.UserID, &offer.NotDisable, &offer.Title,
 			&offer.Description, &offer.Price, &offer.Count, &offer.Images, &offer.VendorSql,
@@ -240,7 +257,13 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 		} else {
 			offer.Vendor = DefaultVendor
 		}
-		offer.Description = "<![CDATA[" + offer.Description + "]]>"
+		_, found := utils.Find(deniedVendors, offer.Vendor)
+		if found {
+			skipped++
+			continue
+		}
+		description, _ := qvx.Parse(offer.Description)
+		offer.Description = description
 		var images []models.ItemImage
 		if offer.ParentID == nil {
 			offer.Images = offerImages.String
@@ -267,7 +290,11 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 			param := RozetkaParam{}
 			param.Name = property.Title
 			param.Value = property.Value
-			offer.Params = append(offer.Params, param)
+			if param.Name == "Артикул" {
+				offer.Title += " " + param.Value
+			} else {
+				offer.Params = append(offer.Params, param)
+			}
 		}
 		if offer.ParentID == nil {
 			continue
@@ -280,10 +307,12 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 		if offer.Count == 0 {
 			offer.Count = DefaultCount
 		}
+		offer.Price += offer.Price / 100 * settings.RozetkaMarkup
 		offers = append(offers, offer)
 	}
 	if err = rows.Err(); err != nil {
 		logger.Error(err.Error())
 	}
+	fmt.Printf("Skipped - %d\n", skipped)
 	return offers
 }

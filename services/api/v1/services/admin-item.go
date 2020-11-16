@@ -695,16 +695,15 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 			logger.Error(err.Error())
 			return nil, status.Errorf(codes.Aborted, "Error save offer")
 		}
-	}
-
-	if req.CategoryId != 0 {
-		_, err := db.DB.Exec(ctx,
-			`INSERT INTO items_categories (user_id, item_id, category_id) VALUES($1, $2, $3)
-					ON CONFLICT ON CONSTRAINT items_categories_pkey 
-					DO NOTHING`,
-			user_id, item.ID, req.CategoryId)
-		if err != nil {
-			logger.Error(err.Error())
+		if req.CategoryId != 0 {
+			_, err := db.DB.Exec(ctx,
+				`INSERT INTO items_categories (user_id, item_id, category_id) VALUES($1, $2, $3)
+						ON CONFLICT ON CONSTRAINT items_categories_pkey 
+						DO NOTHING`,
+				user_id, item.ID, req.CategoryId)
+			if err != nil {
+				logger.Error(err.Error())
+			}
 		}
 	}
 

@@ -268,7 +268,7 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 		if offer.ParentID == nil {
 			offer.Images = offerImages.String
 		} else {
-			offer.Title += " (" + strconv.Itoa(int(offer.ID)) + ")"
+			//offer.Title += " (" + strconv.Itoa(int(offer.ID)) + ")"
 			parentCategory := uint32(parentCategoryID.Int32)
 			offer.CategoryID = &parentCategory
 		}

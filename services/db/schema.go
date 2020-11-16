@@ -58,7 +58,7 @@ CREATE TABLE items (
 	seo_keywords text DEFAULT '',
 
 	parent_id bigint DEFAULT NULL,
-	vendor_id int DEFAULT NUll,
+	vendor_id int DEFAULT 0,
 	currency_id smallint DEFAULT NULL,
 
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,

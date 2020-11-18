@@ -33,7 +33,7 @@ type Item struct {
 	SeoKeywords    string  `db:"seo_keywords" json:"seo_keywords"`
 
 	ParentID   sql.NullInt64 `db:"parent_id"`
-	VendorID   sql.NullInt32 `db:"vendor_id"`
+	VendorID   uint32        `db:"vendor_id"`
 	CurrencyID sql.NullInt32 `db:"currency_id"`
 
 	Categories []Category
@@ -67,7 +67,7 @@ type Offer struct {
 	SeoKeywords    string      `db:"seo_keywords" json:"seo_keywords"`
 
 	ParentID   sql.NullInt64 `db:"parent_id"`
-	VendorID   sql.NullInt32 `db:"vendor_id"`
+	VendorID   uint32        `db:"vendor_id"`
 	CurrencyID sql.NullInt32 `db:"currency_id"`
 
 	Categories []Category

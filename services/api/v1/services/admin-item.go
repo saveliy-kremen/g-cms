@@ -192,11 +192,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 	item.Count = req.Count
 	item.InStock = req.InStock
 	item.Description = req.Description
-	if req.ParentId == 0 {
-		item.VendorID = sql.NullInt32{int32(req.VendorId), false}
-	} else {
-		item.VendorID = sql.NullInt32{int32(req.VendorId), true}
-	}
+	item.VendorID = req.VendorId
 	item.Price = req.Price
 	item.OldPrice = req.OldPrice
 	if req.ParentId == 0 {
@@ -580,12 +576,11 @@ func (s *AdminItemServiceImpl) AdminItemOffers(ctx context.Context, req *v1.Admi
 func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.AdminUploadOfferRequest) (*v1.AdminItemResponse, error) {
 	user_id := auth.GetUserUID(ctx)
 
-	var vendorID int32
+	var vendorID uint32
 
 	if req.Vendor != "" {
 		err := db.DB.QueryRow(ctx, "SELECT id FROM vendors WHERE name=$1", req.Vendor).Scan(&vendorID)
 		if err != nil && err == pgx.ErrNoRows {
-			var vendorID int32
 			row := db.DB.QueryRow(ctx, "INSERT INTO vendors (name, country) VALUES($1, $2) RETURNING (id)", req.Vendor, req.Country)
 			err := row.Scan(&vendorID)
 			if err != nil {
@@ -667,11 +662,7 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 	} else {
 		item.CurrencyID = sql.NullInt32{currencyID, true}
 	}
-	if vendorID == 0 {
-		item.VendorID = sql.NullInt32{vendorID, false}
-	} else {
-		item.VendorID = sql.NullInt32{vendorID, true}
-	}
+	item.VendorID = vendorID
 
 	if item.ID != 0 {
 		_, err := db.DB.Exec(ctx, `

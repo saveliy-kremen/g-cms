@@ -3,20 +3,21 @@ package models
 import (
 	"database/sql"
 	v1 "gcms/api/v1"
+	"time"
 )
 
 type Vendor struct {
-	ID        sql.NullInt32 `db:"id"`
-	CreatedAt sql.NullTime  `db:"created_at"`
+	ID        uint32    `db:"id"`
+	CreatedAt time.Time `db:"created_at"`
 
-	Name    sql.NullString `db:"name"`
+	Name    string         `db:"name"`
 	Country sql.NullString `db:"country"`
 }
 
 func VendorToResponse(vendor Vendor) *v1.Vendor {
 	return &v1.Vendor{
-		Id:      uint32(vendor.ID.Int32),
-		Name:    vendor.Name.String,
+		Id:      vendor.ID,
+		Name:    vendor.Name,
 		Country: vendor.Country.String,
 	}
 }

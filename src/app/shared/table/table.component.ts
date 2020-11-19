@@ -32,7 +32,7 @@ import { MatTable } from '@angular/material/table';
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
-  <mat-paginator [pageSizeOptions]="pageSizeOptions" [length]="length" (page)="changePage($event)"
+  <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageIndex" [length]="length" (page)="changePage($event)"
     showFirstLastButtons>
   </mat-paginator>
   `,
@@ -56,7 +56,7 @@ import { MatTable } from '@angular/material/table';
       padding-right: 10px;
     }
     .button-edit {
-      color: #9c27b0;
+      color: #533430;
     }
     .button-delete {
       color: red;
@@ -83,19 +83,37 @@ export class TableComponent {
   @Input()
   actions: any
 
+  @Input()
+  page: any
+
+  @Input()
+  sort: any
+
+  @Input()
+  direction: any
+
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator
   @ViewChild(MatTable, { static: true }) table: MatTable<any>
   data: any
   pageSizeOptions = environment.pageSizeOptions
   pageIndex: number = 0
   pageSize: number = environment.pageSizeOptions[0]
-  active: string = null
-  direction: string = null
+  pageDirection: string = null
+  pageSort: string = null
 
   constructor(private router: Router) {
   }
 
   ngOnInit() {
+    if (this.page) {
+      this.pageIndex = this.page
+    }
+    if (this.sort) {
+      this.pageSort = this.sort
+    }
+    if (this.direction) {
+      this.pageDirection = this.direction
+    }
     if (this.length) {
       this.table.renderRows()
     }
@@ -103,12 +121,12 @@ export class TableComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.dataSource && this.dataSource) {
-      if (this.active == "position") {
+      if (this.pageSort == "position") {
         this.data = this.dataSource.map((item, index) => {
           return {
             ...item, position: this.pageIndex * this.pageSize + index + 1,
           }
-        }).sort(this.direction == "asc" ? compareNumericAsc : compareNumericDesc)
+        }).sort(this.pageDirection == "asc" ? compareNumericAsc : compareNumericDesc)
       } else {
         this.data = this.dataSource.map((item, index) => {
           return {
@@ -117,21 +135,30 @@ export class TableComponent {
         })
       }
     }
+    if (changes.page) {
+      this.pageIndex = this.page
+    }
+    if (changes.sort) {
+      this.pageSort = this.sort
+    }
+    if (changes.direction) {
+      this.pageDirection = this.direction
+    }
   }
 
   changePage($event) {
     this.pageIndex = $event.pageIndex
     this.pageSize = $event.pageSize
-    this.changePageHandler.emit({ pageIndex: this.pageIndex, pageSize: this.pageSize, sort: this.active != "position" ? this.active : null, direction: this.active != "position" ? this.direction : null })
+    this.changePageHandler.emit({ pageIndex: this.pageIndex, pageSize: this.pageSize, sort: this.pageSort != "position" ? this.pageSort : null, direction: this.pageSort != "position" ? this.pageDirection : null })
   }
 
   sortChange($event) {
-    this.active = $event.active
-    this.direction = $event.direction
+    this.pageSort = $event.active
+    this.pageDirection = $event.direction
     if ($event.active == "position") {
       this.data.sort($event.direction == "asc" ? compareNumericAsc : compareNumericDesc);
     } else {
-      this.changePageHandler.emit({ pageIndex: this.pageIndex, pageSize: this.pageSize, sort: this.active, direction: this.direction })
+      this.changePageHandler.emit({ pageIndex: this.pageIndex, pageSize: this.pageSize, sort: this.pageSort, direction: this.pageDirection })
     }
     this.table.renderRows()
   }

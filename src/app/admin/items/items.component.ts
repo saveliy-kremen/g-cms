@@ -8,6 +8,7 @@ import { environment } from 'src/environments/environment';
 import { ModalService } from 'src/app/shared/modal/modal.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { StorageService } from 'src/app/shared/services/storage.service';
 
 @Component({
   selector: 'app-items',
@@ -40,7 +41,8 @@ export class ItemsComponent implements OnInit {
     private adminItemService: AdminItemGrpcService,
     private modalService: ModalService,
     private translateService: TranslateService,
-    private authService: AuthService
+    private authService: AuthService,
+    private storageService: StorageService
   ) { }
 
   async ngOnInit() {
@@ -49,6 +51,12 @@ export class ItemsComponent implements OnInit {
     this.itemsPageSize = environment.pageSizeOptions[0]
     let res: any = await this.authService.getUser()
     this.uploadUrl = `${environment.siteUrl}/uploads/users/${res.id}/items/`
+    const savedTable = this.storageService.getTable("items")
+    if (savedTable != null) {
+      this.itemsPage = savedTable.page
+      this.itemsSort = savedTable.sort
+      this.itemsDirection = savedTable.direction
+    }
     res = await this.adminItemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
     this.updateItemsData(res)
     this.loaderService.hideLoader()
@@ -59,6 +67,7 @@ export class ItemsComponent implements OnInit {
     this.itemsPageSize = event.pageSize
     this.itemsSort = event.sort
     this.itemsDirection = event.direction
+    this.storageService.saveTable("items", JSON.stringify({ page: this.itemsPage, sort: this.itemsSort, direction: this.itemsDirection }))
     let res = await this.adminItemService.items(this.itemsPage, this.itemsPageSize, this.itemsSort, this.itemsDirection).toPromise()
     this.updateItemsData(res)
   }

@@ -183,7 +183,6 @@ export class ItemEditComponent implements OnInit {
       while (formArray.length !== 0) {
         formArray.removeAt(0)
       }
-      console.log(res)
       this.itemProperties = res.propertiesList
       for (let property of res.propertiesList) {
         let formItem = {};

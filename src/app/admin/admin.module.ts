@@ -41,6 +41,7 @@ import { UsersEditComponent } from './users_page/users-edit/users-edit.component
 import { SearchService } from '../shared/services/search.service'
 import { SettingsComponent } from './settings/settings.component'
 import { AdminSettingsGrpcService } from '../shared/services/grpc/admin-settings.service'
+import { StorageService } from '../shared/services/storage.service'
 
 @NgModule({
   declarations: [
@@ -80,6 +81,7 @@ import { AdminSettingsGrpcService } from '../shared/services/grpc/admin-settings
     LoaderService,
     UploadService,
     SearchService,
+    StorageService,
     AdminAuthGuard,
     GrpcHelper,
     AdminCategoryGrpcService,

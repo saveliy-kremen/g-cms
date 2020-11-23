@@ -13,7 +13,6 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 import { TranslateService } from '@ngx-translate/core';
 import { VendorGrpcService } from 'src/app/shared/services/grpc/vendor.service';
 import { CurrencyGrpcService } from 'src/app/shared/services/grpc/currency.service';
-import { RozetkaService } from 'src/app/shared/services/rozetka.service';
 
 declare var $: any
 
@@ -94,7 +93,6 @@ export class ItemEditComponent implements OnInit {
     private authService: AuthService,
     private uploadService: UploadService,
     private modalService: ModalService,
-    private rozetkaService: RozetkaService,
     private translateService: TranslateService,
   ) { }
 

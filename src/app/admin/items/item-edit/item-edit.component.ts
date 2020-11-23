@@ -115,16 +115,6 @@ export class ItemEditComponent implements OnInit {
       properties: new FormArray([])
     })
     this.loaderService.showLoader()
-
-    //Rozetka
-    this.rozetkaService.login("bezpekadim.ua@gmail.com", "tupna9ab")
-      .subscribe(
-        (data: any) => {
-          console.log(data)
-        },
-        error => console.log(error)
-      );
-
     if (this.activeRoute.snapshot.queryParamMap.get("tab")) {
       this.itemTabIndex = Number(this.activeRoute.snapshot.queryParamMap.get("tab"))
     }

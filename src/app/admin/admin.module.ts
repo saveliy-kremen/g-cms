@@ -42,6 +42,7 @@ import { SearchService } from '../shared/services/search.service'
 import { SettingsComponent } from './settings/settings.component'
 import { AdminSettingsGrpcService } from '../shared/services/grpc/admin-settings.service'
 import { StorageService } from '../shared/services/storage.service'
+import { RozetkaService } from '../shared/services/rozetka.service'
 
 @NgModule({
   declarations: [
@@ -83,6 +84,7 @@ import { StorageService } from '../shared/services/storage.service'
     SearchService,
     StorageService,
     AdminAuthGuard,
+    RozetkaService,
     GrpcHelper,
     AdminCategoryGrpcService,
     AdminItemGrpcService,

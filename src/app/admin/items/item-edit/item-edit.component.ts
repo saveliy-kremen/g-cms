@@ -13,6 +13,7 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 import { TranslateService } from '@ngx-translate/core';
 import { VendorGrpcService } from 'src/app/shared/services/grpc/vendor.service';
 import { CurrencyGrpcService } from 'src/app/shared/services/grpc/currency.service';
+import { RozetkaService } from 'src/app/shared/services/rozetka.service';
 
 declare var $: any
 
@@ -93,6 +94,7 @@ export class ItemEditComponent implements OnInit {
     private authService: AuthService,
     private uploadService: UploadService,
     private modalService: ModalService,
+    private rozetkaService: RozetkaService,
     private translateService: TranslateService,
   ) { }
 
@@ -113,6 +115,16 @@ export class ItemEditComponent implements OnInit {
       properties: new FormArray([])
     })
     this.loaderService.showLoader()
+
+    //Rozetka
+    this.rozetkaService.login("bezpekadim.ua@gmail.com", "tupna9ab")
+      .subscribe(
+        (data: any) => {
+          console.log(data)
+        },
+        error => console.log(error)
+      );
+
     if (this.activeRoute.snapshot.queryParamMap.get("tab")) {
       this.itemTabIndex = Number(this.activeRoute.snapshot.queryParamMap.get("tab"))
     }

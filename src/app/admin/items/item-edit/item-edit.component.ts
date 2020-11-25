@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormArray, NgForm, FormGroupDirective } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,6 +13,8 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 import { TranslateService } from '@ngx-translate/core';
 import { VendorGrpcService } from 'src/app/shared/services/grpc/vendor.service';
 import { CurrencyGrpcService } from 'src/app/shared/services/grpc/currency.service';
+import { Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged } from "rxjs/internal/operators";
 
 declare var $: any
 
@@ -47,6 +49,7 @@ export class ItemEditComponent implements OnInit {
   itemID: number
   item: any = {}
   categoriesData: any
+  rozetkaCategoriesData: any
   itemProperties: any = []
 
   //Parent
@@ -83,6 +86,11 @@ export class ItemEditComponent implements OnInit {
   //Currencies
   currencies: any = []
 
+  //Rozetka category
+  public rozetkaCategorySearchValue: string = "";
+  rozetkaCategorySearchChanged: Subject<string> = new Subject<string>();
+  rozetkaCategory: number
+
   constructor(
     private router: Router,
     private loaderService: LoaderService,
@@ -94,7 +102,15 @@ export class ItemEditComponent implements OnInit {
     private uploadService: UploadService,
     private modalService: ModalService,
     private translateService: TranslateService,
-  ) { }
+  ) {
+    this.rozetkaCategorySearchChanged.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
+      this.adminItemService.rozetkaCategories(this.rozetkaCategorySearchValue).subscribe(
+        (response) => {
+          this.rozetkaCategoriesData = JSON.parse(response.categories)
+        }
+      );
+    });
+  }
 
   async ngOnInit() {
     this.itemForm = new FormGroup({
@@ -149,7 +165,7 @@ export class ItemEditComponent implements OnInit {
       res = await this.adminItemService.itemCategories(this.item.id).toPromise()
       this.categoriesData = res.categoriesList
       await this.categoriesTranslate();
-      await this.updateProperties();
+      //await this.updateProperties();
     } catch (err) {
       this.itemMessage = new Message("danger", err.message);
     }
@@ -162,6 +178,10 @@ export class ItemEditComponent implements OnInit {
       this.itemMessage = new Message("danger", err.message);
     }
     this.loaderService.hideLoader()
+  }
+
+  rozetkaCategorySearchChange(query: string) {
+    this.rozetkaCategorySearchChanged.next(query);
   }
 
   get properties(): FormArray {
@@ -383,5 +403,15 @@ export class ItemEditComponent implements OnInit {
       this.requestUploadImages.push($event.dragData)
       this.requestItemImages = this.itemImages.filter(item => item.filename != $event.dragData.filename)
     }
+  }
+
+  async applyRozetkaCategory() {
+    let res: any = await this.adminItemService.rozetkaBindCategory(this.itemID, this.rozetkaCategory).toPromise()
+    res = await this.adminItemService.rozetkaProperties(this.rozetkaCategory).toPromise()
+    console.log(res.propertiesList)
+  }
+
+  applyRozetkaCategoryAll() {
+    console.log(this.rozetkaCategory)
   }
 }

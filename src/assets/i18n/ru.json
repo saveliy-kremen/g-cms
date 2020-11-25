@@ -1,5 +1,9 @@
 {
   "Category": "Категория",
+  "RozetkaCategory": "Категория Rozetka",
+  "Search": "Поиск",
+  "Apply": "Применить",
+  "ApplyToAll": "Применить ко всем товарам с такой категорией",
   "Categories": "Категории",
   "Import": "Импорт",
   "Delete Сategory": "Удаление категории",

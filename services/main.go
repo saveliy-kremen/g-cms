@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -15,7 +14,8 @@ import (
 	"gcms/api/v1/services"
 	"gcms/config"
 	"gcms/packages/auth"
-	"gcms/packages/download"
+
+	//"gcms/packages/download"
 	"gcms/packages/upload"
 )
 
@@ -62,7 +62,7 @@ func main() {
 
 	fmt.Printf("download")
 	//download.Prom(context.Background())
-	download.Rozetka(context.Background())
+	//download.Rozetka(context.Background())
 
 	// finally, run the server
 	fmt.Printf("GRPC listening on %v\n", grpc_lis.Addr())

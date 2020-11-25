@@ -52,6 +52,28 @@ message AdminItemProperty {
   repeated uint32 property_value_ids = 2;
 }
 
+message AdminRozetkaCategory{
+  string id = 1;
+  string title = 2;
+  string full_title = 3;
+  string parent = 4;
+}
+
+message AdminRozetkaProperty{
+  uint32 id = 1;
+  string name = 2;
+  bool is_global = 3;
+  string filter_type = 4;
+  string attr_type = 5;
+
+  repeated AdminRozetkaPropertyValue values = 6;
+}
+
+message AdminRozetkaPropertyValue{
+  uint32 id = 1;
+  string name = 2;
+}
+
 message AdminItemRequest {
   uint32 id = 1;
 }
@@ -134,6 +156,19 @@ message AdminUploadOfferRequest {
   repeated uint32 properties = 13;
 }
 
+message AdminRozetkaCategoriesRequest {
+  string search = 1;
+}
+
+message AdminRozetkaCategoryBindRequest {
+  uint32 item_id = 1;
+  uint32 category_id = 2;
+}
+
+message AdminRozetkaPropertiesRequest {
+  uint32 category_id = 1;
+}
+
 message AdminItemResponse {
   AdminItem item = 1;
 }
@@ -152,6 +187,18 @@ message AdminUploadImagesResponse {
   repeated AdminUploadImage images = 1;
 }
 
+message AdminRozetkaCategoriesResponse {
+  string categories = 1;
+}
+
+message AdminRozetkaCategoryBindResponse {
+  string category = 1;
+}
+
+message AdminRozetkaPropertiesResponse {
+  repeated AdminRozetkaProperty properties = 1;
+}
+
 service AdminItemService {
   rpc AdminItem(AdminItemRequest) returns (AdminItemResponse);
   rpc AdminCreateDraftItem(AdminDraftRequest) returns (AdminItemResponse);
@@ -166,4 +213,7 @@ service AdminItemService {
   rpc AdminItemProperties(AdminItemRequest) returns (AdminPropertiesResponse);
   rpc AdminItemOffers(AdminOffersRequest) returns (AdminOffersResponse);
   rpc AdminUploadOffer(AdminUploadOfferRequest) returns (AdminItemResponse);
+  rpc AdminRozetkaCategories(AdminRozetkaCategoriesRequest) returns (AdminRozetkaCategoriesResponse);
+  rpc AdminRozetkaBindCategory(AdminRozetkaCategoryBindRequest) returns (AdminRozetkaCategoryBindResponse);
+  rpc AdminRozetkaProperties(AdminRozetkaPropertiesRequest) returns (AdminRozetkaPropertiesResponse);
 }

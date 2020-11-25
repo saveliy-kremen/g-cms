@@ -167,6 +167,33 @@
           <div id="categoryTree"></div>
           <br>
         </mat-tab>
+        <mat-tab label="{{'RozetkaCategory' | translate}}" *ngIf="!parentID && (mode == 'edit' || mode == 'draft')">
+          <br>
+          <mat-form-field class="third-width">
+            <input matInput #rozetkaSearchCategoryInput placeholder="{{'Search' | translate}}"
+              [ngModelOptions]="{standalone: true}" [(ngModel)]="rozetkaCategorySearchValue"
+              (ngModelChange)="rozetkaCategorySearchChange($event)">
+          </mat-form-field>
+          <br>
+          <mat-radio-group aria-label="Rozetka categories" class="rozetka-categories" [(ngModel)]="rozetkaCategory"
+            [ngModelOptions]="{standalone: true}">
+            <mat-radio-button value={{category.id}} *ngFor="let category of rozetkaCategoriesData"
+              class="rozetka-category">
+              {{category.full_title}}</mat-radio-button>
+          </mat-radio-group>
+          <br>
+          <div *ngIf="rozetkaCategoriesData">
+            <button mat-raised-button type="button" class="btn" color="accent" style="margin-right: 10px;"
+              [disabled]="rozetkaCategory ? null : 'disabled'" (click)="applyRozetkaCategory()">
+              {{"Apply" | translate}}
+            </button>
+            <button mat-raised-button type="button" class="btn btn-primary" style="margin-right: 10px;"
+              [disabled]="rozetkaCategory ? null : 'disabled'" (click)="applyRozetkaCategoryAll()">
+              {{"ApplyToAll" | translate}}
+            </button>
+          </div>
+          <br><br><br>
+        </mat-tab>
         <mat-tab label="{{'Trading offers' | translate}}" *ngIf="!parentID && (mode == 'edit' || mode == 'draft')">
           <mat-card>
             <button mat-mini-fab color="accent" style="margin: 20px;"

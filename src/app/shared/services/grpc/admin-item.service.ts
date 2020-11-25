@@ -313,4 +313,59 @@ export class AdminItemGrpcService {
         });
         return this.grpcHelper.grpcUnary<GRPC.AdminItemResponse.AsObject>(promise);
     }
+
+    public rozetkaCategories(search: string): Observable<GRPC.AdminRozetkaCategoriesResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.AdminRozetkaCategoriesRequest()
+            request.setSearch(search)
+            this.client.adminRozetkaCategories(request, meta, (err: grpcWeb.Error, response: GRPC.AdminRozetkaCategoriesResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return this.grpcHelper.grpcUnary<GRPC.AdminRozetkaCategoriesResponse.AsObject>(promise);
+    }
+
+    public rozetkaBindCategory(itemID: number, categoryID: number): Observable<GRPC.AdminRozetkaCategoryBindResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.AdminRozetkaCategoryBindRequest()
+            request.setItemId(itemID)
+            request.setCategoryId(categoryID)
+            this.client.adminRozetkaBindCategory(request, meta, (err: grpcWeb.Error, response: GRPC.AdminRozetkaCategoryBindResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return this.grpcHelper.grpcUnary<GRPC.AdminRozetkaCategoryBindResponse.AsObject>(promise);
+    }
+
+    public rozetkaProperties(categoryID: number): Observable<GRPC.AdminRozetkaPropertiesResponse.AsObject> {
+        const meta: Metadata = {
+            Authorization: "Bearer " + this.session.getToken()
+        };
+
+        const promise = new Promise((resolve, reject) => {
+            var request = new GRPC.AdminRozetkaPropertiesRequest()
+            request.setCategoryId(categoryID)
+            this.client.adminRozetkaProperties(request, meta, (err: grpcWeb.Error, response: GRPC.AdminRozetkaPropertiesResponse) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(response);
+            });
+        });
+        return this.grpcHelper.grpcUnary<GRPC.AdminRozetkaPropertiesResponse.AsObject>(promise);
+    }
 }

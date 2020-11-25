@@ -70,7 +70,6 @@ type RozetkaOffer struct {
 	Vendor      string           `xml:"vendor"`
 	VendorSql   sql.NullString   `xml:"-"`
 	Country     string           `xml:"country"`
-	Available   bool             `xml:"available"`
 	Count       uint32           `xml:"stock_quantity"`
 }
 
@@ -303,7 +302,6 @@ func getRozetkaOffers(ctx context.Context, userID uint32) []RozetkaOffer {
 			offer.Url = config.AppConfig.Host + "offer/" + strconv.Itoa(int(offer.ID))
 		}
 		offer.NotDisable = !offer.NotDisable
-		offer.Available = offer.NotDisable
 		if offer.Count == 0 {
 			offer.Count = DefaultCount
 		}

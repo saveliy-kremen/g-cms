@@ -1,10 +1,13 @@
 package models
 
 import (
+	"encoding/json"
 	"strconv"
 	"time"
 
 	v1 "gcms/api/v1"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 type Category struct {
@@ -27,6 +30,15 @@ type Category struct {
 
 	Children []Category
 }
+
+type RozetkaCategory struct {
+	ID        int
+	Title     string
+	FullTitle string
+	Parent    int
+}
+
+//fmt.Sprintf("%e", categoryData["parent_id"].(float64))
 
 func AdminCategoryToResponse(category Category) *v1.AdminCategory {
 	return &v1.AdminCategory{
@@ -89,4 +101,23 @@ func CategoriesToResponse(categories []Category) []*v1.Category {
 		respCategories = append(respCategories, CategoryToResponse(category))
 	}
 	return respCategories
+}
+
+func AdminRozetkaCategoryToResponse(category RozetkaCategory) *v1.AdminRozetkaCategory {
+	return &v1.AdminRozetkaCategory{
+		Id:        strconv.Itoa(category.ID),
+		Title:     category.Title,
+		FullTitle: category.FullTitle,
+		Parent:    strconv.Itoa(category.Parent),
+	}
+}
+
+func AdminRozetkaCategoriesToResponse(categories []RozetkaCategory) string {
+	respCategories := []*v1.AdminRozetkaCategory{}
+	for _, category := range categories {
+		respCategories = append(respCategories, AdminRozetkaCategoryToResponse(category))
+	}
+	response, err := json.Marshal(respCategories)
+	spew.Dump(err)
+	return string(response)
 }

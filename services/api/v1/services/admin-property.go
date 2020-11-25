@@ -437,7 +437,7 @@ func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req 
 	row = db.DB.QueryRow(ctx,
 		`SELECT id, user_id, property_id, value, sort
 			FROM properties_values
-			WHERE user_id = $1 AND value = $2`,
+			WHERE user_id = $1 AND LOWER(value) = $2`,
 		user_id, strings.ToLower(strings.TrimSpace(req.Value)))
 	err = row.Scan(&propertyValue.ID, &propertyValue.UserID, &propertyValue.PropertyID, &propertyValue.Value, &propertyValue.Sort)
 	if err != nil && err == pgx.ErrNoRows {
@@ -458,7 +458,7 @@ func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req 
 		VALUES ($1, $2, $3, $4)
 		RETURNING id
 		`,
-			propertyValue.UserID, propertyValue.PropertyID, propertyValue.Value, propertyValue.Sort).Scan(&propertyValue.ID)
+			propertyValue.UserID, propertyValue.PropertyID, strings.TrimSpace(propertyValue.Value), propertyValue.Sort).Scan(&propertyValue.ID)
 		if err != nil {
 			logger.Error(err.Error())
 		}
@@ -498,8 +498,6 @@ func (s *AdminPropertyServiceImpl) AdminUploadProperty(ctx context.Context, req 
 		ON CONFLICT ON CONSTRAINT items_properties_pkey DO NOTHING`,
 		user_id, req.ItemId, property.ID, propertyValue.ID)
 	if err != nil {
-		spew.Dump(property.ID)
-		spew.Dump(propertyValue.ID)
 		logger.Error(err.Error())
 		return nil, status.Errorf(codes.Aborted, "Error save item property")
 	}

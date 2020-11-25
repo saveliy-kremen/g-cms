@@ -27,6 +27,12 @@ import {
   AdminItemsResponse,
   AdminOffersRequest,
   AdminOffersResponse,
+  AdminRozetkaCategoriesRequest,
+  AdminRozetkaCategoriesResponse,
+  AdminRozetkaCategoryBindRequest,
+  AdminRozetkaCategoryBindResponse,
+  AdminRozetkaPropertiesRequest,
+  AdminRozetkaPropertiesResponse,
   AdminUploadImagesResponse,
   AdminUploadOfferRequest} from './admin-item_pb';
 
@@ -332,6 +338,72 @@ export class AdminItemServiceClient {
       request,
       metadata || {},
       this.methodInfoAdminUploadOffer,
+      callback);
+  }
+
+  methodInfoAdminRozetkaCategories = new grpcWeb.AbstractClientBase.MethodInfo(
+    AdminRozetkaCategoriesResponse,
+    (request: AdminRozetkaCategoriesRequest) => {
+      return request.serializeBinary();
+    },
+    AdminRozetkaCategoriesResponse.deserializeBinary
+  );
+
+  adminRozetkaCategories(
+    request: AdminRozetkaCategoriesRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: AdminRozetkaCategoriesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.AdminItemService/AdminRozetkaCategories',
+      request,
+      metadata || {},
+      this.methodInfoAdminRozetkaCategories,
+      callback);
+  }
+
+  methodInfoAdminRozetkaBindCategory = new grpcWeb.AbstractClientBase.MethodInfo(
+    AdminRozetkaCategoryBindResponse,
+    (request: AdminRozetkaCategoryBindRequest) => {
+      return request.serializeBinary();
+    },
+    AdminRozetkaCategoryBindResponse.deserializeBinary
+  );
+
+  adminRozetkaBindCategory(
+    request: AdminRozetkaCategoryBindRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: AdminRozetkaCategoryBindResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.AdminItemService/AdminRozetkaBindCategory',
+      request,
+      metadata || {},
+      this.methodInfoAdminRozetkaBindCategory,
+      callback);
+  }
+
+  methodInfoAdminRozetkaProperties = new grpcWeb.AbstractClientBase.MethodInfo(
+    AdminRozetkaPropertiesResponse,
+    (request: AdminRozetkaPropertiesRequest) => {
+      return request.serializeBinary();
+    },
+    AdminRozetkaPropertiesResponse.deserializeBinary
+  );
+
+  adminRozetkaProperties(
+    request: AdminRozetkaPropertiesRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: AdminRozetkaPropertiesResponse) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/v1.AdminItemService/AdminRozetkaProperties',
+      request,
+      metadata || {},
+      this.methodInfoAdminRozetkaProperties,
       callback);
   }
 

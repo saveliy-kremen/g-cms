@@ -3,10 +3,12 @@ package services
 import (
 	"context"
 	"database/sql"
+	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -734,6 +736,196 @@ func (s *AdminItemServiceImpl) AdminUploadOffer(ctx context.Context, req *v1.Adm
 		logger.Error(err.Error())
 	}
 	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
+}
+
+func (s *AdminItemServiceImpl) AdminRozetkaCategories(ctx context.Context, req *v1.AdminRozetkaCategoriesRequest) (*v1.AdminRozetkaCategoriesResponse, error) {
+	formData := url.Values{
+		"username": {"demo"},
+		"password": {b64.StdEncoding.EncodeToString([]byte("2Dem018"))},
+	}
+	res, err := http.PostForm("https://api.seller.rozetka.com.ua/sites", formData)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	var result map[string]interface{}
+	json.NewDecoder(res.Body).Decode(&result)
+	content := result["content"].(map[string]interface{})
+	token := content["access_token"].(string)
+	rozetkaCategories := parseRozetkaCategory(req.Search, 0, 1, token)
+
+	return &v1.AdminRozetkaCategoriesResponse{Categories: models.AdminRozetkaCategoriesToResponse(rozetkaCategories)}, nil
+}
+
+func parseRozetkaCategory(search string, parentID int, page int, token string) []models.RozetkaCategory {
+	var rozetkaCategories []models.RozetkaCategory
+	var result map[string]interface{}
+
+	//?name=search&page=1&sort=name
+	//url := fmt.Sprintf("https://api.seller.rozetka.com.ua/market-categories/get-categories-by-parent?parent_id=%d&page=%d&expand=children", parentID, page)
+	url := fmt.Sprintf("https://api.seller.rozetka.com.ua/market-categories/get-categories-by-parent?name=%s&page=%d&sort=name&expand=parents", search, page)
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	// Получаем и устанавливаем тип контента
+	request.Header.Set("Authorization", "Bearer "+token)
+
+	// Отправляем запрос
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	json.NewDecoder(response.Body).Decode(&result)
+	response.Body.Close()
+
+	rozetkaCategoriesContent := result["content"].(map[string]interface{})
+	rozetkaMeta := rozetkaCategoriesContent["_meta"].(map[string]interface{})
+	rozetkaCategoriesResult := rozetkaCategoriesContent["categories"].([]interface{})
+	for _, rozetkaCategory := range rozetkaCategoriesResult {
+		category := models.RozetkaCategory{}
+		categoryData := rozetkaCategory.(map[string]interface{})
+		category.ID = int(categoryData["category_id"].(float64))
+		category.Parent = int(categoryData["parent_id"].(float64))
+		category.Title = categoryData["name"].(string)
+		category.FullTitle = categoryData["name"].(string)
+		if _, ok := categoryData["parents"]; ok {
+			parents := categoryData["parents"].([]interface{})
+			parentsTitle := ""
+			for _, parent := range parents {
+				data := parent.(map[string]interface{})
+				parentsTitle = data["name"].(string) + "/" + parentsTitle
+			}
+			category.FullTitle = parentsTitle + category.FullTitle
+		}
+		rozetkaCategories = append(rozetkaCategories, category)
+	}
+	currentPage := int(rozetkaMeta["currentPage"].(float64))
+	pageCount := int(rozetkaMeta["pageCount"].(float64))
+	if currentPage < pageCount {
+		nextRozetkaCategories := parseRozetkaCategory(search, parentID, currentPage+1, token)
+		rozetkaCategories = append(rozetkaCategories, nextRozetkaCategories...)
+	}
+	return rozetkaCategories
+}
+
+func (s *AdminItemServiceImpl) AdminRozetkaBindCategory(ctx context.Context, req *v1.AdminRozetkaCategoryBindRequest) (*v1.AdminRozetkaCategoryBindResponse, error) {
+	formData := url.Values{
+		"username": {"demo"},
+		"password": {b64.StdEncoding.EncodeToString([]byte("2Dem018"))},
+	}
+	res, err := http.PostForm("https://api.seller.rozetka.com.ua/sites", formData)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	var result map[string]interface{}
+	json.NewDecoder(res.Body).Decode(&result)
+	content := result["content"].(map[string]interface{})
+	token := content["access_token"].(string)
+
+	url := fmt.Sprintf("https://api.seller.rozetka.com.ua/market-categories/category-options?category_id=%d", req.CategoryId)
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	// Получаем и устанавливаем тип контента
+	request.Header.Set("Authorization", "Bearer "+token)
+
+	// Отправляем запрос
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	json.NewDecoder(response.Body).Decode(&result)
+	response.Body.Close()
+	propertiesContent := result["content"].(string)
+	propertiesData := []models.RozetkaPropertyData{}
+	err = json.Unmarshal([]byte(propertiesContent), &propertiesData)
+	properties := []models.RozetkaProperty{}
+	property := models.RozetkaProperty{}
+	for _, propertyData := range propertiesData {
+		if propertyData.ID != property.ID {
+			if property.ID != 0 {
+				properties = append(properties, property)
+			}
+			property.ID = propertyData.ID
+			property.Name = propertyData.Name
+			property.IsGlobal = propertyData.IsGlobal
+			property.FilterType = propertyData.FilterType
+			property.AttrType = propertyData.AttrType
+		}
+		propertyValue := models.RozetkaPropertyValue{}
+		propertyValue.ID = propertyData.ValueID
+		propertyValue.Name = propertyData.ValueName
+		property.Values = append(property.Values, propertyValue)
+	}
+	if property.ID != 0 {
+		properties = append(properties, property)
+	}
+
+	return &v1.AdminRozetkaCategoryBindResponse{Category: propertiesContent}, nil
+}
+
+func (s *AdminItemServiceImpl) AdminRozetkaProperties(ctx context.Context, req *v1.AdminRozetkaPropertiesRequest) (*v1.AdminRozetkaPropertiesResponse, error) {
+	formData := url.Values{
+		"username": {"demo"},
+		"password": {b64.StdEncoding.EncodeToString([]byte("2Dem018"))},
+	}
+	res, err := http.PostForm("https://api.seller.rozetka.com.ua/sites", formData)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	var result map[string]interface{}
+	json.NewDecoder(res.Body).Decode(&result)
+	content := result["content"].(map[string]interface{})
+	token := content["access_token"].(string)
+
+	url := fmt.Sprintf("https://api.seller.rozetka.com.ua/market-categories/category-options?category_id=%d", req.CategoryId)
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	// Получаем и устанавливаем тип контента
+	request.Header.Set("Authorization", "Bearer "+token)
+
+	// Отправляем запрос
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	json.NewDecoder(response.Body).Decode(&result)
+	response.Body.Close()
+	propertiesContent := result["content"].(string)
+	propertiesData := []models.RozetkaPropertyData{}
+	err = json.Unmarshal([]byte(propertiesContent), &propertiesData)
+	properties := []models.RozetkaProperty{}
+	property := models.RozetkaProperty{}
+	for _, propertyData := range propertiesData {
+		if propertyData.FilterType == "disable" {
+			continue
+		}
+		if propertyData.ID != property.ID {
+			if property.ID != 0 {
+				properties = append(properties, property)
+			}
+			property.ID = propertyData.ID
+			property.Name = propertyData.Name
+			property.IsGlobal = propertyData.IsGlobal
+			property.FilterType = propertyData.FilterType
+			property.AttrType = propertyData.AttrType
+		}
+		propertyValue := models.RozetkaPropertyValue{}
+		propertyValue.ID = propertyData.ValueID
+		propertyValue.Name = propertyData.ValueName
+		property.Values = append(property.Values, propertyValue)
+	}
+	if property.ID != 0 {
+		properties = append(properties, property)
+	}
+
+	return &v1.AdminRozetkaPropertiesResponse{Properties: models.AdminRozetkaPropertiesToResponse(properties)}, nil
 }
 
 // compile-type check that our new type provides the

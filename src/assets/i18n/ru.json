@@ -26,6 +26,8 @@
   "Delete": "Удалить",
   "Cancel": "Отмена",
   "Properties": "Свойства",
+  "RozetkaPropertiesMain": "Свойства Rozetka в фильтре",
+  "RozetkaProperties": "Свойства Rozetka не в фильтре",
   "Items": "Товары",
   "item": "товар",
   "Orders": "Заказы",

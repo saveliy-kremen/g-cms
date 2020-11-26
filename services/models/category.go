@@ -1,13 +1,12 @@
 package models
 
 import (
+	"database/sql"
 	"encoding/json"
 	"strconv"
 	"time"
 
 	v1 "gcms/api/v1"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 type Category struct {
@@ -38,7 +37,13 @@ type RozetkaCategory struct {
 	Parent    int
 }
 
-//fmt.Sprintf("%e", categoryData["parent_id"].(float64))
+type ItemRozetkaCategory struct {
+	UserID     sql.NullInt64
+	ItemID     sql.NullInt64
+	CategoryID sql.NullInt64
+	Title      sql.NullString
+	FullTitle  sql.NullString
+}
 
 func AdminCategoryToResponse(category Category) *v1.AdminCategory {
 	return &v1.AdminCategory{
@@ -105,7 +110,7 @@ func CategoriesToResponse(categories []Category) []*v1.Category {
 
 func AdminRozetkaCategoryToResponse(category RozetkaCategory) *v1.AdminRozetkaCategory {
 	return &v1.AdminRozetkaCategory{
-		Id:        strconv.Itoa(category.ID),
+		Id:        uint64(category.ID),
 		Title:     category.Title,
 		FullTitle: category.FullTitle,
 		Parent:    strconv.Itoa(category.Parent),
@@ -117,7 +122,15 @@ func AdminRozetkaCategoriesToResponse(categories []RozetkaCategory) string {
 	for _, category := range categories {
 		respCategories = append(respCategories, AdminRozetkaCategoryToResponse(category))
 	}
-	response, err := json.Marshal(respCategories)
-	spew.Dump(err)
+	response, _ := json.Marshal(respCategories)
 	return string(response)
+}
+
+func AdminItemRozetkaCategoryToResponse(category ItemRozetkaCategory) *v1.AdminItemRozetkaCategory {
+	return &v1.AdminItemRozetkaCategory{
+		ItemId:    uint64(category.ItemID.Int64),
+		Id:        uint64(category.CategoryID.Int64),
+		Title:     category.Title.String,
+		FullTitle: category.FullTitle.String,
+	}
 }

@@ -13,7 +13,7 @@ import { ModalService } from 'src/app/shared/modal/modal.service';
 import { TranslateService } from '@ngx-translate/core';
 import { VendorGrpcService } from 'src/app/shared/services/grpc/vendor.service';
 import { CurrencyGrpcService } from 'src/app/shared/services/grpc/currency.service';
-import { Subject } from "rxjs";
+import { Subject, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged } from "rxjs/internal/operators";
 
 declare var $: any
@@ -40,7 +40,9 @@ export class ItemEditComponent implements OnInit {
   matcher = new MyErrorStateMatcher()
   uploadUrl: string
   mode: string
-  itemTabIndex: number;
+  itemTabIndex: number
+  subscriptions: Subscription[] = []
+  public loading: boolean
 
   //Item
   itemForm: FormGroup
@@ -49,8 +51,9 @@ export class ItemEditComponent implements OnInit {
   itemID: number
   item: any = {}
   categoriesData: any
-  rozetkaCategoriesData: any
+  rozetkaCategoriesData: any = []
   itemProperties: any = []
+  itemRozetkaProperties: any = []
 
   //Parent
   parent: any
@@ -89,7 +92,7 @@ export class ItemEditComponent implements OnInit {
   //Rozetka category
   public rozetkaCategorySearchValue: string = "";
   rozetkaCategorySearchChanged: Subject<string> = new Subject<string>();
-  rozetkaCategory: number
+  rozetkaCategoryID: number
 
   constructor(
     private router: Router,
@@ -106,7 +109,9 @@ export class ItemEditComponent implements OnInit {
     this.rozetkaCategorySearchChanged.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
       this.adminItemService.rozetkaCategories(this.rozetkaCategorySearchValue).subscribe(
         (response) => {
+          this.loaderService.showLoader()
           this.rozetkaCategoriesData = JSON.parse(response.categories)
+          this.loaderService.hideLoader()
         }
       );
     });
@@ -126,7 +131,8 @@ export class ItemEditComponent implements OnInit {
       inStock: new FormControl(''),
       disable: new FormControl(''),
       sort: new FormControl('', Validators.required),
-      properties: new FormArray([])
+      properties: new FormArray([]),
+      rozetkaProperties: new FormArray([])
     })
     this.loaderService.showLoader()
     if (this.activeRoute.snapshot.queryParamMap.get("tab")) {
@@ -146,6 +152,12 @@ export class ItemEditComponent implements OnInit {
       if (this.mode == "edit") {
         let res: any = await this.adminItemService.item(Number(this.itemID)).toPromise()
         this.item = res.item
+        console.log(this.item)
+        if (this.item.rozetkaCategory.id) {
+          this.rozetkaCategoriesData.push({ id: this.item.rozetkaCategory.id, title: this.item.rozetkaCategory.title, full_title: this.item.rozetkaCategory.fullTitle })
+          this.rozetkaCategoryID = this.item.rozetkaCategory.id
+          this.updateRozetkaProperties()
+        }
         this.updateOffersData(res.item)
       } else {
         const res: any = await this.adminItemService.createDraftItem(this.parentID).toPromise()
@@ -165,7 +177,7 @@ export class ItemEditComponent implements OnInit {
       res = await this.adminItemService.itemCategories(this.item.id).toPromise()
       this.categoriesData = res.categoriesList
       await this.categoriesTranslate();
-      //await this.updateProperties();
+      await this.updateProperties();
     } catch (err) {
       this.itemMessage = new Message("danger", err.message);
     }
@@ -177,7 +189,18 @@ export class ItemEditComponent implements OnInit {
     } catch (err) {
       this.itemMessage = new Message("danger", err.message);
     }
+    this.subscriptions.push(this.loaderService.loader$.subscribe((value) => {
+      this.loading = value
+    }, (err) => {
+      console.log(err)
+    }))
     this.loaderService.hideLoader()
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(
+      (subscription) => subscription.unsubscribe());
+    this.subscriptions = [];
   }
 
   rozetkaCategorySearchChange(query: string) {
@@ -186,6 +209,10 @@ export class ItemEditComponent implements OnInit {
 
   get properties(): FormArray {
     return this.itemForm.get('properties') as FormArray;
+  }
+
+  get rozetkaProperties(): FormArray {
+    return this.itemForm.get('rozetkaProperties') as FormArray;
   }
 
   async categoriesTranslate() {
@@ -215,6 +242,24 @@ export class ItemEditComponent implements OnInit {
       }
     } catch (err) {
       console.log("updateProperties", err)
+    }
+  }
+
+  async updateRozetkaProperties() {
+    try {
+      let res: any = await this.adminItemService.rozetkaProperties(this.rozetkaCategoryID).toPromise()
+      let formArray = <FormArray>this.itemForm.get("rozetkaProperties")
+      while (formArray.length !== 0) {
+        formArray.removeAt(0)
+      }
+      this.itemRozetkaProperties = res.propertiesList
+      for (let property of res.propertiesList) {
+        let formItem = {};
+        formItem[property.id] = new FormControl();
+        formArray.push(new FormGroup(formItem))
+      }
+    } catch (err) {
+      console.log("updateRozetkaProperties", err)
     }
   }
 
@@ -406,12 +451,15 @@ export class ItemEditComponent implements OnInit {
   }
 
   async applyRozetkaCategory() {
-    let res: any = await this.adminItemService.rozetkaBindCategory(this.itemID, this.rozetkaCategory).toPromise()
-    res = await this.adminItemService.rozetkaProperties(this.rozetkaCategory).toPromise()
-    console.log(res.propertiesList)
-  }
-
-  applyRozetkaCategoryAll() {
-    console.log(this.rozetkaCategory)
+    this.loaderService.showLoader()
+    try {
+      const category = this.rozetkaCategoriesData.filter(item => item.id === this.rozetkaCategoryID)[0]
+      await this.adminItemService.rozetkaBindCategory(this.itemID, this.rozetkaCategoryID, category.title, category.full_title).toPromise()
+      this.updateRozetkaProperties()
+    } catch (err) {
+      console.log(err)
+      this.itemMessage = new Message("danger", err.message);
+    }
+    this.loaderService.hideLoader()
   }
 }

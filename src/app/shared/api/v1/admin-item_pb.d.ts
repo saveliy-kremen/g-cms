@@ -78,6 +78,16 @@ export class AdminItem extends jspb.Message {
   clearOffersList(): void;
   addOffers(value?: AdminItem, index?: number): AdminItem;
 
+  getRozetkaCategory(): AdminItemRozetkaCategory | undefined;
+  setRozetkaCategory(value?: AdminItemRozetkaCategory): void;
+  hasRozetkaCategory(): boolean;
+  clearRozetkaCategory(): void;
+
+  getRozetkaPropertiesList(): Array<AdminItemRozetkaProperty>;
+  setRozetkaPropertiesList(value: Array<AdminItemRozetkaProperty>): void;
+  clearRozetkaPropertiesList(): void;
+  addRozetkaProperties(value?: AdminItemRozetkaProperty, index?: number): AdminItemRozetkaProperty;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AdminItem.AsObject;
   static toObject(includeInstance: boolean, msg: AdminItem): AdminItem.AsObject;
@@ -109,6 +119,8 @@ export namespace AdminItem {
     currency?: currency_pb.Currency.AsObject,
     imagesList: Array<AdminItemImage.AsObject>,
     offersList: Array<AdminItem.AsObject>,
+    rozetkaCategory?: AdminItemRozetkaCategory.AsObject,
+    rozetkaPropertiesList: Array<AdminItemRozetkaProperty.AsObject>,
   }
 }
 
@@ -192,9 +204,39 @@ export namespace AdminItemProperty {
   }
 }
 
+export class AdminRozetkaItemProperty extends jspb.Message {
+  getPropertyId(): number;
+  setPropertyId(value: number): void;
+
+  getPropertyName(): string;
+  setPropertyName(value: string): void;
+
+  getPropertyValueId(): number;
+  setPropertyValueId(value: number): void;
+
+  getPropertyValueName(): string;
+  setPropertyValueName(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): AdminRozetkaItemProperty.AsObject;
+  static toObject(includeInstance: boolean, msg: AdminRozetkaItemProperty): AdminRozetkaItemProperty.AsObject;
+  static serializeBinaryToWriter(message: AdminRozetkaItemProperty, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AdminRozetkaItemProperty;
+  static deserializeBinaryFromReader(message: AdminRozetkaItemProperty, reader: jspb.BinaryReader): AdminRozetkaItemProperty;
+}
+
+export namespace AdminRozetkaItemProperty {
+  export type AsObject = {
+    propertyId: number,
+    propertyName: string,
+    propertyValueId: number,
+    propertyValueName: string,
+  }
+}
+
 export class AdminRozetkaCategory extends jspb.Message {
-  getId(): string;
-  setId(value: string): void;
+  getId(): number;
+  setId(value: number): void;
 
   getTitle(): string;
   setTitle(value: string): void;
@@ -215,7 +257,7 @@ export class AdminRozetkaCategory extends jspb.Message {
 
 export namespace AdminRozetkaCategory {
   export type AsObject = {
-    id: string,
+    id: number,
     title: string,
     fullTitle: string,
     parent: string,
@@ -317,6 +359,70 @@ export class AdminDraftRequest extends jspb.Message {
 export namespace AdminDraftRequest {
   export type AsObject = {
     parentId: number,
+  }
+}
+
+export class AdminItemRozetkaCategory extends jspb.Message {
+  getItemId(): number;
+  setItemId(value: number): void;
+
+  getId(): number;
+  setId(value: number): void;
+
+  getTitle(): string;
+  setTitle(value: string): void;
+
+  getFullTitle(): string;
+  setFullTitle(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): AdminItemRozetkaCategory.AsObject;
+  static toObject(includeInstance: boolean, msg: AdminItemRozetkaCategory): AdminItemRozetkaCategory.AsObject;
+  static serializeBinaryToWriter(message: AdminItemRozetkaCategory, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AdminItemRozetkaCategory;
+  static deserializeBinaryFromReader(message: AdminItemRozetkaCategory, reader: jspb.BinaryReader): AdminItemRozetkaCategory;
+}
+
+export namespace AdminItemRozetkaCategory {
+  export type AsObject = {
+    itemId: number,
+    id: number,
+    title: string,
+    fullTitle: string,
+  }
+}
+
+export class AdminItemRozetkaProperty extends jspb.Message {
+  getItemId(): number;
+  setItemId(value: number): void;
+
+  getPropertyId(): number;
+  setPropertyId(value: number): void;
+
+  getPropertyName(): string;
+  setPropertyName(value: string): void;
+
+  getPropertyValueId(): number;
+  setPropertyValueId(value: number): void;
+
+  getPropertyValueName(): string;
+  setPropertyValueName(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): AdminItemRozetkaProperty.AsObject;
+  static toObject(includeInstance: boolean, msg: AdminItemRozetkaProperty): AdminItemRozetkaProperty.AsObject;
+  static serializeBinaryToWriter(message: AdminItemRozetkaProperty, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AdminItemRozetkaProperty;
+  static deserializeBinaryFromReader(message: AdminItemRozetkaProperty, reader: jspb.BinaryReader): AdminItemRozetkaProperty;
+}
+
+export namespace AdminItemRozetkaProperty {
+  export type AsObject = {
+    itemId: number,
+    propertyId: number,
+    propertyName: string,
+    propertyValueId: number,
+    propertyValueName: string,
   }
 }
 
@@ -438,6 +544,11 @@ export class AdminEditItemRequest extends jspb.Message {
   clearPropertiesList(): void;
   addProperties(value?: AdminItemProperty, index?: number): AdminItemProperty;
 
+  getRozetkaPropertiesList(): Array<AdminRozetkaItemProperty>;
+  setRozetkaPropertiesList(value: Array<AdminRozetkaItemProperty>): void;
+  clearRozetkaPropertiesList(): void;
+  addRozetkaProperties(value?: AdminRozetkaItemProperty, index?: number): AdminRozetkaItemProperty;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AdminEditItemRequest.AsObject;
   static toObject(includeInstance: boolean, msg: AdminEditItemRequest): AdminEditItemRequest.AsObject;
@@ -465,6 +576,7 @@ export namespace AdminEditItemRequest {
     itemImages: string,
     uploadImages: string,
     propertiesList: Array<AdminItemProperty.AsObject>,
+    rozetkaPropertiesList: Array<AdminRozetkaItemProperty.AsObject>,
   }
 }
 
@@ -657,6 +769,12 @@ export class AdminRozetkaCategoryBindRequest extends jspb.Message {
   getCategoryId(): number;
   setCategoryId(value: number): void;
 
+  getTitle(): string;
+  setTitle(value: string): void;
+
+  getFullTitle(): string;
+  setFullTitle(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AdminRozetkaCategoryBindRequest.AsObject;
   static toObject(includeInstance: boolean, msg: AdminRozetkaCategoryBindRequest): AdminRozetkaCategoryBindRequest.AsObject;
@@ -669,6 +787,8 @@ export namespace AdminRozetkaCategoryBindRequest {
   export type AsObject = {
     itemId: number,
     categoryId: number,
+    title: string,
+    fullTitle: string,
   }
 }
 
@@ -797,8 +917,10 @@ export namespace AdminRozetkaCategoriesResponse {
 }
 
 export class AdminRozetkaCategoryBindResponse extends jspb.Message {
-  getCategory(): string;
-  setCategory(value: string): void;
+  getCategory(): AdminItemRozetkaCategory | undefined;
+  setCategory(value?: AdminItemRozetkaCategory): void;
+  hasCategory(): boolean;
+  clearCategory(): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AdminRozetkaCategoryBindResponse.AsObject;
@@ -810,7 +932,7 @@ export class AdminRozetkaCategoryBindResponse extends jspb.Message {
 
 export namespace AdminRozetkaCategoryBindResponse {
   export type AsObject = {
-    category: string,
+    category?: AdminItemRozetkaCategory.AsObject,
   }
 }
 

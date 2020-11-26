@@ -54,10 +54,12 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 			 items.sort, items.seo_title, items.seo_description, items.seo_keywords,
 			 vendors.id, vendors.created_at, vendors.name, vendors.country,
 			 currencies.id, currencies.created_at, currencies.name, currencies.short_name, currencies.code,
-			 currencies.rate
+			 currencies.rate,
+			 rc.category_id, rc.title, rc.full_title
 			FROM items
 			LEFT JOIN vendors ON items.vendor_id = vendors.id
 			LEFT JOIN currencies ON items.currency_id = currencies.id
+			LEFT JOIN items_rozetka_categories rc ON items.id = rc.item_id
 			WHERE items.user_id = $1 AND items.id = $2`,
 		user_id, req.Id)
 	err := row.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.VendorID, &item.ParentID,
@@ -66,12 +68,35 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 		&item.Sort, &item.SeoTitle, &item.SeoDescription, &item.SeoKeywords,
 		&item.Vendor.ID, &item.Vendor.CreatedAt, &item.Vendor.Name, &item.Vendor.Country,
 		&item.Currency.ID, &item.Currency.CreatedAt, &item.Currency.Name, &item.Currency.ShortName,
-		&item.Currency.Code, &item.Currency.Rate)
+		&item.Currency.Code, &item.Currency.Rate,
+		&item.RozetkaCategory.CategoryID, &item.RozetkaCategory.Title, &item.RozetkaCategory.FullTitle)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, status.Errorf(codes.NotFound, "Item not found")
 	}
 
+	//Rozetka properties
+	query := fmt.Sprintf(
+		`SELECT property_id, property_name, property_value_id, property_value_name
+		FROM items_rozetka_properties
+		WHERE (user_id = $1 AND item_id = $2)`)
+	rows, err := db.DB.Query(ctx, query, user_id, item.ID)
+	defer rows.Close()
+	for rows.Next() {
+		property := models.ItemRozetkaProperty{}
+		err := rows.Scan(&property.PropertyID, &property.PropertyName, &property.PropertyValueID,
+			&property.PropertyValueName)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		item.RozetkaProperties = append(item.RozetkaProperties, property)
+	}
+	if err = rows.Err(); err != nil {
+		logger.Error(err.Error())
+		return nil, status.Errorf(codes.NotFound, "Rozetka properties set error")
+	}
+
+	//Offers
 	item.Offers = itemOffers(ctx, &item, nil, nil, nil, nil)
 
 	return &v1.AdminItemResponse{Item: models.AdminItemToResponse(item)}, nil
@@ -124,6 +149,7 @@ func (s *AdminItemServiceImpl) AdminItems(ctx context.Context, req *v1.AdminItem
 		return nil, status.Errorf(codes.NotFound, "Items set error")
 	}
 
+	//Offers
 	for i, item := range items {
 		items[i].Offers = itemOffers(ctx, &item, nil, nil, nil, nil)
 	}
@@ -256,6 +282,27 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 			INSERT INTO items_properties (user_id, item_id, property_id, property_value_id)
 			VALUES ($1, $2, $3, $4)
 			`, user_id, item.ID, propertyID, valueID)
+			}
+		}
+	}
+
+	//Rozetka Properties
+	_, err = db.DB.Exec(ctx,
+		`DELETE FROM items_rozetka_properties WHERE user_id = $1 AND item_id = $2`,
+		user_id, item.ID)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	for _, propertyValue := range req.RozetkaProperties {
+		if propertyValue.PropertyId != 0 && propertyValue.PropertyValueId != 0 {
+			_, err := db.DB.Exec(ctx, `
+			INSERT INTO items_rozetka_properties (user_id, item_id, property_id, property_name,
+			property_value_id, property_value_name)
+			VALUES ($1, $2, $3, $4, $5, $6)
+			`, user_id, item.ID, propertyValue.PropertyId, propertyValue.PropertyName,
+				propertyValue.PropertyValueId, propertyValue.PropertyValueName)
+			if err != nil {
+				logger.Error(err.Error())
 			}
 		}
 	}
@@ -810,61 +857,43 @@ func parseRozetkaCategory(search string, parentID int, page int, token string) [
 }
 
 func (s *AdminItemServiceImpl) AdminRozetkaBindCategory(ctx context.Context, req *v1.AdminRozetkaCategoryBindRequest) (*v1.AdminRozetkaCategoryBindResponse, error) {
-	formData := url.Values{
-		"username": {"demo"},
-		"password": {b64.StdEncoding.EncodeToString([]byte("2Dem018"))},
-	}
-	res, err := http.PostForm("https://api.seller.rozetka.com.ua/sites", formData)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	var result map[string]interface{}
-	json.NewDecoder(res.Body).Decode(&result)
-	content := result["content"].(map[string]interface{})
-	token := content["access_token"].(string)
+	user_id := auth.GetUserUID(ctx)
+	category := models.ItemRozetkaCategory{}
+	category.UserID = sql.NullInt64{Int64: int64(user_id), Valid: true}
+	category.ItemID = sql.NullInt64{Int64: int64(req.ItemId), Valid: true}
+	category.CategoryID = sql.NullInt64{Int64: int64(req.CategoryId), Valid: true}
+	category.Title = sql.NullString{String: req.Title, Valid: true}
+	category.FullTitle = sql.NullString{String: req.FullTitle, Valid: true}
 
-	url := fmt.Sprintf("https://api.seller.rozetka.com.ua/market-categories/category-options?category_id=%d", req.CategoryId)
-	request, err := http.NewRequest("GET", url, nil)
+	var exists bool
+	err := db.DB.QueryRow(ctx, `
+		SELECT EXISTS(SELECT 1 FROM items_rozetka_categories
+		WHERE user_id=$1 AND item_id=$2)`,
+		category.UserID, category.ItemID).Scan(&exists)
 	if err != nil {
 		logger.Error(err.Error())
+		return nil, status.Errorf(codes.Aborted, "Error bind rozetka category")
 	}
-	// Получаем и устанавливаем тип контента
-	request.Header.Set("Authorization", "Bearer "+token)
-
-	// Отправляем запрос
-	client := &http.Client{}
-	response, err := client.Do(request)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	json.NewDecoder(response.Body).Decode(&result)
-	response.Body.Close()
-	propertiesContent := result["content"].(string)
-	propertiesData := []models.RozetkaPropertyData{}
-	err = json.Unmarshal([]byte(propertiesContent), &propertiesData)
-	properties := []models.RozetkaProperty{}
-	property := models.RozetkaProperty{}
-	for _, propertyData := range propertiesData {
-		if propertyData.ID != property.ID {
-			if property.ID != 0 {
-				properties = append(properties, property)
-			}
-			property.ID = propertyData.ID
-			property.Name = propertyData.Name
-			property.IsGlobal = propertyData.IsGlobal
-			property.FilterType = propertyData.FilterType
-			property.AttrType = propertyData.AttrType
+	if exists {
+		_, err := db.DB.Exec(ctx, `
+			UPDATE items_rozetka_categories SET category_id=$1, title=$2, full_title=$3
+			WHERE user_id=$4 AND item_id=$5`,
+			category.CategoryID, category.Title, category.FullTitle, category.UserID, category.ItemID)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.Aborted, "Error bind rozetka category")
 		}
-		propertyValue := models.RozetkaPropertyValue{}
-		propertyValue.ID = propertyData.ValueID
-		propertyValue.Name = propertyData.ValueName
-		property.Values = append(property.Values, propertyValue)
+	} else {
+		_, err := db.DB.Exec(ctx, `
+		INSERT INTO items_rozetka_categories (user_id, item_id, category_id, title, full_title)
+		VALUES($1, $2, $3, $4, $5)`,
+			category.UserID, category.ItemID, category.CategoryID, category.Title, category.FullTitle)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, status.Errorf(codes.Aborted, "Error bind rozetka category")
+		}
 	}
-	if property.ID != 0 {
-		properties = append(properties, property)
-	}
-
-	return &v1.AdminRozetkaCategoryBindResponse{Category: propertiesContent}, nil
+	return &v1.AdminRozetkaCategoryBindResponse{Category: models.AdminItemRozetkaCategoryToResponse(category)}, nil
 }
 
 func (s *AdminItemServiceImpl) AdminRozetkaProperties(ctx context.Context, req *v1.AdminRozetkaPropertiesRequest) (*v1.AdminRozetkaPropertiesResponse, error) {
@@ -903,9 +932,6 @@ func (s *AdminItemServiceImpl) AdminRozetkaProperties(ctx context.Context, req *
 	properties := []models.RozetkaProperty{}
 	property := models.RozetkaProperty{}
 	for _, propertyData := range propertiesData {
-		if propertyData.FilterType == "disable" {
-			continue
-		}
 		if propertyData.ID != property.ID {
 			if property.ID != 0 {
 				properties = append(properties, property)
@@ -915,6 +941,7 @@ func (s *AdminItemServiceImpl) AdminRozetkaProperties(ctx context.Context, req *
 			property.IsGlobal = propertyData.IsGlobal
 			property.FilterType = propertyData.FilterType
 			property.AttrType = propertyData.AttrType
+			property.Values = []models.RozetkaPropertyValue{}
 		}
 		propertyValue := models.RozetkaPropertyValue{}
 		propertyValue.ID = propertyData.ValueID

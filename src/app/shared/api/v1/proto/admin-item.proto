@@ -32,6 +32,8 @@ message AdminItem {
   Currency currency = 21;
   repeated AdminItemImage images = 22;
   repeated AdminItem offers = 23;
+  AdminItemRozetkaCategory rozetka_category = 24;
+  repeated AdminItemRozetkaProperty rozetka_properties = 25;
 }
 
 message AdminItemImage {
@@ -52,8 +54,15 @@ message AdminItemProperty {
   repeated uint32 property_value_ids = 2;
 }
 
+message AdminRozetkaItemProperty {
+  uint64 property_id = 1;
+  string property_name = 2;
+  uint64 property_value_id = 3;
+  string property_value_name = 4;
+}
+
 message AdminRozetkaCategory{
-  string id = 1;
+  uint64 id = 1;
   string title = 2;
   string full_title = 3;
   string parent = 4;
@@ -80,6 +89,21 @@ message AdminItemRequest {
 
 message AdminDraftRequest {
   uint64 parent_id = 1;
+}
+
+message AdminItemRozetkaCategory{
+  uint64 item_id = 1;
+  uint64 id = 2;
+  string title = 3;
+  string full_title = 4;
+}
+
+message AdminItemRozetkaProperty{
+  uint64 item_id = 1;
+  uint64 property_id = 2;
+  string property_name = 3;
+  uint64 property_value_id = 4;
+  string property_value_name = 5;
 }
 
 message AdminItemsRequest {
@@ -116,6 +140,7 @@ message AdminEditItemRequest {
   string upload_images = 16;
   
   repeated AdminItemProperty properties = 17;
+  repeated AdminRozetkaItemProperty rozetka_properties = 18;
 }
 
 message AdminDeleteItemRequest {
@@ -161,8 +186,10 @@ message AdminRozetkaCategoriesRequest {
 }
 
 message AdminRozetkaCategoryBindRequest {
-  uint32 item_id = 1;
-  uint32 category_id = 2;
+  uint64 item_id = 1;
+  uint64 category_id = 2;
+  string title = 3;
+  string full_title = 4;
 }
 
 message AdminRozetkaPropertiesRequest {
@@ -192,7 +219,7 @@ message AdminRozetkaCategoriesResponse {
 }
 
 message AdminRozetkaCategoryBindResponse {
-  string category = 1;
+  AdminItemRozetkaCategory category = 1;
 }
 
 message AdminRozetkaPropertiesResponse {

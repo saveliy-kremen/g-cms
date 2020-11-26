@@ -141,22 +141,75 @@
 
         <mat-tab label="{{'Properties' | translate}}" *ngIf="mode == 'edit' || mode == 'draft'">
           <br>
-          <div class="form-group" formArrayName="properties">
-            <div *ngFor="let property of properties.controls; let i = index" [formGroup]="property" [formGroupName]="i">
-              <div *ngIf="!property.controls[itemProperties[i].code].controls">
-                <mat-form-field>
-                  <mat-select formControlName="{{itemProperties[i].code}}" placeholder="{{itemProperties[i].title}}"
-                    [errorStateMatcher]="matcher" [multiple]="itemProperties[i].multiple">
-                    <mat-option *ngIf="!itemProperties[i].multiple">{{"None" | translate}}</mat-option>
-                    <mat-option *ngFor="let value of itemProperties[i].valuesList" [value]="value.id">
-                      {{value.value}}</mat-option>
-                  </mat-select>
-                  <mat-error>
-                    <validator-message [field]="property.controls[itemProperties[i].code]"
-                      [submitted]="itemFormSubmitted" [title]="itemProperties[i].title">
-                    </validator-message>
-                  </mat-error>
-                </mat-form-field>
+          <div class="properties">
+            <div class="form-group" formArrayName="properties" class="propertiesColumn">
+              <p>{{'Properties' | translate}}</p>
+              <div *ngFor="let property of properties.controls; let i = index" [formGroup]="property"
+                [formGroupName]="i">
+                <div *ngIf="!property.controls[itemProperties[i].code].controls">
+                  <mat-form-field>
+                    <mat-select formControlName="{{itemProperties[i].code}}" placeholder="{{itemProperties[i].title}}"
+                      [errorStateMatcher]="matcher" [multiple]="itemProperties[i].multiple">
+                      <mat-option *ngIf="!itemProperties[i].multiple">{{"None" | translate}}</mat-option>
+                      <mat-option *ngFor="let value of itemProperties[i].valuesList" [value]="value.id">
+                        {{value.value}}</mat-option>
+                    </mat-select>
+                    <mat-error>
+                      <validator-message [field]="property.controls[itemProperties[i].code]"
+                        [submitted]="itemFormSubmitted" [title]="itemProperties[i].title">
+                      </validator-message>
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" formArrayName="rozetkaProperties" class="properties">
+              <div class="propertiesColumn">
+                <p>{{'RozetkaPropertiesMain' | translate}}</p>
+                <div *ngFor="let property of rozetkaProperties.controls; let i = index" [formGroup]="property"
+                  [formGroupName]="i">
+                  <div
+                    *ngIf="!property.controls[itemRozetkaProperties[i].id].controls && itemRozetkaProperties[i].filterType != 'disable'">
+                    <mat-form-field>
+                      <mat-select formControlName="{{itemRozetkaProperties[i].id}}"
+                        placeholder="{{itemRozetkaProperties[i].name}}" [errorStateMatcher]="matcher">
+                        <mat-option>{{"None" | translate}}</mat-option>
+                        <mat-option *ngFor="let value of itemRozetkaProperties[i].valuesList" [value]="value">
+                          {{value.name}}</mat-option>
+                      </mat-select>
+                      <mat-error>
+                        <validator-message [field]="property.controls[itemRozetkaProperties[i].id]"
+                          [submitted]="itemFormSubmitted" [title]="itemRozetkaProperties[i].name">
+                        </validator-message>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+
+              <div class="propertiesColumn">
+                <p>{{'RozetkaProperties' | translate}}</p>
+                <div *ngFor="let property of rozetkaProperties.controls; let i = index" [formGroup]="property"
+                  [formGroupName]="i">
+                  <div
+                    *ngIf="!property.controls[itemRozetkaProperties[i].id].controls && itemRozetkaProperties[i].filterType == 'disable'">
+                    <mat-form-field>
+                      <mat-select formControlName="{{itemRozetkaProperties[i].id}}"
+                        placeholder="{{itemRozetkaProperties[i].name}}" [errorStateMatcher]="matcher">
+                        <mat-option>{{"None" | translate}}</mat-option>
+                        <mat-option *ngFor="let value of itemRozetkaProperties[i].valuesList"
+                          [value]="{'propertyID': itemRozetkaProperties[i].id, 'propertyName': itemRozetkaProperties[i].name, 'propertyValueID': value.id, 'propertyValueName': value.name}">
+                          {{value.name}}</mat-option>
+                      </mat-select>
+                      <mat-error>
+                        <validator-message [field]="property.controls[itemRozetkaProperties[i].id]"
+                          [submitted]="itemFormSubmitted" [title]="itemRozetkaProperties[i].name">
+                        </validator-message>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -175,21 +228,17 @@
               (ngModelChange)="rozetkaCategorySearchChange($event)">
           </mat-form-field>
           <br>
-          <mat-radio-group aria-label="Rozetka categories" class="rozetka-categories" [(ngModel)]="rozetkaCategory"
+          <mat-radio-group aria-label="Rozetka categories" class="rozetka-categories" [(ngModel)]="rozetkaCategoryID"
             [ngModelOptions]="{standalone: true}">
-            <mat-radio-button value={{category.id}} *ngFor="let category of rozetkaCategoriesData"
+            <mat-radio-button [value]="category.id" *ngFor="let category of rozetkaCategoriesData"
               class="rozetka-category">
               {{category.full_title}}</mat-radio-button>
           </mat-radio-group>
           <br>
           <div *ngIf="rozetkaCategoriesData">
             <button mat-raised-button type="button" class="btn" color="accent" style="margin-right: 10px;"
-              [disabled]="rozetkaCategory ? null : 'disabled'" (click)="applyRozetkaCategory()">
+              [disabled]="rozetkaCategoryID && !loading ? null : 'disabled'" (click)="applyRozetkaCategory()">
               {{"Apply" | translate}}
-            </button>
-            <button mat-raised-button type="button" class="btn btn-primary" style="margin-right: 10px;"
-              [disabled]="rozetkaCategory ? null : 'disabled'" (click)="applyRozetkaCategoryAll()">
-              {{"ApplyToAll" | translate}}
             </button>
           </div>
           <br><br><br>
@@ -209,7 +258,8 @@
           </mat-card>
         </mat-tab>
       </mat-tab-group>
-      <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;">
+      <button mat-raised-button type="submit" class="btn btn-primary" style="margin-right: 10px;"
+        [disabled]="!loading ? null : 'disabled'">
         {{mode == "edit" ? ("Save" | translate) : ("Add" | translate)}}
       </button>
       <button mat-raised-button type="reset" class="btn btn-secondary"

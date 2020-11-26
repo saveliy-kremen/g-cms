@@ -76,6 +76,13 @@ type RozetkaProperty struct {
 	Values []RozetkaPropertyValue
 }
 
+type ItemRozetkaProperty struct {
+	PropertyID        uint64
+	PropertyName      string
+	PropertyValueID   uint64
+	PropertyValueName string
+}
+
 type RozetkaPropertyValue struct {
 	ID   uint32
 	Name string
@@ -197,6 +204,23 @@ func AdminRozetkaPropertiesToResponse(properties []RozetkaProperty) []*v1.AdminR
 	respProperties := []*v1.AdminRozetkaProperty{}
 	for _, property := range properties {
 		respProperties = append(respProperties, AdminRozetkaPropertyToResponse(property))
+	}
+	return respProperties
+}
+
+func AdminItemRozetkaPropertyToResponse(property ItemRozetkaProperty) *v1.AdminItemRozetkaProperty {
+	return &v1.AdminItemRozetkaProperty{
+		PropertyId:        property.PropertyID,
+		PropertyName:      property.PropertyName,
+		PropertyValueId:   property.PropertyValueID,
+		PropertyValueName: property.PropertyValueName,
+	}
+}
+
+func AdminItemRozetkaPropertiesToResponse(properties []ItemRozetkaProperty) []*v1.AdminItemRozetkaProperty {
+	respProperties := []*v1.AdminItemRozetkaProperty{}
+	for _, property := range properties {
+		respProperties = append(respProperties, AdminItemRozetkaPropertyToResponse(property))
 	}
 	return respProperties
 }

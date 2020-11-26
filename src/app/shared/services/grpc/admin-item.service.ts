@@ -119,6 +119,17 @@ export class AdminItemGrpcService {
                 }
                 return wrapper
             }))
+            request.setRozetkaPropertiesList(data.rozetkaProperties.map(item => {
+                const wrapper = new GRPC.AdminRozetkaItemProperty
+                const id = Object.keys(item)[0]
+                if (item[id]) {
+                    wrapper.setPropertyId(item[id].propertyID)
+                    wrapper.setPropertyName(item[id].propertyName)
+                    wrapper.setPropertyValueId(item[id].propertyValueID)
+                    wrapper.setPropertyValueName(item[id].propertyValueName)
+                }
+                return wrapper
+            }))
             this.client.adminEditItem(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemResponse) => {
                 if (err) {
                     return reject(err);
@@ -332,7 +343,7 @@ export class AdminItemGrpcService {
         return this.grpcHelper.grpcUnary<GRPC.AdminRozetkaCategoriesResponse.AsObject>(promise);
     }
 
-    public rozetkaBindCategory(itemID: number, categoryID: number): Observable<GRPC.AdminRozetkaCategoryBindResponse.AsObject> {
+    public rozetkaBindCategory(itemID: number, categoryID: number, title: string, fullTitle: string): Observable<GRPC.AdminRozetkaCategoryBindResponse.AsObject> {
         const meta: Metadata = {
             Authorization: "Bearer " + this.session.getToken()
         };
@@ -341,6 +352,8 @@ export class AdminItemGrpcService {
             var request = new GRPC.AdminRozetkaCategoryBindRequest()
             request.setItemId(itemID)
             request.setCategoryId(categoryID)
+            request.setTitle(title)
+            request.setFullTitle(fullTitle)
             this.client.adminRozetkaBindCategory(request, meta, (err: grpcWeb.Error, response: GRPC.AdminRozetkaCategoryBindResponse) => {
                 if (err) {
                     return reject(err);

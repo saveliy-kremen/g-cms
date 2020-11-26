@@ -1,6 +1,8 @@
 package db
 
 var schema = `
+DROP TABLE IF EXISTS items_rozetka_properties;
+DROP TABLE IF EXISTS items_rozetka_categories;
 DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS orders_items;
 DROP TABLE IF EXISTS orders;
@@ -183,5 +185,26 @@ CREATE TABLE settings (
 
 	user_id int,
 	rozetka_markup numeric(4,2) DEFAULT 0
+);
+
+CREATE TABLE items_rozetka_categories (
+	user_id int NOT NULL,
+	item_id    bigint REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	category_id int NOT NULL,
+	title varchar(256) NOT NULL,
+	full_title varchar(256) NOT NULL,
+	
+	CONSTRAINT items_rozetka_categories_pkey PRIMARY KEY (item_id, category_id)
+);
+
+CREATE TABLE items_rozetka_properties (
+	user_id int NOT NULL,
+	item_id bigint REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	property_id int NOT NULL,
+	property_name varchar(256) NOT NULL,
+	property_value_id int NOT NULL,
+	property_value_name varchar(256) NOT NULL,
+	
+	CONSTRAINT items_rozetka_properties_pkey PRIMARY KEY (item_id, property_id)
 );
 `

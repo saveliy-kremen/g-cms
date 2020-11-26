@@ -36,13 +36,15 @@ type Item struct {
 	VendorID   uint32        `db:"vendor_id"`
 	CurrencyID sql.NullInt32 `db:"currency_id"`
 
-	Categories []Category
-	Properties []Property
+	Categories        []Category
+	Properties        []Property
+	RozetkaProperties []ItemRozetkaProperty
 
-	Offers     []Item
-	ItemOffers string
-	Vendor     Vendor   `struct:"vendors"`
-	Currency   Currency `struct:"currencies"`
+	Offers          []Item
+	ItemOffers      string
+	Vendor          Vendor   `struct:"vendors"`
+	Currency        Currency `struct:"currencies"`
+	RozetkaCategory ItemRozetkaCategory
 }
 
 type Offer struct {
@@ -132,10 +134,12 @@ func AdminItemToResponse(item Item) *v1.AdminItem {
 		SeoDescription: item.SeoDescription,
 		SeoKeywords:    item.SeoKeywords,
 
-		Images:   AdminItemImagesToResponse(item.Images),
-		Offers:   AdminItemsToResponse(item.Offers),
-		Vendor:   VendorToResponse(item.Vendor),
-		Currency: CurrencyToResponse(item.Currency),
+		Images:            AdminItemImagesToResponse(item.Images),
+		Offers:            AdminItemsToResponse(item.Offers),
+		Vendor:            VendorToResponse(item.Vendor),
+		Currency:          CurrencyToResponse(item.Currency),
+		RozetkaCategory:   AdminItemRozetkaCategoryToResponse(item.RozetkaCategory),
+		RozetkaProperties: AdminItemRozetkaPropertiesToResponse(item.RozetkaProperties),
 	}
 }
 

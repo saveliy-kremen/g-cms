@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jackc/pgx/v4"
 	"github.com/sirupsen/logrus"
@@ -59,7 +60,12 @@ func (s *AdminItemServiceImpl) AdminItem(ctx context.Context, req *v1.AdminItemR
 			FROM items
 			LEFT JOIN vendors ON items.vendor_id = vendors.id
 			LEFT JOIN currencies ON items.currency_id = currencies.id
-			LEFT JOIN items_rozetka_categories rc ON items.id = rc.item_id
+			LEFT JOIN items_rozetka_categories rc ON rc.item_id =
+				CASE
+					WHEN items.parent_id IS NULL
+						THEN items.id 
+					ELSE items.parent_id
+				END
 			WHERE items.user_id = $1 AND items.id = $2`,
 		user_id, req.Id)
 	err := row.Scan(&item.ID, &item.CreatedAt, &item.UserID, &item.VendorID, &item.ParentID,
@@ -286,6 +292,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 		}
 	}
 
+	spew.Dump(req)
 	//Rozetka Properties
 	_, err = db.DB.Exec(ctx,
 		`DELETE FROM items_rozetka_properties WHERE user_id = $1 AND item_id = $2`,

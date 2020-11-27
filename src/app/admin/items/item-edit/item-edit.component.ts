@@ -156,7 +156,9 @@ export class ItemEditComponent implements OnInit {
         if (this.item.rozetkaCategory.id) {
           this.rozetkaCategoriesData.push({ id: this.item.rozetkaCategory.id, title: this.item.rozetkaCategory.title, full_title: this.item.rozetkaCategory.fullTitle })
           this.rozetkaCategoryID = this.item.rozetkaCategory.id
-          this.updateRozetkaProperties()
+          if (this.parentID) {
+            this.updateRozetkaProperties()
+          }
         }
         this.updateOffersData(res.item)
       } else {
@@ -455,7 +457,6 @@ export class ItemEditComponent implements OnInit {
     try {
       const category = this.rozetkaCategoriesData.filter(item => item.id === this.rozetkaCategoryID)[0]
       await this.adminItemService.rozetkaBindCategory(this.itemID, this.rozetkaCategoryID, category.title, category.full_title).toPromise()
-      this.updateRozetkaProperties()
     } catch (err) {
       console.log(err)
       this.itemMessage = new Message("danger", err.message);

@@ -3607,7 +3607,6 @@ proto.v1.AdminItemRozetkaProperty.prototype.toObject = function(opt_includeInsta
  */
 proto.v1.AdminItemRozetkaProperty.toObject = function(includeInstance, msg) {
   var f, obj = {
-    itemId: jspb.Message.getFieldWithDefault(msg, 1, 0),
     propertyId: jspb.Message.getFieldWithDefault(msg, 2, 0),
     propertyName: jspb.Message.getFieldWithDefault(msg, 3, ""),
     propertyValueId: jspb.Message.getFieldWithDefault(msg, 4, 0),
@@ -3648,10 +3647,6 @@ proto.v1.AdminItemRozetkaProperty.deserializeBinaryFromReader = function(msg, re
     }
     var field = reader.getFieldNumber();
     switch (field) {
-    case 1:
-      var value = /** @type {number} */ (reader.readUint64());
-      msg.setItemId(value);
-      break;
     case 2:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setPropertyId(value);
@@ -3697,13 +3692,6 @@ proto.v1.AdminItemRozetkaProperty.prototype.serializeBinary = function() {
  */
 proto.v1.AdminItemRozetkaProperty.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getItemId();
-  if (f !== 0) {
-    writer.writeUint64(
-      1,
-      f
-    );
-  }
   f = message.getPropertyId();
   if (f !== 0) {
     writer.writeUint64(
@@ -3732,24 +3720,6 @@ proto.v1.AdminItemRozetkaProperty.serializeBinaryToWriter = function(message, wr
       f
     );
   }
-};
-
-
-/**
- * optional uint64 item_id = 1;
- * @return {number}
- */
-proto.v1.AdminItemRozetkaProperty.prototype.getItemId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.v1.AdminItemRozetkaProperty} returns this
- */
-proto.v1.AdminItemRozetkaProperty.prototype.setItemId = function(value) {
-  return jspb.Message.setProto3IntField(this, 1, value);
 };
 
 

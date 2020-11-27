@@ -99,7 +99,6 @@ message AdminItemRozetkaCategory{
 }
 
 message AdminItemRozetkaProperty{
-  uint64 item_id = 1;
   uint64 property_id = 2;
   string property_name = 3;
   uint64 property_value_id = 4;

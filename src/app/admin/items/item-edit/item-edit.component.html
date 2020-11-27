@@ -164,7 +164,7 @@
               </div>
             </div>
 
-            <div class="form-group" formArrayName="rozetkaProperties" class="properties">
+            <div *ngIf="parentID" class="form-group" formArrayName="rozetkaProperties" class="properties">
               <div class="propertiesColumn">
                 <p>{{'RozetkaPropertiesMain' | translate}}</p>
                 <div *ngFor="let property of rozetkaProperties.controls; let i = index" [formGroup]="property"

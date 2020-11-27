@@ -393,9 +393,6 @@ export namespace AdminItemRozetkaCategory {
 }
 
 export class AdminItemRozetkaProperty extends jspb.Message {
-  getItemId(): number;
-  setItemId(value: number): void;
-
   getPropertyId(): number;
   setPropertyId(value: number): void;
 
@@ -418,7 +415,6 @@ export class AdminItemRozetkaProperty extends jspb.Message {
 
 export namespace AdminItemRozetkaProperty {
   export type AsObject = {
-    itemId: number,
     propertyId: number,
     propertyName: string,
     propertyValueId: number,

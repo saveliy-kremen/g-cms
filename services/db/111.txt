@@ -4,3 +4,9 @@ GRANT ALL ON DATABASE dbname TO user;
 psql -h localhost dbname username
 create schema schemaname
 SET search_path TO schemaname;
+
+systemctl stop postgresql-12.service systemctl start postgresql-12.service
+SELECT l.*,a.*
+FROM pg_locks l
+JOIN pg_stat_activity a USING (pid)
+WHERE NOT granted;

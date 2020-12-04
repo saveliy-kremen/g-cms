@@ -121,13 +121,10 @@ export class AdminItemGrpcService {
             }))
             request.setRozetkaPropertiesList(data.rozetkaProperties.map(item => {
                 const wrapper = new GRPC.AdminRozetkaItemProperty
-                const id = Object.keys(item)[0]
-                if (item[id]) {
-                    wrapper.setPropertyId(item[id].propertyID)
-                    wrapper.setPropertyName(item[id].propertyName)
-                    wrapper.setPropertyValueId(item[id].propertyValueID)
-                    wrapper.setPropertyValueName(item[id].propertyValueName)
-                }
+                wrapper.setPropertyId(item.propertyID)
+                wrapper.setPropertyName(item.propertyName)
+                wrapper.setPropertyValueId(item.propertyValueID)
+                wrapper.setPropertyValueName(item.propertyValueName)
                 return wrapper
             }))
             this.client.adminEditItem(request, meta, (err: grpcWeb.Error, response: GRPC.AdminItemResponse) => {

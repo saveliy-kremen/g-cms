@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/jackc/pgx/v4"
 	"github.com/sirupsen/logrus"
@@ -28,11 +27,6 @@ import (
 	"gcms/packages/thumbs"
 	"gcms/packages/utils"
 )
-
-// item := models.Item{}
-// fields, pointers := utils.GetDbFields("items", "item", item)
-// spew.Dump(fields)
-// spew.Dump(pointers)
 
 type AdminItemServiceImpl struct {
 }
@@ -275,24 +269,25 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 		logger.Error(err.Error())
 	}
 	for _, propertyValue := range req.Properties {
-		var propertyID uint32
-		row := db.DB.QueryRow(ctx,
-			`SELECT id
+		if propertyValue.Code != "" {
+			var propertyID uint32
+			row := db.DB.QueryRow(ctx,
+				`SELECT id
 			FROM properties
 			WHERE user_id = $1 AND code = $2`,
-			user_id, propertyValue.Code)
-		err := row.Scan(&propertyID)
-		if err == nil {
-			for _, valueID := range propertyValue.PropertyValueIds {
-				db.DB.QueryRow(ctx, `
+				user_id, propertyValue.Code)
+			err := row.Scan(&propertyID)
+			if err == nil {
+				for _, valueID := range propertyValue.PropertyValueIds {
+					db.DB.Exec(ctx, `
 			INSERT INTO items_properties (user_id, item_id, property_id, property_value_id)
 			VALUES ($1, $2, $3, $4)
 			`, user_id, item.ID, propertyID, valueID)
+				}
 			}
 		}
 	}
 
-	spew.Dump(req)
 	//Rozetka Properties
 	_, err = db.DB.Exec(ctx,
 		`DELETE FROM items_rozetka_properties WHERE user_id = $1 AND item_id = $2`,
@@ -301,7 +296,7 @@ func (s *AdminItemServiceImpl) AdminEditItem(ctx context.Context, req *v1.AdminE
 		logger.Error(err.Error())
 	}
 	for _, propertyValue := range req.RozetkaProperties {
-		if propertyValue.PropertyId != 0 && propertyValue.PropertyValueId != 0 {
+		if propertyValue.PropertyId != 0 {
 			_, err := db.DB.Exec(ctx, `
 			INSERT INTO items_rozetka_properties (user_id, item_id, property_id, property_name,
 			property_value_id, property_value_name)

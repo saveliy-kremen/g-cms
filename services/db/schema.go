@@ -203,8 +203,7 @@ CREATE TABLE items_rozetka_properties (
 	property_id int NOT NULL,
 	property_name varchar(256) NOT NULL,
 	property_value_id int NOT NULL,
-	property_value_name varchar(256) NOT NULL,
-	
-	CONSTRAINT items_rozetka_properties_pkey PRIMARY KEY (item_id, property_id)
+	property_value_name varchar(256) NOT NULL
 );
+CREATE INDEX item_id ON items_rozetka_properties(item_id);
 `

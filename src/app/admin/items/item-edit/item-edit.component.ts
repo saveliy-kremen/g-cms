@@ -54,6 +54,7 @@ export class ItemEditComponent implements OnInit {
   rozetkaCategoriesData: any = []
   itemProperties: any = []
   itemRozetkaProperties: any = []
+  itemRozetkaPropertiesValues: any = {}
 
   //Parent
   parent: any
@@ -152,7 +153,6 @@ export class ItemEditComponent implements OnInit {
       if (this.mode == "edit") {
         let res: any = await this.adminItemService.item(Number(this.itemID)).toPromise()
         this.item = res.item
-        console.log(this.item)
         if (this.item.rozetkaCategory.id) {
           this.rozetkaCategoriesData.push({ id: this.item.rozetkaCategory.id, title: this.item.rozetkaCategory.title, full_title: this.item.rozetkaCategory.fullTitle })
           this.rozetkaCategoryID = this.item.rozetkaCategory.id
@@ -256,8 +256,22 @@ export class ItemEditComponent implements OnInit {
       }
       this.itemRozetkaProperties = res.propertiesList
       for (let property of res.propertiesList) {
+        for (let itemRozetkaPropertyValue of property.valuesList) {
+          this.itemRozetkaPropertiesValues[itemRozetkaPropertyValue.id] = {
+            'propertyID': property.id,
+            'propertyName': property.name,
+            'propertyValueID': itemRozetkaPropertyValue.id,
+            'propertyValueName': itemRozetkaPropertyValue.name
+          }
+        }
         let formItem = {};
-        formItem[property.id] = new FormControl();
+        const rozetkaProperty = this.item.rozetkaPropertiesList.filter(item => item.propertyId === property.id)
+        if (rozetkaProperty.length == 0) {
+          formItem[property.id] = new FormControl();
+        } else {
+          const propertyValue = this.item.rozetkaPropertiesList.filter(item => item.propertyId === property.id)[0]
+          formItem[property.id] = new FormControl(propertyValue.propertyValueId)
+        }
         formArray.push(new FormGroup(formItem))
       }
     } catch (err) {
@@ -384,11 +398,18 @@ export class ItemEditComponent implements OnInit {
     this.matcher.changeFormState(true)
     if (this.itemForm.valid) {
       try {
+        let rozetkaPropertyValues = []
+        this.itemForm.value.rozetkaProperties.map(item => {
+          if (Object.values(item)[0]) {
+            rozetkaPropertyValues.push(Object.values(item)[0])
+          }
+        })
+        this.itemForm.value.rozetkaProperties = rozetkaPropertyValues.map(item => this.itemRozetkaPropertiesValues[item])
         this.itemForm.value.id = (this.mode == "edit" || this.mode == "draft") ? Number(this.item.id) : null
         this.itemForm.value.itemImages = this.itemImages
         this.itemForm.value.uploadImages = this.uploadImages
         this.itemForm.value.parentID = this.parentID
-        await this.adminItemService.editItem(this.itemForm.value)
+        await this.adminItemService.editItem(this.itemForm.value).toPromise()
         this.itemFormSubmitted = false
         this.matcher.changeFormState(false)
         this.itemMessage = new Message("success", "")

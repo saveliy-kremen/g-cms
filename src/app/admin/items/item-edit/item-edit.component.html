@@ -175,7 +175,7 @@
                       <mat-select formControlName="{{itemRozetkaProperties[i].id}}"
                         placeholder="{{itemRozetkaProperties[i].name}}" [errorStateMatcher]="matcher">
                         <mat-option>{{"None" | translate}}</mat-option>
-                        <mat-option *ngFor="let value of itemRozetkaProperties[i].valuesList" [value]="value">
+                        <mat-option *ngFor="let value of itemRozetkaProperties[i].valuesList" [value]="value.id">
                           {{value.name}}</mat-option>
                       </mat-select>
                       <mat-error>
@@ -198,8 +198,7 @@
                       <mat-select formControlName="{{itemRozetkaProperties[i].id}}"
                         placeholder="{{itemRozetkaProperties[i].name}}" [errorStateMatcher]="matcher">
                         <mat-option>{{"None" | translate}}</mat-option>
-                        <mat-option *ngFor="let value of itemRozetkaProperties[i].valuesList"
-                          [value]="{'propertyID': itemRozetkaProperties[i].id, 'propertyName': itemRozetkaProperties[i].name, 'propertyValueID': value.id, 'propertyValueName': value.name}">
+                        <mat-option *ngFor="let value of itemRozetkaProperties[i].valuesList" [value]="value.id">
                           {{value.name}}</mat-option>
                       </mat-select>
                       <mat-error>
